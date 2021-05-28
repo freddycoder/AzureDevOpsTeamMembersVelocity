@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31205.134
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOpsTeamMembersVelocity", "AzureDevOpsTeamMembersVelocity\AzureDevOpsTeamMembersVelocity.csproj", "{84938CC3-87BB-420A-A282-DEAD503FE970}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{84938CC3-87BB-420A-A282-DEAD503FE970}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84938CC3-87BB-420A-A282-DEAD503FE970}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84938CC3-87BB-420A-A282-DEAD503FE970}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84938CC3-87BB-420A-A282-DEAD503FE970}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {42FDC10B-0447-470E-92A6-3CD5A87BB480}
+	EndGlobalSection
+EndGlobal
