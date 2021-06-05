@@ -1,8 +1,7 @@
 ﻿using AzureDevOpsTeamMembersVelocity.Model;
 using AzureDevOpsTeamMembersVelocity.Proxy;
+using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Core.WebApi;
-using Microsoft.TeamFoundation.Work.WebApi;
-using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,10 +11,12 @@ namespace AzureDevOpsTeamMembersVelocity.Services
     public class DevOpsService
     {
         private readonly DevOpsProxy _proxy;
+        private readonly ILogger<DevOpsService> _logger;
 
-        public DevOpsService(DevOpsProxy proxy)
+        public DevOpsService(DevOpsProxy proxy, ILogger<DevOpsService> logger)
         {
             _proxy = proxy;
+            _logger = logger;
         }
 
         public async Task<List<TeamProject>> Projects(string organisation)
@@ -23,10 +24,10 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             var list = await _proxy.GetAsync<ListResponse<TeamProject>>(
                 $"https://dev.azure.com/{organisation}/_apis/projects");
 
-            Console.WriteLine(list?.Count);
-            Console.WriteLine(list?.Value);
+            _logger.LogDebug(list?.Count.ToString());
+            _logger.LogDebug(list?.Value?.ToString());
 
-            return list.Value;
+            return list?.Value;
         }
 
         public async Task<List<WebApiTeam>> Teams(string organisation, Guid teamProjectId)
@@ -34,10 +35,10 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             var list = await _proxy.GetAsync<ListResponse<WebApiTeam>>(
                 $"https://dev.azure.com/{organisation}/_apis/projects/{teamProjectId}/teams?api-version=6.0");
 
-            Console.WriteLine(list?.Count);
-            Console.WriteLine(list?.Value);
+            _logger.LogDebug(list?.Count.ToString());
+            _logger.LogDebug(list?.Value?.ToString());
 
-            return list.Value;
+            return list?.Value;
         }
 
         public async Task<List<Sprint>> Sprints(string organization, string project, string team)
@@ -45,8 +46,8 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             var list = await _proxy.GetAsync<ListResponse<Sprint>>(
                 $"https://dev.azure.com/{organization}/{project}/{team}/_apis/work/teamsettings/iterations?api-version=6.0");
 
-            Console.WriteLine(list?.Count);
-            Console.WriteLine(list?.Value);
+            _logger.LogDebug(list?.Count.ToString());
+            _logger.LogDebug(list?.Value?.ToString());
 
             return list?.Value;
         }
@@ -58,20 +59,20 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// <returns>A work item with details</returns>
         public async Task<WorkItems> WorkItems(string sprintUrl)
         {
-            var list = await _proxy.GetAsync<WorkItems>(
+            var workItems = await _proxy.GetAsync<WorkItems>(
                 $"{sprintUrl}/workitems?api-version=6.0-preview.1");
 
-            Console.WriteLine(list?.Url);
-            Console.WriteLine(list?.WorkItemRelations);
+            _logger.LogDebug(workItems?.Url?.ToString());
+            _logger.LogDebug(workItems?.WorkItemRelations?.ToString());
 
-            return list;
+            return workItems;
         }
 
         public async Task<WorkItem> WorkItem(string workItemUrl)
         {
             var workItem = await _proxy.GetAsync<WorkItem>(workItemUrl);
 
-            Console.WriteLine(workItem);
+            _logger.LogDebug(workItem?.ToString());
 
             return workItem;
         }
@@ -80,10 +81,10 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         {
             var list = await _proxy.GetAsync<ListResponse<WorkItemUpdate>>($"{updatesUrl}?api-version=6.0");
 
-            Console.WriteLine(list?.Count);
-            Console.WriteLine(list?.Value);
+            _logger.LogDebug(list?.Count.ToString());
+            _logger.LogDebug(list?.Value?.ToString());
 
-            return list.Value;
+            return list?.Value;
         }
     }
 }

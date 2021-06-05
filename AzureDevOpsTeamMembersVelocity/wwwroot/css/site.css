@@ -48,3 +48,8 @@ a, .btn-link {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+.blazored-modal {
+    overflow: auto !important;
+    max-height: calc(100% - 3.5rem) !important;
+}

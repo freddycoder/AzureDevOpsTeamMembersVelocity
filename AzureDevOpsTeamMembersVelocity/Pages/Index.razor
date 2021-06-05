@@ -20,12 +20,15 @@ Welcome to the team members velocity app.
         <div class="form-group">
             <label for="inputTeamProject">Team Project</label>
             <input id="inputTeamProject" autocomplete="new-password" list="teamProjectSuggestion" @bind="TeamProject" @bind:event="oninput" type="text" class="form-control" aria-describedby="describeTeamProject" placeholder="Team project">
-            <datalist id="teamProjectSuggestion">
-                @foreach (var teamProject in TeamProjects)
-                {
-                    <option value="@teamProject.Name" />
-                }
-            </datalist>
+            @if (TeamProjects != null)
+            {
+                <datalist id="teamProjectSuggestion">
+                    @foreach (var teamProject in TeamProjects)
+                    {
+                        <option value="@teamProject.Name" />
+                    }
+                </datalist>
+            }
             <small id="describeTeamProject" class="form-text text-muted">dev.azure.com/@Organisation/_apis/projects/{team-project}</small>
         </div>
         <div class="form-group">

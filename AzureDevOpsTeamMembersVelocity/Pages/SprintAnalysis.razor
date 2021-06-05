@@ -1,37 +1,51 @@
 ﻿@page "/SprintAnalysis"
 @inject NavigationManager NavManager
-@inject DevOpsService DevOpsService
+@inject VelocityService VelocityService
 
 <h3>SprintAnalysis</h3>
 
-@if (WorkItems != null)
+@if (MembersVelocities != null)
 {
-    <table class="table table-hover table-striped table-responsive">
+    <table class="table table-striped table-hover table-responsive-md">
         <thead>
             <tr>
-                <th>Type</th>
-                <th>Title</th>
-                <th>Assigned to</th>
+                <th>Person</th>
+                <th>Hours of work done</th>
+                <th>Estimated Capacity</th>
+                <th>Real capacity</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var workItem in WorkItems)
+            @for (int i = 0; i < MembersVelocities.Count; i++)
             {
+                var updates = @MembersVelocities[i].Updates;
+
                 <tr>
-                    <td>@workItem.Fields?.MaybeGet("System.WorkItemType")</td>
-                    <td>@workItem.Fields?.MaybeGet("System.Title")</td>
-                    <td>@workItem.Fields?.MaybeGet("System.AssignedTo")</td>
-                    <td></td>
+                    <td>@MembersVelocities[i].DisplayName</td>
+                    <td>@MembersVelocities[i].HoursOfWorkDone</td>
+                    <td>@MembersVelocities[i].CapacitySaved</td>
+                    <td>@MembersVelocities[i].RealCapacity</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="() => ShowUpdates(updates)">Show history</button>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
 }
+else
+{
+    <div>
+        <p>Loading ...</p>
+    </div>
+}
 
 @code {
-    public List<WorkItem> WorkItems { get; set; } = new();
+    [CascadingParameter]
+    public IModalService Modal { get; set; }
 
-    public List<List<WorkItemUpdate>> WorkItemUpdates { get; set; } = new();
+    public List<MemberVelocity> MembersVelocities { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -39,44 +53,16 @@
 
         if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("sprints", out var sprintUrl))
         {
-            var items = (await DevOpsService.WorkItems(sprintUrl.ToString())).WorkItemRelations;
-
-            var workItems = new List<WorkItem>(items.Count);
-
-            var workItemUpdates = new List<List<WorkItemUpdate>>(items.Count);
-
-            foreach (var item in items)
-            {
-                var result = await GetWorkItem(item);
-
-                if (result != null)
-                {
-                    workItems.Add(result);
-
-                    if (result.Links != null)
-                    {
-                        workItemUpdates.Add(await GetWorkItemUpdate(result.Links.Links.Get<object>("workItemUpdates")));
-                    }
-                }
-            }
-
-            WorkItems = workItems;
-            WorkItemUpdates = workItemUpdates;
+            MembersVelocities = await VelocityService.MemberVelocities(sprintUrl);
         }
     }
 
-    public async Task<WorkItem>GetWorkItem(WorkItemLink workItem)
+    private void ShowUpdates(List<WorkItemUpdate> updates)
     {
-        if (workItem.Source != null && workItem.Target != null)
-        {
-            return await DevOpsService.WorkItem(workItem.Target.Url);
-        }
+        var parameters = new ModalParameters();
 
-        return null;
-    }
+        parameters.Add("Updates", updates);
 
-    public async Task<List<WorkItemUpdate>> GetWorkItemUpdate(object updatesLink)
-    {
-        return await DevOpsService.Updates(updatesLink.ToString());
+        Modal.Show<PersonHistoryModal>("Update history", parameters);
     }
 }

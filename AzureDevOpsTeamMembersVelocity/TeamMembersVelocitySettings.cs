@@ -1,5 +1,8 @@
 ﻿namespace AzureDevOpsTeamMembersVelocity
 {
+    /// <summary>
+    /// This is the main configuration of the appé Those settings can be saved on disc.
+    /// </summary>
     public class TeamMembersVelocitySettings
     {
         public string Organisation { get; set; }

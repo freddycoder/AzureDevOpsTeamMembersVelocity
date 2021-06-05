@@ -1,11 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -18,9 +15,11 @@ namespace AzureDevOpsTeamMembersVelocity
         {
             var host = CreateHostBuilder(args).Build();
 
+            var logger = host.Services.GetRequiredService<ILogger<Program>>();
+
             if (File.Exists("AzureDevOpsTeamMemberVelocity.json"))
             {
-                Console.WriteLine("Load settings from file : AzureDevOpsTeamMemberVelocity.json");
+                logger.LogInformation("Load settings from file : AzureDevOpsTeamMemberVelocity.json");
 
                 var settings = host.Services.GetRequiredService<TeamMembersVelocitySettings>();
 
@@ -34,7 +33,7 @@ namespace AzureDevOpsTeamMembersVelocity
             }
             else
             {
-                Console.WriteLine("No settings found : AzureDevOpsTeamMemberVelocity.json");
+                logger.LogInformation("No settings found : AzureDevOpsTeamMemberVelocity.json");
             }
 
             host.Run();
@@ -46,5 +45,12 @@ namespace AzureDevOpsTeamMembersVelocity
                 {
                     webBuilder.UseStartup<Startup>();
                 });
+
+        public static readonly JsonSerializerOptions SerializerOptions = new()
+        {
+            PropertyNameCaseInsensitive = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            WriteIndented = true
+        };
     }
 }

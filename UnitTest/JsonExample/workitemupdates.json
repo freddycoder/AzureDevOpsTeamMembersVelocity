@@ -1,0 +1,512 @@
+{
+    "count": 7,
+    "value": [
+        {
+            "id": 1,
+            "workItemId": 4,
+            "rev": 1,
+            "revisedBy": {
+                "id": "1c342682-fda8-6ec1-92f5-c293d698ed07",
+                "name": "John Doe <john.doe@johdoe.com>",
+                "displayName": "John Doe",
+                "url": "https://spsprodcca1.vssps.visualstudio.com/A0d6f4446-b305-4e20-a1e6-6b05b24f5910/_apis/Identities/1c342682-fda8-6ec1-92f5-c293d698ed07",
+                "_links": {
+                    "avatar": {
+                        "href": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+                    }
+                },
+                "uniqueName": "john.doe@johdoe.com",
+                "imageUrl": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3",
+                "descriptor": "aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+            },
+            "revisedDate": "2021-06-05T00:50:52.65Z",
+            "fields": {
+                "System.Id": {
+                    "newValue": 4
+                },
+                "System.AreaId": {
+                    "newValue": 2
+                },
+                "System.NodeName": {
+                    "newValue": "TeamMembersVelocity"
+                },
+                "System.AreaLevel1": {
+                    "newValue": "TeamMembersVelocity"
+                },
+                "System.Rev": {
+                    "newValue": 1
+                },
+                "System.AuthorizedDate": {
+                    "newValue": "2021-06-05T00:50:48.627Z"
+                },
+                "System.RevisedDate": {
+                    "newValue": "2021-06-05T00:50:52.65Z"
+                },
+                "System.IterationId": {
+                    "newValue": 3
+                },
+                "System.IterationLevel1": {
+                    "newValue": "TeamMembersVelocity"
+                },
+                "System.IterationLevel2": {
+                    "newValue": "Sprint 1"
+                },
+                "System.WorkItemType": {
+                    "newValue": "Task"
+                },
+                "System.State": {
+                    "newValue": "To Do"
+                },
+                "System.Reason": {
+                    "newValue": "Added to backlog"
+                },
+                "System.AssignedTo": {
+                },
+                "System.CreatedDate": {
+                    "newValue": "2021-06-05T00:50:48.627Z"
+                },
+                "System.CreatedBy": {
+                    "newValue": {
+                        "displayName": "John Doe",
+                        "url": "https://spsprodcca1.vssps.visualstudio.com/A0d6f4446-b305-4e20-a1e6-6b05b24f5910/_apis/Identities/1c342682-fda8-6ec1-92f5-c293d698ed07",
+                        "_links": {
+                            "avatar": {
+                                "href": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+                            }
+                        },
+                        "id": "1c342682-fda8-6ec1-92f5-c293d698ed07",
+                        "uniqueName": "john.doe@johdoe.com",
+                        "imageUrl": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3",
+                        "descriptor": "aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+                    }
+                },
+                "System.ChangedDate": {
+                    "newValue": "2021-06-05T00:50:48.627Z"
+                },
+                "System.ChangedBy": {
+                    "newValue": {
+                        "displayName": "John Doe",
+                        "url": "https://spsprodcca1.vssps.visualstudio.com/A0d6f4446-b305-4e20-a1e6-6b05b24f5910/_apis/Identities/1c342682-fda8-6ec1-92f5-c293d698ed07",
+                        "_links": {
+                            "avatar": {
+                                "href": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+                            }
+                        },
+                        "id": "1c342682-fda8-6ec1-92f5-c293d698ed07",
+                        "uniqueName": "john.doe@johdoe.com",
+                        "imageUrl": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3",
+                        "descriptor": "aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+                    }
+                },
+                "System.AuthorizedAs": {
+                    "newValue": {
+                        "displayName": "John Doe",
+                        "url": "https://spsprodcca1.vssps.visualstudio.com/A0d6f4446-b305-4e20-a1e6-6b05b24f5910/_apis/Identities/1c342682-fda8-6ec1-92f5-c293d698ed07",
+                        "_links": {
+                            "avatar": {
+                                "href": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+                            }
+                        },
+                        "id": "1c342682-fda8-6ec1-92f5-c293d698ed07",
+                        "uniqueName": "john.doe@johdoe.com",
+                        "imageUrl": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3",
+                        "descriptor": "aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+                    }
+                },
+                "System.PersonId": {
+                    "newValue": 138132843
+                },
+                "System.Watermark": {
+                    "newValue": 8
+                },
+                "System.IsDeleted": {
+                    "newValue": false
+                },
+                "System.CommentCount": {
+                    "newValue": 0
+                },
+                "System.TeamProject": {
+                    "newValue": "TeamMembersVelocity"
+                },
+                "System.AreaPath": {
+                    "newValue": "TeamMembersVelocity"
+                },
+                "System.IterationPath": {
+                    "newValue": "TeamMembersVelocity\\Sprint 1"
+                },
+                "System.Title": {
+                    "newValue": "I'm done !!!"
+                },
+                "Microsoft.VSTS.Common.Priority": {
+                    "newValue": 2
+                },
+                "Microsoft.VSTS.Common.StateChangeDate": {
+                    "newValue": "2021-06-05T00:50:48.627Z"
+                },
+                "System.Parent": {
+                    "newValue": 1
+                }
+            },
+            "relations": {
+                "added": [
+                    {
+                        "rel": "System.LinkTypes.Hierarchy-Reverse",
+                        "url": "https://dev.azure.com/johndoe/74320073-199c-4b53-81ff-37671a8d42a9/_apis/wit/workItems/1",
+                        "attributes": {
+                            "isLocked": false,
+                            "name": "Parent"
+                        }
+                    }
+                ]
+            },
+            "url": "https://dev.azure.com/johndoe/74320073-199c-4b53-81ff-37671a8d42a9/_apis/wit/workItems/4/updates/1"
+        },
+        {
+            "id": 2,
+            "workItemId": 4,
+            "rev": 2,
+            "revisedBy": {
+                "id": "1c342682-fda8-6ec1-92f5-c293d698ed07",
+                "name": "John Doe <john.doe@johdoe.com>",
+                "displayName": "John Doe",
+                "url": "https://spsprodcca1.vssps.visualstudio.com/A0d6f4446-b305-4e20-a1e6-6b05b24f5910/_apis/Identities/1c342682-fda8-6ec1-92f5-c293d698ed07",
+                "_links": {
+                    "avatar": {
+                        "href": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+                    }
+                },
+                "uniqueName": "john.doe@johdoe.com",
+                "imageUrl": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3",
+                "descriptor": "aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+            },
+            "revisedDate": "2021-06-05T00:50:54.637Z",
+            "fields": {
+                "System.Rev": {
+                    "oldValue": 1,
+                    "newValue": 2
+                },
+                "System.AuthorizedDate": {
+                    "oldValue": "2021-06-05T00:50:48.627Z",
+                    "newValue": "2021-06-05T00:50:52.65Z"
+                },
+                "System.RevisedDate": {
+                    "oldValue": "2021-06-05T00:50:52.65Z",
+                    "newValue": "2021-06-05T00:50:54.637Z"
+                },
+                "System.ChangedDate": {
+                    "oldValue": "2021-06-05T00:50:48.627Z",
+                    "newValue": "2021-06-05T00:50:52.65Z"
+                },
+                "System.Watermark": {
+                    "oldValue": 8,
+                    "newValue": 9
+                },
+                "Microsoft.VSTS.Scheduling.RemainingWork": {
+                    "newValue": 15.0
+                }
+            },
+            "url": "https://dev.azure.com/johndoe/74320073-199c-4b53-81ff-37671a8d42a9/_apis/wit/workItems/4/updates/2"
+        },
+        {
+            "id": 3,
+            "workItemId": 4,
+            "rev": 3,
+            "revisedBy": {
+                "id": "1c342682-fda8-6ec1-92f5-c293d698ed07",
+                "name": "John Doe <john.doe@johdoe.com>",
+                "displayName": "John Doe",
+                "url": "https://spsprodcca1.vssps.visualstudio.com/A0d6f4446-b305-4e20-a1e6-6b05b24f5910/_apis/Identities/1c342682-fda8-6ec1-92f5-c293d698ed07",
+                "_links": {
+                    "avatar": {
+                        "href": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+                    }
+                },
+                "uniqueName": "john.doe@johdoe.com",
+                "imageUrl": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3",
+                "descriptor": "aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+            },
+            "revisedDate": "2021-06-05T00:50:57.983Z",
+            "fields": {
+                "System.Rev": {
+                    "oldValue": 2,
+                    "newValue": 3
+                },
+                "System.AuthorizedDate": {
+                    "oldValue": "2021-06-05T00:50:52.65Z",
+                    "newValue": "2021-06-05T00:50:54.637Z"
+                },
+                "System.RevisedDate": {
+                    "oldValue": "2021-06-05T00:50:54.637Z",
+                    "newValue": "2021-06-05T00:50:57.983Z"
+                },
+                "System.State": {
+                    "oldValue": "To Do",
+                    "newValue": "Doing"
+                },
+                "System.Reason": {
+                    "oldValue": "Added to backlog",
+                    "newValue": "Started"
+                },
+                "System.ChangedDate": {
+                    "oldValue": "2021-06-05T00:50:52.65Z",
+                    "newValue": "2021-06-05T00:50:54.637Z"
+                },
+                "System.Watermark": {
+                    "oldValue": 9,
+                    "newValue": 10
+                },
+                "Microsoft.VSTS.Common.ActivatedDate": {
+                    "newValue": "2021-06-05T00:50:54.637Z"
+                },
+                "Microsoft.VSTS.Common.ActivatedBy": {
+                    "newValue": {
+                        "displayName": "John Doe",
+                        "url": "https://spsprodcca1.vssps.visualstudio.com/A0d6f4446-b305-4e20-a1e6-6b05b24f5910/_apis/Identities/1c342682-fda8-6ec1-92f5-c293d698ed07",
+                        "_links": {
+                            "avatar": {
+                                "href": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+                            }
+                        },
+                        "id": "1c342682-fda8-6ec1-92f5-c293d698ed07",
+                        "uniqueName": "john.doe@johdoe.com",
+                        "imageUrl": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3",
+                        "descriptor": "aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+                    }
+                },
+                "Microsoft.VSTS.Common.StateChangeDate": {
+                    "oldValue": "2021-06-05T00:50:48.627Z",
+                    "newValue": "2021-06-05T00:50:54.637Z"
+                }
+            },
+            "url": "https://dev.azure.com/johndoe/74320073-199c-4b53-81ff-37671a8d42a9/_apis/wit/workItems/4/updates/3"
+        },
+        {
+            "id": 4,
+            "workItemId": 4,
+            "rev": 4,
+            "revisedBy": {
+                "id": "1c342682-fda8-6ec1-92f5-c293d698ed07",
+                "name": "John Doe <john.doe@johdoe.com>",
+                "displayName": "John Doe",
+                "url": "https://spsprodcca1.vssps.visualstudio.com/A0d6f4446-b305-4e20-a1e6-6b05b24f5910/_apis/Identities/1c342682-fda8-6ec1-92f5-c293d698ed07",
+                "_links": {
+                    "avatar": {
+                        "href": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+                    }
+                },
+                "uniqueName": "john.doe@johdoe.com",
+                "imageUrl": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3",
+                "descriptor": "aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+            },
+            "revisedDate": "2021-06-05T00:51:07.36Z",
+            "fields": {
+                "System.Rev": {
+                    "oldValue": 3,
+                    "newValue": 4
+                },
+                "System.AuthorizedDate": {
+                    "oldValue": "2021-06-05T00:50:54.637Z",
+                    "newValue": "2021-06-05T00:50:57.983Z"
+                },
+                "System.RevisedDate": {
+                    "oldValue": "2021-06-05T00:50:57.983Z",
+                    "newValue": "2021-06-05T00:51:07.36Z"
+                },
+                "System.AssignedTo": {
+                    "newValue": {
+                        "displayName": "John Doe",
+                        "url": "https://spsprodcca1.vssps.visualstudio.com/A0d6f4446-b305-4e20-a1e6-6b05b24f5910/_apis/Identities/1c342682-fda8-6ec1-92f5-c293d698ed07",
+                        "_links": {
+                            "avatar": {
+                                "href": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+                            }
+                        },
+                        "id": "1c342682-fda8-6ec1-92f5-c293d698ed07",
+                        "uniqueName": "john.doe@johdoe.com",
+                        "imageUrl": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3",
+                        "descriptor": "aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+                    }
+                },
+                "System.ChangedDate": {
+                    "oldValue": "2021-06-05T00:50:54.637Z",
+                    "newValue": "2021-06-05T00:50:57.983Z"
+                },
+                "System.Watermark": {
+                    "oldValue": 10,
+                    "newValue": 11
+                }
+            },
+            "url": "https://dev.azure.com/johndoe/74320073-199c-4b53-81ff-37671a8d42a9/_apis/wit/workItems/4/updates/4"
+        },
+        {
+            "id": 5,
+            "workItemId": 4,
+            "rev": 5,
+            "revisedBy": {
+                "id": "1c342682-fda8-6ec1-92f5-c293d698ed07",
+                "name": "John Doe <john.doe@johdoe.com>",
+                "displayName": "John Doe",
+                "url": "https://spsprodcca1.vssps.visualstudio.com/A0d6f4446-b305-4e20-a1e6-6b05b24f5910/_apis/Identities/1c342682-fda8-6ec1-92f5-c293d698ed07",
+                "_links": {
+                    "avatar": {
+                        "href": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+                    }
+                },
+                "uniqueName": "john.doe@johdoe.com",
+                "imageUrl": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3",
+                "descriptor": "aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+            },
+            "revisedDate": "2021-06-05T00:51:12.873Z",
+            "fields": {
+                "System.Rev": {
+                    "oldValue": 4,
+                    "newValue": 5
+                },
+                "System.AuthorizedDate": {
+                    "oldValue": "2021-06-05T00:50:57.983Z",
+                    "newValue": "2021-06-05T00:51:07.36Z"
+                },
+                "System.RevisedDate": {
+                    "oldValue": "2021-06-05T00:51:07.36Z",
+                    "newValue": "2021-06-05T00:51:12.873Z"
+                },
+                "System.ChangedDate": {
+                    "oldValue": "2021-06-05T00:50:57.983Z",
+                    "newValue": "2021-06-05T00:51:07.36Z"
+                },
+                "System.Watermark": {
+                    "oldValue": 11,
+                    "newValue": 12
+                },
+                "Microsoft.VSTS.Scheduling.RemainingWork": {
+                    "oldValue": 15.0,
+                    "newValue": 10.0
+                }
+            },
+            "url": "https://dev.azure.com/johndoe/74320073-199c-4b53-81ff-37671a8d42a9/_apis/wit/workItems/4/updates/5"
+        },
+        {
+            "id": 6,
+            "workItemId": 4,
+            "rev": 6,
+            "revisedBy": {
+                "id": "1c342682-fda8-6ec1-92f5-c293d698ed07",
+                "name": "John Doe <john.doe@johdoe.com>",
+                "displayName": "John Doe",
+                "url": "https://spsprodcca1.vssps.visualstudio.com/A0d6f4446-b305-4e20-a1e6-6b05b24f5910/_apis/Identities/1c342682-fda8-6ec1-92f5-c293d698ed07",
+                "_links": {
+                    "avatar": {
+                        "href": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+                    }
+                },
+                "uniqueName": "john.doe@johdoe.com",
+                "imageUrl": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3",
+                "descriptor": "aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+            },
+            "revisedDate": "2021-06-05T00:51:16.517Z",
+            "fields": {
+                "System.Rev": {
+                    "oldValue": 5,
+                    "newValue": 6
+                },
+                "System.AuthorizedDate": {
+                    "oldValue": "2021-06-05T00:51:07.36Z",
+                    "newValue": "2021-06-05T00:51:12.873Z"
+                },
+                "System.RevisedDate": {
+                    "oldValue": "2021-06-05T00:51:12.873Z",
+                    "newValue": "2021-06-05T00:51:16.517Z"
+                },
+                "System.ChangedDate": {
+                    "oldValue": "2021-06-05T00:51:07.36Z",
+                    "newValue": "2021-06-05T00:51:12.873Z"
+                },
+                "System.Watermark": {
+                    "oldValue": 12,
+                    "newValue": 13
+                },
+                "Microsoft.VSTS.Scheduling.RemainingWork": {
+                    "oldValue": 10.0,
+                    "newValue": 6.0
+                }
+            },
+            "url": "https://dev.azure.com/johndoe/74320073-199c-4b53-81ff-37671a8d42a9/_apis/wit/workItems/4/updates/6"
+        },
+        {
+            "id": 7,
+            "workItemId": 4,
+            "rev": 7,
+            "revisedBy": {
+                "id": "1c342682-fda8-6ec1-92f5-c293d698ed07",
+                "name": "John Doe <john.doe@johdoe.com>",
+                "displayName": "John Doe",
+                "url": "https://spsprodcca1.vssps.visualstudio.com/A0d6f4446-b305-4e20-a1e6-6b05b24f5910/_apis/Identities/1c342682-fda8-6ec1-92f5-c293d698ed07",
+                "_links": {
+                    "avatar": {
+                        "href": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+                    }
+                },
+                "uniqueName": "john.doe@johdoe.com",
+                "imageUrl": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3",
+                "descriptor": "aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+            },
+            "revisedDate": "9999-01-01T00:00:00Z",
+            "fields": {
+                "System.Rev": {
+                    "oldValue": 6,
+                    "newValue": 7
+                },
+                "System.AuthorizedDate": {
+                    "oldValue": "2021-06-05T00:51:12.873Z",
+                    "newValue": "2021-06-05T00:51:16.517Z"
+                },
+                "System.RevisedDate": {
+                    "oldValue": "2021-06-05T00:51:16.517Z",
+                    "newValue": "9999-01-01T00:00:00Z"
+                },
+                "System.State": {
+                    "oldValue": "Doing",
+                    "newValue": "Done"
+                },
+                "System.Reason": {
+                    "oldValue": "Started",
+                    "newValue": "Completed"
+                },
+                "System.ChangedDate": {
+                    "oldValue": "2021-06-05T00:51:12.873Z",
+                    "newValue": "2021-06-05T00:51:16.517Z"
+                },
+                "System.Watermark": {
+                    "oldValue": 13,
+                    "newValue": 14
+                },
+                "Microsoft.VSTS.Scheduling.RemainingWork": {
+                    "oldValue": 6.0
+                },
+                "Microsoft.VSTS.Common.StateChangeDate": {
+                    "oldValue": "2021-06-05T00:50:54.637Z",
+                    "newValue": "2021-06-05T00:51:16.517Z"
+                },
+                "Microsoft.VSTS.Common.ClosedDate": {
+                    "newValue": "2021-06-05T00:51:16.517Z"
+                },
+                "Microsoft.VSTS.Common.ClosedBy": {
+                    "newValue": {
+                        "displayName": "John Doe",
+                        "url": "https://spsprodcca1.vssps.visualstudio.com/A0d6f4446-b305-4e20-a1e6-6b05b24f5910/_apis/Identities/1c342682-fda8-6ec1-92f5-c293d698ed07",
+                        "_links": {
+                            "avatar": {
+                                "href": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+                            }
+                        },
+                        "id": "1c342682-fda8-6ec1-92f5-c293d698ed07",
+                        "uniqueName": "john.doe@johdoe.com",
+                        "imageUrl": "https://dev.azure.com/johndoe/_apis/GraphProfile/MemberAvatars/aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3",
+                        "descriptor": "aad.MWMzNDI2ODItZmRhOC03ZWMxLTkyZjUtYzI5M2Q2OThlZDA3"
+                    }
+                }
+            },
+            "url": "https://dev.azure.com/johndoe/74320073-199c-4b53-81ff-37671a8d42a9/_apis/wit/workItems/4/updates/7"
+        }
+    ]
+}
