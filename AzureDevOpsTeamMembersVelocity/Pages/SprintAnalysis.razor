@@ -29,6 +29,20 @@
                 <dd>@Sprint.Attributes?.TimeFrame</dd>
             </dl>
         </div>
+        <div class="col-md-4">
+            <dl>
+                <dt>Total days</dt>
+                <dd>@Sprint.GetTotalDays()</dd>
+            </dl>
+
+            @if (TeamSettings != null)
+            {
+                <dl>
+                    <dt>Total working days</dt>
+                    <dd>@Sprint.GetTotalWorkingDays(TeamSettings.WorkingDays, TeamDaysOff)</dd>
+                </dl>
+            }
+        </div>
     </div>
 }
 else
@@ -41,6 +55,8 @@ else
 
 @if (MembersVelocities != null)
 {
+    <h3>Velocity table</h3>
+
     <table class="table table-striped table-hover table-responsive-md">
         <thead>
             <tr>
@@ -82,6 +98,10 @@ else
 
     public Sprint Sprint { get; set; }
 
+    public TeamSettings TeamSettings { get; set; }
+
+    public TeamDaysOff TeamDaysOff { get; set; }
+
     public List<MemberVelocity> MembersVelocities { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -103,11 +123,16 @@ else
                     capacities = await DevOpsService.Capacities(Sprint.Links.Capacity.Href);
                 }
 
-                TeamDaysOff teamDaysOff = default;
-
                 if (string.IsNullOrWhiteSpace(Sprint.Links?.TeamDaysOff?.Href) == false)
                 {
-                    teamDaysOff = await DevOpsService.TeamDaysOff(Sprint.Links.TeamDaysOff.Href);
+                    TeamDaysOff = await DevOpsService.TeamDaysOff(Sprint.Links.TeamDaysOff.Href);
+                }
+
+                if (string.IsNullOrWhiteSpace(Sprint.Links?.TeamSettings?.Href) == false)
+                {
+                    TeamSettings = await DevOpsService.TeamSettings(Sprint.Links.TeamSettings.Href);
+
+                    if (TeamSettings != null) StateHasChanged();
                 }
 
                 var membersVelocities = await VelocityService.MemberVelocities(sprintUrl);
@@ -125,13 +150,10 @@ else
                                 Sprint.Attributes.StartDate < DateTimeOffset.Now &&
                                 Sprint.Attributes?.FinishDate != null)
                             {
-                                var nbDayOfWork = (Sprint.Attributes.FinishDate - Sprint.Attributes.StartDate).Value.TotalDays;
+                                var nbDayOfWork = TeamSettings != null ? Sprint.GetTotalWorkingDays(TeamSettings.WorkingDays, TeamDaysOff) : Sprint.GetTotalDays();
 
                                 if (capacity.DaysOff?.Any() == true)
                                     nbDayOfWork -= capacity.DaysOff.Select(d => (d.End - d.Start).TotalDays).Sum();
-
-                                if (teamDaysOff?.DaysOff?.Any() == true) 
-                                    nbDayOfWork -= nbDayOfWork - teamDaysOff.DaysOff.Select(d => (d.End - d.Start).TotalDays).Sum();
 
                                 if (nbDayOfWork != 0)
                                     velocity.RealCapacity = velocity.HoursOfWorkDone / nbDayOfWork;

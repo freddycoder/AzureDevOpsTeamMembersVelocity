@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -46,11 +45,20 @@ namespace AzureDevOpsTeamMembersVelocity
                     webBuilder.UseStartup<Startup>();
                 });
 
-        public static readonly JsonSerializerOptions SerializerOptions = new()
+        public static readonly JsonSerializerOptions SerializerOptions = InitSettings();
+
+        private static JsonSerializerOptions InitSettings()
         {
-            PropertyNameCaseInsensitive = true,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            WriteIndented = true
-        };
+            var settings = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                WriteIndented = true
+            };
+
+            settings.Converters.Add(new JsonStringEnumConverter());
+
+            return settings;
+        }
     }
 }

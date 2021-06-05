@@ -11,7 +11,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var update in Updates)
+                @foreach (var update in Updates.OrderBy(u => u))
                 {
                 <tr>
                     <td>@update.RelatedTaskTitle</td>

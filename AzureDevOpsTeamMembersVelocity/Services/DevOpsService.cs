@@ -51,6 +51,16 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             return teamDaysOff;
         }
 
+        public async Task<TeamSettings> TeamSettings(string teamSettingsUrl)
+        {
+            var teamSettings = await _proxy.GetAsync<TeamSettings>(
+                $"{teamSettingsUrl}?api-version=6.0");
+
+            _logger.LogDebug(teamSettings?.ToString());
+
+            return teamSettings;
+        }
+
         public async Task<List<Sprint>> Sprints(string organization, string project, string team)
         {
             var list = await _proxy.GetAsync<ListResponse<Sprint>>(
