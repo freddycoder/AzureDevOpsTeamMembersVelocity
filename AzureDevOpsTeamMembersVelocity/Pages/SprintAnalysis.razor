@@ -150,7 +150,7 @@ else
                                 Sprint.Attributes.StartDate < DateTimeOffset.Now &&
                                 Sprint.Attributes?.FinishDate != null)
                             {
-                                var nbDayOfWork = TeamSettings != null ? Sprint.GetTotalWorkingDays(TeamSettings.WorkingDays, TeamDaysOff) : Sprint.GetTotalDays();
+                                var nbDayOfWork = Sprint.GetTotalWorkingDays(TeamSettings?.WorkingDays, TeamDaysOff);
 
                                 if (capacity.DaysOff?.Any() == true)
                                     nbDayOfWork -= capacity.DaysOff.Select(d => (d.End - d.Start).TotalDays).Sum();

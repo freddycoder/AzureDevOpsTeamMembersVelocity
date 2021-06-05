@@ -22,6 +22,36 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
             _logger = logger;
         }
 
+        public async Task<string> GetAsync(string fullUrl)
+        {
+            _logger.LogInformation($"Try fetch {fullUrl}");
+
+            try
+            {
+                var personalaccesstoken = _appSettings.ApiKey;
+
+                using HttpClient client = new();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+                    Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(string.Format("{0}:{1}", "", personalaccesstoken))));
+                await TimeConstrainte;
+                using HttpResponseMessage response = await client.GetAsync(fullUrl);
+                response.EnsureSuccessStatusCode();
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+                _logger.LogDebug(responseBody);
+
+                return responseBody;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex, ex.Message);
+            }
+
+            return default;
+        }
+
         public async Task<T> GetAsync<T>(string fullUrl)
         {
             _logger.LogInformation($"Try fetch {fullUrl}");

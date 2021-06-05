@@ -53,3 +53,7 @@ a, .btn-link {
     overflow: auto !important;
     max-height: calc(100% - 3.5rem) !important;
 }
+
+.text {
+    white-space: pre-wrap;
+}
