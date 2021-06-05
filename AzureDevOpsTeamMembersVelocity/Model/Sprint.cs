@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace AzureDevOpsTeamMembersVelocity.Model
 {
@@ -10,7 +8,10 @@ namespace AzureDevOpsTeamMembersVelocity.Model
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string Path { get; set; }
-        public SprintAttribute Attribute { get; set; }
+        public SprintAttribute Attributes { get; set; }
         public string Url { get; set; }
+
+        [JsonPropertyName("_links")]
+        public SprintLinks Links { get; set; }
     }
 }

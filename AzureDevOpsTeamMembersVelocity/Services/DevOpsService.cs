@@ -41,6 +41,16 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             return list?.Value;
         }
 
+        public async Task<TeamDaysOff> TeamDaysOff(string teamIterationDaysOffUrl)
+        {
+            var teamDaysOff = await _proxy.GetAsync<TeamDaysOff>(
+                $"{teamIterationDaysOffUrl}?api-version=6.0");
+
+            _logger.LogDebug(teamDaysOff?.ToString());
+
+            return teamDaysOff;
+        }
+
         public async Task<List<Sprint>> Sprints(string organization, string project, string team)
         {
             var list = await _proxy.GetAsync<ListResponse<Sprint>>(
@@ -50,6 +60,26 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             _logger.LogDebug(list?.Value?.ToString());
 
             return list?.Value;
+        }
+
+        public async Task<Sprint> Sprint(string sprintUrl)
+        {
+            var sprint = await _proxy.GetAsync<Sprint>($"{sprintUrl}?api-version=6.0");
+
+            _logger.LogDebug(sprint?.ToString());
+
+            return sprint;
+        }
+
+        public async Task<List<Capacity>> Capacities(string capacityUrl)
+        {
+            var capacity = await _proxy.GetAsync<ListResponse<Capacity>>(
+                $"{capacityUrl}?api-version=6.0");
+
+            _logger.LogDebug(capacity?.Count.ToString());
+            _logger.LogDebug(capacity?.Value?.ToString());
+
+            return capacity?.Value;
         }
 
         /// <summary>

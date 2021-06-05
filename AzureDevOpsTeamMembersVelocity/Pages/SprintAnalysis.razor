@@ -1,8 +1,43 @@
 ﻿@page "/SprintAnalysis"
 @inject NavigationManager NavManager
 @inject VelocityService VelocityService
+@inject DevOpsService DevOpsService
 
 <h3>SprintAnalysis</h3>
+
+@if (Sprint != null)
+{
+    <div class="row">
+        <div class="col-md-4">
+            <dl>
+                <dt>Name</dt>
+                <dd>@Sprint.Name</dd>
+
+                <dt>Path</dt>
+                <dd>@Sprint.Path</dd>
+            </dl>
+        </div>
+        <div class="col-md-4">
+            <dl>
+                <dt>Start date</dt>
+                <dd>@Sprint.Attributes?.StartDate</dd>
+
+                <dt>Finish date</dt>
+                <dd>@Sprint.Attributes?.FinishDate</dd>
+
+                <dt>Timeframe</dt>
+                <dd>@Sprint.Attributes?.TimeFrame</dd>
+            </dl>
+        </div>
+    </div>
+}
+else
+{
+    <div>
+        <p>Loading sprint information...</p>
+    </div>
+}
+
 
 @if (MembersVelocities != null)
 {
@@ -25,7 +60,7 @@
                     <td>@MembersVelocities[i].DisplayName</td>
                     <td>@MembersVelocities[i].HoursOfWorkDone</td>
                     <td>@MembersVelocities[i].CapacitySaved</td>
-                    <td>@MembersVelocities[i].RealCapacity</td>
+                    <td>@MembersVelocities[i].RealCapacity.ToString("F2")</td>
                     <td>
                         <button class="btn btn-primary" @onclick="() => ShowUpdates(updates)">Show history</button>
                     </td>
@@ -37,13 +72,15 @@
 else
 {
     <div>
-        <p>Loading ...</p>
+        <p>Building velocity table ...</p>
     </div>
 }
 
 @code {
     [CascadingParameter]
     public IModalService Modal { get; set; }
+
+    public Sprint Sprint { get; set; }
 
     public List<MemberVelocity> MembersVelocities { get; set; }
 
@@ -53,7 +90,58 @@ else
 
         if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("sprints", out var sprintUrl))
         {
-            MembersVelocities = await VelocityService.MemberVelocities(sprintUrl);
+            Sprint = await DevOpsService.Sprint(sprintUrl);
+
+            StateHasChanged();
+
+            if (Sprint != null)
+            {
+                List<Capacity> capacities = default;
+
+                if (string.IsNullOrWhiteSpace(Sprint.Links?.Capacity?.Href) == false)
+                {
+                    capacities = await DevOpsService.Capacities(Sprint.Links.Capacity.Href);
+                }
+
+                TeamDaysOff teamDaysOff = default;
+
+                if (string.IsNullOrWhiteSpace(Sprint.Links?.TeamDaysOff?.Href) == false)
+                {
+                    teamDaysOff = await DevOpsService.TeamDaysOff(Sprint.Links.TeamDaysOff.Href);
+                }
+
+                var membersVelocities = await VelocityService.MemberVelocities(sprintUrl);
+
+                if (capacities != default)
+                {
+                    foreach (var capacity in capacities)
+                    {
+                        if (membersVelocities.TryGetValue(capacity.TeamMember.DisplayName, out var velocity))
+                        {
+                            if (capacity.Activities?.Any() == true)
+                                velocity.CapacitySaved = capacity.Activities.Select(a => (double)a.CapacityPerDay).Sum();
+
+                            if (Sprint.Attributes?.StartDate != null &&
+                                Sprint.Attributes.StartDate < DateTimeOffset.Now &&
+                                Sprint.Attributes?.FinishDate != null)
+                            {
+                                var nbDayOfWork = (Sprint.Attributes.FinishDate - Sprint.Attributes.StartDate).Value.TotalDays;
+
+                                if (capacity.DaysOff?.Any() == true)
+                                    nbDayOfWork -= capacity.DaysOff.Select(d => (d.End - d.Start).TotalDays).Sum();
+
+                                if (teamDaysOff?.DaysOff?.Any() == true) 
+                                    nbDayOfWork -= nbDayOfWork - teamDaysOff.DaysOff.Select(d => (d.End - d.Start).TotalDays).Sum();
+
+                                if (nbDayOfWork != 0)
+                                    velocity.RealCapacity = velocity.HoursOfWorkDone / nbDayOfWork;
+                            }
+                        }
+                    }
+                }
+
+                MembersVelocities = membersVelocities.Values.OrderByDescending(v => v.HoursOfWorkDone).ToList();
+            }
         }
     }
 

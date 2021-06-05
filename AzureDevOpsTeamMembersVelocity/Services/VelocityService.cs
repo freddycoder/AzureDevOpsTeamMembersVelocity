@@ -16,7 +16,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             _devOpsService = devOpsService;
         }
 
-        public async Task<List<MemberVelocity>> MemberVelocities(string sprintUrl)
+        public async Task<Dictionary<string, MemberVelocity>> MemberVelocities(string sprintUrl)
         {
             var items = (await _devOpsService.WorkItems(sprintUrl)).WorkItemRelations;
 
@@ -32,7 +32,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
                     GroupByPerson(groupByPerson, workItems[i], workItemUpdates[i]);
             }
 
-            return groupByPerson.Values.OrderBy(m => m.HoursOfWorkDone).ToList();
+            return groupByPerson;
         }
 
         public static void GroupByPerson(Dictionary<string, MemberVelocity> groupByPerson, WorkItem workItem, List<WorkItemUpdate> workItemUpdates)
