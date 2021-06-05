@@ -1,0 +1,82 @@
+﻿@page "/SprintAnalysis"
+@inject NavigationManager NavManager
+@inject DevOpsService DevOpsService
+
+<h3>SprintAnalysis</h3>
+
+@if (WorkItems != null)
+{
+    <table class="table table-hover table-striped table-responsive">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Title</th>
+                <th>Assigned to</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var workItem in WorkItems)
+            {
+                <tr>
+                    <td>@workItem.Fields?.MaybeGet("System.WorkItemType")</td>
+                    <td>@workItem.Fields?.MaybeGet("System.Title")</td>
+                    <td>@workItem.Fields?.MaybeGet("System.AssignedTo")</td>
+                    <td></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    public List<WorkItem> WorkItems { get; set; } = new();
+
+    public List<List<WorkItemUpdate>> WorkItemUpdates { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("sprints", out var sprintUrl))
+        {
+            var items = (await DevOpsService.WorkItems(sprintUrl.ToString())).WorkItemRelations;
+
+            var workItems = new List<WorkItem>(items.Count);
+
+            var workItemUpdates = new List<List<WorkItemUpdate>>(items.Count);
+
+            foreach (var item in items)
+            {
+                var result = await GetWorkItem(item);
+
+                if (result != null)
+                {
+                    workItems.Add(result);
+
+                    if (result.Links != null)
+                    {
+                        workItemUpdates.Add(await GetWorkItemUpdate(result.Links.Links.Get<object>("workItemUpdates")));
+                    }
+                }
+            }
+
+            WorkItems = workItems;
+            WorkItemUpdates = workItemUpdates;
+        }
+    }
+
+    public async Task<WorkItem>GetWorkItem(WorkItemLink workItem)
+    {
+        if (workItem.Source != null && workItem.Target != null)
+        {
+            return await DevOpsService.WorkItem(workItem.Target.Url);
+        }
+
+        return null;
+    }
+
+    public async Task<List<WorkItemUpdate>> GetWorkItemUpdate(object updatesLink)
+    {
+        return await DevOpsService.Updates(updatesLink.ToString());
+    }
+}

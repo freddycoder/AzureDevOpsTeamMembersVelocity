@@ -1,55 +1,77 @@
 @page "/"
 @inject TeamMembersVelocitySettings AppSettings
+@inject DevOpsService DevOpsService
 
 <h1>Team members velocity</h1>
 
 Welcome to the team members velocity app.
 
-<div class="col-4 mt-2">
-    <div class="form-group">
-        <label for="exampleInputPassword1">Api Key</label>
-        <input @bind="ApiKey" autocomplete="new-password" type="password" class="form-control" id="apiKey" placeholder="API KEY">
+<div class="row">
+    <div class="col-4 mt-2">
+        <div class="form-group">
+            <label for="exampleInputPassword1">Api Key</label>
+            <input @bind="ApiKey" autocomplete="new-password" type="password" class="form-control" id="apiKey" placeholder="API KEY">
+        </div>
+        <div class="form-group">
+            <label for="inputOrganisation">Organisation</label>
+            <input id="inputOrganisation" autocomplete="new-password" @bind="Organisation" @bind:event="oninput" type="text" class="form-control" aria-describedby="describeOrganisation" placeholder="Organisation">
+            <small id="describeOrganisation" class="form-text text-muted">dev.azure.com/{organisation}</small>
+        </div>
+        <div class="form-group">
+            <label for="inputTeamProject">Team Project</label>
+            <input id="inputTeamProject" autocomplete="new-password" list="teamProjectSuggestion" @bind="TeamProject" @bind:event="oninput" type="text" class="form-control" aria-describedby="describeTeamProject" placeholder="Team project">
+            <datalist id="teamProjectSuggestion">
+                @foreach (var teamProject in TeamProjects)
+                {
+                    <option value="@teamProject.Name" />
+                }
+            </datalist>
+            <small id="describeTeamProject" class="form-text text-muted">dev.azure.com/@Organisation/_apis/projects/{team-project}</small>
+        </div>
+        <div class="form-group">
+            <label for="inputTeam">Team</label>
+            <input id="inputTeam" autocomplete="new-password" list="teamSuggestion" @bind="Team" @bind:event="oninput" type="text" class="form-control" aria-describedby="describeTeam" placeholder="Team">
+            <datalist id="teamSuggestion">
+                @foreach (var team in Teams)
+                {
+                    <option value="@team.Name" />
+                }
+            </datalist>
+            <small id="describeTeam" class="form-text text-muted">dev.azure.com/@Organisation/_apis/projects/@TeamProject/teams?api-version=6.0</small>
+        </div>
+        <button @onclick="SaveSettings" class="btn btn-primary">Save settings</button>
     </div>
-    <div class="form-group">
-        <label for="inputOrganisation">Organisation</label>
-        <input id="inputOrganisation" autocomplete="new-password" @bind="Organisation" @bind:event="oninput" type="text" class="form-control" aria-describedby="describeOrganisation" placeholder="Organisation">
-        <small id="describeOrganisation" class="form-text text-muted">dev.azure.com/{organisation}</small>
+
+    <div class="col-md-2">
+
     </div>
-    <div class="form-group">
-        <label for="inputTeamProject">Team Project</label>
-        <input id="inputTeamProject" autocomplete="new-password" list="teamProjectSuggestion" @bind="TeamProject" @bind:event="oninput" type="text" class="form-control" aria-describedby="describeTeamProject" placeholder="Team project">
-        <datalist id="teamProjectSuggestion">
-            @foreach (var teamProject in TeamProjects)
-            {
-                <option value="@teamProject.Name" />
-            }
-        </datalist>
-        <small id="describeTeamProject" class="form-text text-muted">dev.azure.com/@Organisation/_apis/projects/{team-project}</small>
-    </div>
-    <div class="form-group">
-        <label for="inputTeam">Team</label>
-        <input id="inputTeam" autocomplete="new-password" list="teamSuggestion" @bind="Team" @bind:event="oninput" type="text" class="form-control" aria-describedby="describeTeam" placeholder="Team">
-        <datalist id="teamSuggestion">
-            @foreach (var team in Teams)
-            {
-                <option value="@team.Name" />
-            }
-        </datalist>
-        <small id="describeTeam" class="form-text text-muted">dev.azure.com/@Organisation/_apis/projects/@TeamProject/teams?api-version=6.0</small>
-    </div>
-    <div class="form-group">
-        <label for="inputTeam">Board</label>
-        <input id="inputBoard" autocomplete="new-password" list="boardSuggestion" @bind="Board" @bind:event="oninput" type="text" class="form-control" aria-describedby="describeBoard" placeholder="Board">
-        <datalist id="boardSuggestion">
-            @foreach (var board in Boards)
-            {
-                <option value="@board.Name" />
-            }
-        </datalist>
-        <small id="describeTeam" class="form-text text-muted">dev.azure.com/@Organisation/@TeamProject/</small>
-    </div>
-    <button @onclick="SaveSettings" class="btn btn-primary">Save settings</button>
+
+    @if (Sprints != null)
+    {
+        <div class="col-md-6">
+            <ul class="list-group">
+                @foreach (var iteration in Sprints)
+                {
+                    <li class="list-group-item list-group-item-action">
+                        <a href="/SprintAnalysis?sprints=@iteration.Url">@iteration.Name</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+    else
+    {
+        <div class="col-md-4">
+            <ul class="list-group">
+                @foreach (var iteration in Sprints)
+                {
+                    <li>zero sprint found</li>
+                }
+            </ul>
+        </div>
+    }
 </div>
+
 
 @code {
     private string _org;
@@ -149,7 +171,7 @@ Welcome to the team members velocity app.
 
         if (string.IsNullOrWhiteSpace(Team) == false)
         {
-            await GetBoards();
+            await GetSprints();
         }
     }
 
@@ -173,146 +195,26 @@ Welcome to the team members velocity app.
 
     public async Task GetProjects()
     {
-        Console.WriteLine("Try fetch projects");
+        TeamProjects = await DevOpsService.Projects(Organisation);
 
-        try
-        {
-            var personalaccesstoken = ApiKey;
-
-            using (HttpClient client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                    Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(string.Format("{0}:{1}", "", personalaccesstoken))));
-
-                using (HttpResponseMessage response = await client.GetAsync($"https://dev.azure.com/{Organisation}/_apis/projects"))
-                {
-                    response.EnsureSuccessStatusCode();
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine(responseBody);
-
-                    var responsesDeserialized = JsonSerializer.Deserialize<ListResponse<TeamProject>>(responseBody, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true,
-                        WriteIndented = true
-                    });
-
-                    Console.WriteLine(responsesDeserialized.Count);
-                    Console.WriteLine(responsesDeserialized.Value);
-
-                    if (responsesDeserialized?.Value != null)
-                    {
-                        TeamProjects = responsesDeserialized.Value;
-                    }
-
-                    StateHasChanged();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine(ex.ToString());
-        }
+        StateHasChanged();
     }
 
     public List<Microsoft.TeamFoundation.Core.WebApi.WebApiTeam> Teams { get; set; } = new();
 
     public async Task GetTeams()
     {
-        Console.WriteLine("Try fetch teams");
+        Teams = await DevOpsService.Teams(Organisation, TeamProjects.First(t => t.Name == TeamProject).Id);
 
-        try
-        {
-            var personalaccesstoken = ApiKey;
-
-            using (HttpClient client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Accept.Add(
-                    new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                    Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(
-                            string.Format("{0}:{1}", "", personalaccesstoken))));
-
-                using (HttpResponseMessage response = await client.GetAsync($"https://dev.azure.com/{Organisation}/_apis/projects/{TeamProjects.First(t => t.Name == TeamProject).Id}/teams?api-version=6.0"))
-                {
-                    response.EnsureSuccessStatusCode();
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine(responseBody);
-
-                    var responsesDeserialized = JsonSerializer.Deserialize<ListResponse<Microsoft.TeamFoundation.Core.WebApi.WebApiTeam>>(responseBody, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true,
-                        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
-                        WriteIndented = true
-                    });
-
-                    Console.WriteLine(responsesDeserialized.Count);
-                    Console.WriteLine(responsesDeserialized.Value);
-
-                    if (responsesDeserialized?.Value != null)
-                    {
-                        Teams = responsesDeserialized.Value;
-                    }
-
-                    StateHasChanged();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine(ex.ToString());
-        }
+        StateHasChanged();
     }
 
-    public List<Microsoft.TeamFoundation.Work.WebApi.Board> Boards { get; set; } = new();
+    public List<Sprint> Sprints { get; set; } = new();
 
-    public async Task GetBoards()
+    public async Task GetSprints()
     {
-        Console.WriteLine("Try fetch boards");
+        Sprints = await DevOpsService.Sprints(Organisation, TeamProject, Team);
 
-        try
-        {
-            var personalaccesstoken = ApiKey;
-
-            using (HttpClient client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Accept.Add(
-                    new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                    Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(
-                            string.Format("{0}:{1}", "", personalaccesstoken))));
-
-                using (HttpResponseMessage response = await client.GetAsync($"https://dev.azure.com/{Organisation}/{TeamProjects.First(t => t.Name == TeamProject).Id}/{Teams.First(t => t.Name == Team)}/_apis/work/boards?api-version=5.0"))
-                {
-                    response.EnsureSuccessStatusCode();
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine(responseBody);
-
-                    var responsesDeserialized = JsonSerializer.Deserialize<ListResponse<Microsoft.TeamFoundation.Work.WebApi.Board>>(responseBody, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true,
-                        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
-                        WriteIndented = true
-                    });
-
-                    Console.WriteLine(responsesDeserialized.Count);
-                    Console.WriteLine(responsesDeserialized.Value);
-
-                    if (responsesDeserialized?.Value != null)
-                    {
-                        Boards = responsesDeserialized.Value;
-                    }
-
-                    StateHasChanged();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine(ex.ToString());
-        }
+        StateHasChanged();
     }
 }
