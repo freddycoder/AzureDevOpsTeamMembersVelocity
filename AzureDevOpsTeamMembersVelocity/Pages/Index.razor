@@ -1,6 +1,7 @@
 @page "/"
 @inject TeamMembersVelocitySettings AppSettings
 @inject DevOpsService DevOpsService
+@inject IDataProtectionProvider DataProtectionProvider
 
 <h1>Team members velocity</h1>
 
@@ -35,9 +36,12 @@ Welcome to the team members velocity app.
             <label for="inputTeam">Team</label>
             <input id="inputTeam" autocomplete="new-password" list="teamSuggestion" @bind="Team" @bind:event="oninput" @onfocus="GetTeams" @onchange="GetSprints" type="text" class="form-control" aria-describedby="describeTeam" placeholder="Team">
             <datalist id="teamSuggestion">
-                @foreach (var team in Teams)
+                @if (Teams != null)
                 {
-                    <option value="@team.Name" />
+                    @foreach (var team in Teams)
+                    {
+                        <option value="@team.Name" />
+                    }
                 }
             </datalist>
             <small id="describeTeam" class="form-text text-muted">dev.azure.com/@Organisation/_apis/projects/@TeamProject/teams?api-version=6.0</small>
@@ -64,12 +68,9 @@ Welcome to the team members velocity app.
     }
     else
     {
-        <div class="col-md-4">
+        <div class="col-md-6">
             <ul class="list-group">
-                @foreach (var iteration in Sprints)
-                {
-                    <li>zero sprint found</li>
-                }
+                <li>zero sprint found</li>
             </ul>
         </div>
     }
@@ -77,9 +78,9 @@ Welcome to the team members velocity app.
 
 
 @code {
-    private string _org;
+    private string? _org;
     [Parameter]
-    public string Organisation
+    public string? Organisation
     {
         get
         {
@@ -94,9 +95,9 @@ Welcome to the team members velocity app.
         }
     }
 
-    private string _teamProject;
+    private string? _teamProject;
     [Parameter]
-    public string TeamProject
+    public string? TeamProject
     {
         get
         {
@@ -111,9 +112,9 @@ Welcome to the team members velocity app.
         }
     }
 
-    private string _team;
+    private string? _team;
     [Parameter]
-    public string Team
+    public string? Team
     {
         get
         {
@@ -128,9 +129,9 @@ Welcome to the team members velocity app.
         }
     }
 
-    private string _apiKey;
+    private string? _apiKey;
     [Parameter]
-    public string ApiKey
+    public string? ApiKey
     {
         get
         {
@@ -149,13 +150,13 @@ Welcome to the team members velocity app.
 
     protected override async Task OnInitializedAsync()
     {
-        Organisation = AppSettings.Organisation;
-        TeamProject = AppSettings.TeamProject;
-        Team = AppSettings.Team;
-        ApiKey = AppSettings.ApiKey;
+        Organisation = AppSettings?.Organisation;
+        TeamProject = AppSettings?.TeamProject;
+        Team = AppSettings?.Team;
+        ApiKey = AppSettings?.ApiKey;
 
-        if (string.IsNullOrWhiteSpace(AppSettings.Organisation) == false &&
-            string.IsNullOrWhiteSpace(AppSettings.ApiKey) == false)
+        if (string.IsNullOrWhiteSpace(AppSettings?.Organisation) == false &&
+            string.IsNullOrWhiteSpace(AppSettings?.ApiKey) == false)
         {
             await GetProjects();
         }
@@ -180,36 +181,51 @@ Welcome to the team members velocity app.
             AppSettings.Team = Team;
             AppSettings.ApiKey = ApiKey;
 
-            await File.WriteAllTextAsync("AzureDevOpsTeamMemberVelocity.json", JsonSerializer.Serialize(AppSettings));
+            var appSettingsJson = JsonSerializer.Serialize(AppSettings);
+
+            var dateProtector = DataProtectionProvider.CreateProtector(nameof(AzureDevOpsTeamMembersVelocity));
+
+            var encryptedText = dateProtector.Protect(appSettingsJson);
+
+            await File.WriteAllTextAsync("AzureDevOpsTeamMemberVelocity.json", encryptedText);
 
             NeedToSaveConfig = false;
         }
     }
 
-    public List<TeamProject> TeamProjects { get; set; } = new();
+    public List<TeamProject>? TeamProjects { get; set; } = new();
 
     public async Task GetProjects()
     {
-        TeamProjects = (await DevOpsService.Projects(Organisation))?.Value;
+        if (Organisation != null)
+        {
+            TeamProjects = (await DevOpsService.Projects(Organisation))?.Value;
 
-        StateHasChanged();
+            StateHasChanged();
+        }
     }
 
-    public List<Microsoft.TeamFoundation.Core.WebApi.WebApiTeam> Teams { get; set; } = new();
+    public List<Microsoft.TeamFoundation.Core.WebApi.WebApiTeam>? Teams { get; set; } = new();
 
     public async Task GetTeams()
     {
-        Teams = (await DevOpsService.Teams(Organisation, TeamProjects.First(t => t.Name == TeamProject).Id))?.Value;
+        if (Organisation != null && TeamProjects != null)
+        {
+            Teams = (await DevOpsService.Teams(Organisation, TeamProjects.First(t => t.Name == TeamProject).Id))?.Value;
 
-        StateHasChanged();
+            StateHasChanged();
+        }
     }
 
-    public List<Sprint> Sprints { get; set; } = new();
+    public List<Sprint>? Sprints { get; set; } = new();
 
     public async Task GetSprints()
     {
-        Sprints = (await DevOpsService.Sprints(Organisation, TeamProject, Team))?.Value;
+        if (Organisation != null && TeamProject != null && Team != null)
+        {
+            Sprints = (await DevOpsService.Sprints(Organisation, TeamProject, Team))?.Value;
 
-        StateHasChanged();
+            StateHasChanged();
+        }
     }
 }

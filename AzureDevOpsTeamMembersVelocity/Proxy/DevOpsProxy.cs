@@ -25,7 +25,7 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
             this.client = client;
         }
 
-        public async Task<string> GetAsync(string fullUrl)
+        public async Task<string?> GetAsync(string fullUrl)
         {
             _logger.LogInformation($"Try fetch {fullUrl}");
 
@@ -49,7 +49,7 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
             return default;
         }
 
-        public async Task<T> GetAsync<T>(string fullUrl)
+        public async Task<T?> GetAsync<T>(string fullUrl)
         {
             _logger.LogInformation($"Try fetch {fullUrl}");
 

@@ -8,15 +8,18 @@
 
 @code {
     [CascadingParameter]
-    BlazoredModalInstance ModalInstance { get; set; }
+    BlazoredModalInstance? ModalInstance { get; set; }
 
     [Parameter]
-    public string HistoryUrl { get; set; }
+    public string? HistoryUrl { get; set; }
 
-    public string Json { get; set; }
+    public string? Json { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
-        Json = (await DevOpsProxy.GetAsync(HistoryUrl)).FormatJson();
+        if (HistoryUrl != null)
+        {
+            Json = (await DevOpsProxy.GetAsync(HistoryUrl))?.FormatJson();
+        }
     }
 }

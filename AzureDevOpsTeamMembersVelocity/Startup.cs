@@ -2,10 +2,12 @@ using AzureDevOpsTeamMembersVelocity.Proxy;
 using AzureDevOpsTeamMembersVelocity.Services;
 using Blazored.Modal;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
@@ -27,6 +29,9 @@ namespace AzureDevOpsTeamMembersVelocity
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddBlazoredModal();
+            services.AddDataProtection()
+                    .PersistKeysToFileSystem(new DirectoryInfo(Directory.GetCurrentDirectory()))
+                    .SetApplicationName(nameof(AzureDevOpsTeamMembersVelocity));
             services.AddSingleton(sp =>
             {
                 var client = new HttpClient();

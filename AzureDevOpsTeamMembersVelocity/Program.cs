@@ -1,6 +1,8 @@
+using System;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,16 +20,28 @@ namespace AzureDevOpsTeamMembersVelocity
 
             if (File.Exists("AzureDevOpsTeamMemberVelocity.json"))
             {
-                logger.LogInformation("Load settings from file : AzureDevOpsTeamMemberVelocity.json");
+                try
+                {
+                    logger.LogInformation("Load settings from file : AzureDevOpsTeamMemberVelocity.json");
 
-                var settings = host.Services.GetRequiredService<TeamMembersVelocitySettings>();
+                    var settings = host.Services.GetRequiredService<TeamMembersVelocitySettings>();
 
-                var savedSettings = JsonSerializer.Deserialize<TeamMembersVelocitySettings>(File.ReadAllText("AzureDevOpsTeamMemberVelocity.json"));
+                    var dataProtector = host.Services.GetRequiredService<IDataProtectionProvider>()
+                                                     .CreateProtector(nameof(AzureDevOpsTeamMembersVelocity));
 
-                settings.Organisation = savedSettings.Organisation;
-                settings.TeamProject = savedSettings.TeamProject;
-                settings.Team = savedSettings.Team;
-                settings.ApiKey = savedSettings.ApiKey;
+                    var jsonString = dataProtector.Unprotect(File.ReadAllText("AzureDevOpsTeamMemberVelocity.json"));
+
+                    var savedSettings = JsonSerializer.Deserialize<TeamMembersVelocitySettings>(jsonString);
+
+                    settings.Organisation = savedSettings?.Organisation;
+                    settings.TeamProject = savedSettings?.TeamProject;
+                    settings.Team = savedSettings?.Team;
+                    settings.ApiKey = savedSettings?.ApiKey;
+                }
+                catch (Exception e)
+                {
+                    logger.LogCritical(e, "Error reading settings from disk");
+                }
             }
             else
             {

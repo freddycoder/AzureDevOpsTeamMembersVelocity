@@ -16,30 +16,33 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             _devOpsService = devOpsService;
         }
 
-        public async IAsyncEnumerable<MemberVelocity> MemberVelocities(string sprintUrl, List<Capacity> capacities = null, Sprint sprint = null, TeamDaysOff teamDaysOff = null, TeamSettings teamSettings = null)
+        public async IAsyncEnumerable<MemberVelocity> MemberVelocities(string sprintUrl, List<Capacity>? capacities = null, Sprint? sprint = null, TeamDaysOff? teamDaysOff = null, TeamSettings? teamSettings = null)
         {
-            var items = (await _devOpsService.WorkItems(sprintUrl)).WorkItemRelations;
+            var items = (await _devOpsService.WorkItems(sprintUrl))?.WorkItemRelations;
 
-            var groupByPerson = new Dictionary<string, MemberVelocity>();
-
-            await foreach (var (workItem, workItemUpdates) in GetWorksAndHistory(items))
+            if (items != null)
             {
-                GroupByPerson(groupByPerson, workItem, workItemUpdates);
+                var groupByPerson = new Dictionary<string, MemberVelocity>();
 
-                foreach (var value in groupByPerson.Values)
+                await foreach (var (workItem, workItemUpdates) in GetWorksAndHistory(items))
                 {
-                    yield return EnhanceMemberVolocityInfo(value, capacities, sprint, teamDaysOff, teamSettings);
+                    GroupByPerson(groupByPerson, workItem, workItemUpdates);
+
+                    foreach (var value in groupByPerson.Values)
+                    {
+                        yield return EnhanceMemberVolocityInfo(value, capacities, sprint, teamDaysOff, teamSettings);
+                    }
                 }
             }
         }
 
-        private static MemberVelocity EnhanceMemberVolocityInfo(MemberVelocity velocity, List<Capacity> capacities = null, Sprint sprint = null, TeamDaysOff teamDaysOff = null, TeamSettings teamSettings = null)
+        private static MemberVelocity EnhanceMemberVolocityInfo(MemberVelocity velocity, List<Capacity>? capacities = null, Sprint? sprint = null, TeamDaysOff? teamDaysOff = null, TeamSettings? teamSettings = null)
         {
             if (capacities != default)
             {
-                var capacity = capacities.FirstOrDefault(c => c.TeamMember.DisplayName == velocity.DisplayName);
+                var capacity = capacities.FirstOrDefault(c => c.TeamMember?.DisplayName == velocity.DisplayName);
 
-                if (capacity != null)
+                if (capacity != null && sprint != null)
                 {
                     if (capacity.Activities?.Any() == true)
                         velocity.CapacitySaved = capacity.Activities.Select(a => (double)a.CapacityPerDay).Sum();
@@ -83,7 +86,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             return 0.0;
         }
 
-        private async IAsyncEnumerable<(WorkItem, List<WorkItemUpdate>)> GetWorksAndHistory(List<Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItemLink> items)
+        private async IAsyncEnumerable<(WorkItem, List<WorkItemUpdate>?)> GetWorksAndHistory(List<Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItemLink> items)
         {
             foreach (var item in items)
             {
@@ -91,7 +94,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
 
                 if (result != null)
                 {
-                    List<WorkItemUpdate> workItemUpdate = default;
+                    List<WorkItemUpdate>? workItemUpdate = default;
 
                     if (result.Links?.WorkItemUpdates?.Href != null)
                     {
@@ -103,7 +106,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             }
         }
 
-        private async Task<WorkItem> GetWorkItem(Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItemLink workItem)
+        private async Task<WorkItem?> GetWorkItem(Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItemLink workItem)
         {
             if (workItem.Source != null && workItem.Target != null)
             {
@@ -113,13 +116,15 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             return null;
         }
 
-        public static void GroupByPerson(Dictionary<string, MemberVelocity> groupByPerson, WorkItem workItem, List<WorkItemUpdate> workItemUpdates)
+        public static void GroupByPerson(Dictionary<string, MemberVelocity> groupByPerson, WorkItem workItem, List<WorkItemUpdate>? workItemUpdates)
         {
+            if (workItemUpdates == null) return;
+
             foreach (var update in workItemUpdates)
             {
                 var person = update.RevisedBy?.DisplayName ?? string.Empty;
 
-                if (!groupByPerson.TryGetValue(person, out MemberVelocity velocity))
+                if (!groupByPerson.TryGetValue(person, out MemberVelocity? velocity))
                 {
                     velocity = new MemberVelocity
                     {
@@ -138,9 +143,12 @@ namespace AzureDevOpsTeamMembersVelocity.Services
 
                     velocity.HoursOfWorkDone += delta;
 
-                    update.RelatedTaskTitle = workItem.Fields?.MaybeGet("System.Title")?.ToString();
+                    if (update != null)
+                    {
+                        update.RelatedTaskTitle = workItem.Fields?.MaybeGet("System.Title")?.ToString();
 
-                    velocity.Updates.Add(update);
+                        velocity.Updates.Add(update);
+                    }
                 }
             }
         }

@@ -10,17 +10,17 @@ namespace AzureDevOpsTeamMembersVelocity
     /// </summary>
     public class TeamMembersVelocitySettings
     {
-        public string Organisation { get; set; }
+        public string? Organisation { get; set; }
 
-        public string TeamProject { get; set; }
+        public string? TeamProject { get; set; }
 
-        public string Team { get; set; }
+        public string? Team { get; set; }
 
-        private string _apiKey;
+        private string? _apiKey;
         private bool _authKeyChanged;
-        private AuthenticationHeaderValue _authenticationHeader;
+        private AuthenticationHeaderValue? _authenticationHeader;
 
-        public string ApiKey 
+        public string? ApiKey 
         { 
             get
             {
@@ -34,7 +34,7 @@ namespace AzureDevOpsTeamMembersVelocity
         }
 
         [JsonIgnore]
-        public AuthenticationHeaderValue AuthenticationHeader
+        public AuthenticationHeaderValue? AuthenticationHeader
         {
             get
             {

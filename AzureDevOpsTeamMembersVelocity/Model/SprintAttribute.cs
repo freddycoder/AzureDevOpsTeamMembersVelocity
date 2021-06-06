@@ -6,6 +6,6 @@ namespace AzureDevOpsTeamMembersVelocity.Model
     {
         public DateTimeOffset? StartDate { get; set; }
         public DateTimeOffset? FinishDate { get; set; }
-        public string TimeFrame { get; set; }
+        public string? TimeFrame { get; set; }
     }
 }

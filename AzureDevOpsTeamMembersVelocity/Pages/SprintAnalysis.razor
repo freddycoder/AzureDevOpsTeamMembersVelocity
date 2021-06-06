@@ -94,17 +94,17 @@ else
 
 @code {
     [CascadingParameter]
-    public IModalService Modal { get; set; }
+    public IModalService? Modal { get; set; }
 
-    public Sprint Sprint { get; set; }
+    public Sprint? Sprint { get; set; }
 
-    public List<Capacity> Capacities { get; set; }
+    public List<Capacity>? Capacities { get; set; }
 
-    public TeamSettings TeamSettings { get; set; }
+    public TeamSettings? TeamSettings { get; set; }
 
-    public TeamDaysOff TeamDaysOff { get; set; }
+    public TeamDaysOff? TeamDaysOff { get; set; }
 
-    public SortedSet<MemberVelocity> MembersVelocities { get; set; }
+    public SortedSet<MemberVelocity>? MembersVelocities { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -152,6 +152,6 @@ else
 
         parameters.Add("Updates", updates);
 
-        Modal.Show<PersonHistoryModal>("Update history", parameters);
+        Modal?.Show<PersonHistoryModal>("Update history", parameters);
     }
 }

@@ -5,8 +5,8 @@ namespace AzureDevOpsTeamMembersVelocity.Model
 {
     public class WorkItems
     {
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
-        public List<WorkItemLink> WorkItemRelations { get; set; }
+        public List<WorkItemLink>? WorkItemRelations { get; set; }
     }
 }

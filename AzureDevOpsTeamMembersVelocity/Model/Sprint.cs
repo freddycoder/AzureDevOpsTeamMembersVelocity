@@ -7,13 +7,13 @@ namespace AzureDevOpsTeamMembersVelocity.Model
     public class Sprint
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Path { get; set; }
-        public SprintAttribute Attributes { get; set; }
-        public string Url { get; set; }
+        public string? Name { get; set; }
+        public string? Path { get; set; }
+        public SprintAttribute? Attributes { get; set; }
+        public string? Url { get; set; }
 
         [JsonPropertyName("_links")]
-        public SprintLinks Links { get; set; }
+        public SprintLinks? Links { get; set; }
 
         public double GetTotalDays()
         {
@@ -24,7 +24,7 @@ namespace AzureDevOpsTeamMembersVelocity.Model
             return (Attributes.FinishDate.Value - Attributes.StartDate.Value).TotalDays;
         }
 
-        public double GetTotalWorkingDays(DayOfWeek[] workingDays, TeamDaysOff teamDaysOff)
+        public double GetTotalWorkingDays(DayOfWeek[]? workingDays, TeamDaysOff? teamDaysOff)
         {
             var initial = GetTotalDays();
             
@@ -32,11 +32,14 @@ namespace AzureDevOpsTeamMembersVelocity.Model
             {
                 for (int i = 0; i < initial; i++)
                 {
-                    var date = Attributes.StartDate.Value + TimeSpan.FromDays(i);
-
-                    if (workingDays.Any(w => date.DayOfWeek == w) == false)
+                    if (Attributes != null && Attributes.StartDate.HasValue == true)
                     {
-                        initial--;
+                        var date = Attributes.StartDate.Value + TimeSpan.FromDays(i);
+
+                        if (workingDays.Any(w => date.DayOfWeek == w) == false)
+                        {
+                            initial--;
+                        }
                     }
                 }
             }

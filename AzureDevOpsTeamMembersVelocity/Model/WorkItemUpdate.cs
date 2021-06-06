@@ -4,11 +4,11 @@ namespace AzureDevOpsTeamMembersVelocity.Model
 {
     public class WorkItemUpdate : Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItemUpdate, IComparable<WorkItemUpdate>
     {
-        public new IdentityReference RevisedBy { get; set; }
+        public new IdentityReference? RevisedBy { get; set; }
 
-        public string RelatedTaskTitle { get; set; }
+        public string? RelatedTaskTitle { get; set; }
 
-        public int CompareTo(WorkItemUpdate other)
+        public int CompareTo(WorkItemUpdate? other)
         {
             if (other == null) return 1;
 

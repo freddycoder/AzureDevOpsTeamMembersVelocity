@@ -1,44 +1,47 @@
-﻿<div class="container">
-    <div class="row">
-        <table class="table table-striped table-hover">
-            <thead>
-                <tr>
-                    <th>Task title</th>
-                    <th>Field update</th>
-                    <th>Remaning work</th>
-                    <th>Revised date</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var update in Updates.OrderBy(u => u))
-                {
-                <tr>
-                    <td>@update.RelatedTaskTitle</td>
-                    <td>@Print(update.Fields?.MaybeGet("System.State"))</td>
-                    <td>@Print(update.Fields?.MaybeGet("Microsoft.VSTS.Scheduling.RemainingWork"))</td>
-                    <td>@update.RevisedDate</td>
-                    <td>
-                        <button @onclick="() => ShowJson(update.Url)">json</button>
-                    </td>
-                </tr>
-                }
-            </tbody>
-        </table>
+﻿@if (Updates != null)
+{
+    <div class="container">
+        <div class="row">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Task title</th>
+                        <th>Field update</th>
+                        <th>Remaning work</th>
+                        <th>Revised date</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var update in Updates.OrderBy(u => u))
+                    {
+                        <tr>
+                            <td>@update.RelatedTaskTitle</td>
+                            <td>@Print(update.Fields?.MaybeGet("System.State"))</td>
+                            <td>@Print(update.Fields?.MaybeGet("Microsoft.VSTS.Scheduling.RemainingWork"))</td>
+                            <td>@update.RevisedDate</td>
+                            <td>
+                                <button @onclick="() => ShowJson(update.Url)">json</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
+}
 
 @code {
     [CascadingParameter]
-    public IModalService Modal { get; set; }
+    public IModalService? Modal { get; set; }
 
     [CascadingParameter]
-    BlazoredModalInstance ModalInstance { get; set; }
+    BlazoredModalInstance? ModalInstance { get; set; }
 
     [Parameter]
-    public List<WorkItemUpdate> Updates { get; set; }
+    public List<WorkItemUpdate>? Updates { get; set; }
 
-    public string Print(object obj)
+    public string? Print(object? obj)
     {
         if (obj is Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItemFieldUpdate fieldUpdate)
         {
@@ -54,6 +57,6 @@
 
         parameters.Add("HistoryUrl", url);
 
-        Modal.Show<JsonModal>("Json view", parameters);
+        Modal?.Show<JsonModal>("Json view", parameters);
     }
 }
