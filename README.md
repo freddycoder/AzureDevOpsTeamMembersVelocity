@@ -1,6 +1,10 @@
 # AzureDevOpsTeamMembersVelocity
 
-A app that fetch task history and tell informations about velocity of each member base on a sprint
+A app that fetch task history and tell informations about velocity of each member base on a sprint.
+
+To use the app, you'll need to create an access token inside your azure devops account.
+
+The app can list you each member and calculate the total of working hours, capacity estimated, real capacity, and history for each members of a sprint.
 
 ## Run the app
 
@@ -49,10 +53,6 @@ Then go to : http://localhost:45000
 docker build -t <username>/azuredevopsteammembersvelocity:<tag> .
 docker push <username>/azuredevopsteammembersvelocity:<tag> .
 ```
-
-To try the app, you'll need to create an access token inside your azure devops account.
-
-The app can list you each member and calculate the total of working hours for each members of a team based on a selected sprint.
 
 ### Additional information
 
