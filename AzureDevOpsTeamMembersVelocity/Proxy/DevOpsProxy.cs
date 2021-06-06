@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using ComposableAsync;
+using System.IO;
 
 namespace AzureDevOpsTeamMembersVelocity.Proxy
 {
@@ -15,11 +16,13 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
         private static readonly TimeLimiter TimeConstrainte = TimeLimiter.GetFromMaxCountByInterval(30, TimeSpan.FromSeconds(1));
         private readonly TeamMembersVelocitySettings _appSettings;
         private readonly ILogger<DevOpsProxy> _logger;
+        private readonly HttpClient client;
 
-        public DevOpsProxy(TeamMembersVelocitySettings appSettings, ILogger<DevOpsProxy> logger)
+        public DevOpsProxy(HttpClient client, TeamMembersVelocitySettings appSettings, ILogger<DevOpsProxy> logger)
         {
             _appSettings = appSettings;
             _logger = logger;
+            this.client = client;
         }
 
         public async Task<string> GetAsync(string fullUrl)
@@ -28,21 +31,15 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
 
             try
             {
-                var personalaccesstoken = _appSettings.ApiKey;
+                client.DefaultRequestHeaders.Authorization = _appSettings.AuthenticationHeader;
 
-                using HttpClient client = new();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                    Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(string.Format("{0}:{1}", "", personalaccesstoken))));
                 await TimeConstrainte;
+
                 using HttpResponseMessage response = await client.GetAsync(fullUrl);
+                
                 response.EnsureSuccessStatusCode();
 
-                string responseBody = await response.Content.ReadAsStringAsync();
-                _logger.LogDebug(responseBody);
-
-                return responseBody;
+                return await response.Content.ReadAsStringAsync();
             }
             catch (Exception ex)
             {
@@ -59,17 +56,15 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
             try
             {
                 var personalaccesstoken = _appSettings.ApiKey;
+                client.DefaultRequestHeaders.Authorization = _appSettings.AuthenticationHeader;
 
-                using HttpClient client = new();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                    Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(string.Format("{0}:{1}", "", personalaccesstoken))));
                 await TimeConstrainte;
+
                 using HttpResponseMessage response = await client.GetAsync(fullUrl);
+
                 response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
-                _logger.LogDebug(responseBody);
+
+                var responseBody = await response.Content.ReadAsByteArrayAsync();
 
                 var responsesDeserialized = JsonSerializer.Deserialize<T>(responseBody, Program.SerializerOptions);
 

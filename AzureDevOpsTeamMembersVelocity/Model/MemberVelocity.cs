@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AzureDevOpsTeamMembersVelocity.Model
 {
-    public class MemberVelocity
+    public class MemberVelocity : IComparable<MemberVelocity>
     {
         public string DisplayName { get; set; }
 
@@ -16,5 +14,10 @@ namespace AzureDevOpsTeamMembersVelocity.Model
         public double RealCapacity { get; set; }
 
         public List<WorkItemUpdate> Updates { get; } = new List<WorkItemUpdate>();
+
+        public int CompareTo(MemberVelocity other)
+        {
+            return HoursOfWorkDone.CompareTo(other?.HoursOfWorkDone ?? 0.0) * -1;
+        }
     }
 }

@@ -68,15 +68,15 @@ else
             </tr>
         </thead>
         <tbody>
-            @for (int i = 0; i < MembersVelocities.Count; i++)
+            @foreach (var velocity in MembersVelocities) 
             {
-                var updates = @MembersVelocities[i].Updates;
+                var updates = velocity.Updates;
 
                 <tr>
-                    <td>@MembersVelocities[i].DisplayName</td>
-                    <td>@MembersVelocities[i].HoursOfWorkDone</td>
-                    <td>@MembersVelocities[i].CapacitySaved</td>
-                    <td>@MembersVelocities[i].RealCapacity.ToString("F2")</td>
+                    <td>@velocity.DisplayName</td>
+                    <td>@velocity.HoursOfWorkDone</td>
+                    <td>@velocity.CapacitySaved</td>
+                    <td>@velocity.RealCapacity.ToString("F2")</td>
                     <td>
                         <button class="btn btn-primary" @onclick="() => ShowUpdates(updates)">Show history</button>
                     </td>
@@ -98,11 +98,13 @@ else
 
     public Sprint Sprint { get; set; }
 
+    public List<Capacity> Capacities { get; set; }
+
     public TeamSettings TeamSettings { get; set; }
 
     public TeamDaysOff TeamDaysOff { get; set; }
 
-    public List<MemberVelocity> MembersVelocities { get; set; }
+    public SortedSet<MemberVelocity> MembersVelocities { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -116,11 +118,9 @@ else
 
             if (Sprint != null)
             {
-                List<Capacity> capacities = default;
-
                 if (string.IsNullOrWhiteSpace(Sprint.Links?.Capacity?.Href) == false)
                 {
-                    capacities = await DevOpsService.Capacities(Sprint.Links.Capacity.Href);
+                    Capacities = (await DevOpsService.Capacities(Sprint.Links.Capacity.Href))?.Value;
                 }
 
                 if (string.IsNullOrWhiteSpace(Sprint.Links?.TeamDaysOff?.Href) == false)
@@ -135,34 +135,13 @@ else
                     if (TeamSettings != null) StateHasChanged();
                 }
 
-                var membersVelocities = await VelocityService.MemberVelocities(sprintUrl);
+                MembersVelocities = new SortedSet<MemberVelocity>();
 
-                if (capacities != default)
+                await foreach (var velocity in VelocityService.MemberVelocities(sprintUrl, Capacities, Sprint, TeamDaysOff, TeamSettings))
                 {
-                    foreach (var capacity in capacities)
-                    {
-                        if (membersVelocities.TryGetValue(capacity.TeamMember.DisplayName, out var velocity))
-                        {
-                            if (capacity.Activities?.Any() == true)
-                                velocity.CapacitySaved = capacity.Activities.Select(a => (double)a.CapacityPerDay).Sum();
-
-                            if (Sprint.Attributes?.StartDate != null &&
-                                Sprint.Attributes.StartDate < DateTimeOffset.Now &&
-                                Sprint.Attributes?.FinishDate != null)
-                            {
-                                var nbDayOfWork = Sprint.GetTotalWorkingDays(TeamSettings?.WorkingDays, TeamDaysOff);
-
-                                if (capacity.DaysOff?.Any() == true)
-                                    nbDayOfWork -= capacity.DaysOff.Select(d => (d.End - d.Start).TotalDays).Sum();
-
-                                if (nbDayOfWork != 0)
-                                    velocity.RealCapacity = velocity.HoursOfWorkDone / nbDayOfWork;
-                            }
-                        }
-                    }
+                    MembersVelocities.Add(velocity);
+                    StateHasChanged();
                 }
-
-                MembersVelocities = membersVelocities.Values.OrderByDescending(v => v.HoursOfWorkDone).ToList();
             }
         }
     }

@@ -198,7 +198,7 @@ Welcome to the team members velocity app.
 
     public async Task GetProjects()
     {
-        TeamProjects = await DevOpsService.Projects(Organisation);
+        TeamProjects = (await DevOpsService.Projects(Organisation))?.Value;
 
         StateHasChanged();
     }
@@ -207,7 +207,7 @@ Welcome to the team members velocity app.
 
     public async Task GetTeams()
     {
-        Teams = await DevOpsService.Teams(Organisation, TeamProjects.First(t => t.Name == TeamProject).Id);
+        Teams = (await DevOpsService.Teams(Organisation, TeamProjects.First(t => t.Name == TeamProject).Id))?.Value;
 
         StateHasChanged();
     }
@@ -216,7 +216,7 @@ Welcome to the team members velocity app.
 
     public async Task GetSprints()
     {
-        Sprints = await DevOpsService.Sprints(Organisation, TeamProject, Team);
+        Sprints = (await DevOpsService.Sprints(Organisation, TeamProject, Team))?.Value;
 
         StateHasChanged();
     }

@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace AzureDevOpsTeamMembersVelocity
 {
@@ -25,10 +27,18 @@ namespace AzureDevOpsTeamMembersVelocity
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddBlazoredModal();
+            services.AddSingleton(sp =>
+            {
+                var client = new HttpClient();
+
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                return client;
+            });
             services.AddSingleton<TeamMembersVelocitySettings>();
-            services.AddScoped<DevOpsService>();
-            services.AddScoped<DevOpsProxy>();
-            services.AddScoped<VelocityService>();
+            services.AddSingleton<DevOpsService>();
+            services.AddSingleton<DevOpsProxy>();
+            services.AddSingleton<VelocityService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
