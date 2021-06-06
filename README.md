@@ -10,6 +10,17 @@ A app that fetch task history and tell informations about velocity of each membe
 
 ## Run the app
 
+### Using docker
+
+```
+git clone https://github.com/freddycoder/AzureDevOpsTeamMembersVelocity.git
+cd AzureDevOpsTeamMembersVelocity
+docker build -t azuredevopsteammembersvelocity:initial .
+docker run -p 45000:80 azuredevopsteammembersvelocity:initial
+```
+
+### Using dotnet cli
+
 Using the command line
 
 ```

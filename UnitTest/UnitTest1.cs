@@ -10,11 +10,13 @@ namespace UnitTest
 {
     public class UnitTest1
     {
+        private static string ExampleFolder = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "JsonExample");
+
         [Fact]
         public void DeserializeWorkItemUpdatesLink()
         {
             var responsesDeserialized = JsonSerializer.Deserialize<WorkItem>(
-                File.ReadAllText(Path.Combine("JsonExample", "workitem.json")), Program.SerializerOptions);
+                File.ReadAllText(Path.Combine(ExampleFolder, "workitem.json")), Program.SerializerOptions);
 
             Assert.NotNull(responsesDeserialized.Links);
             Assert.NotNull(responsesDeserialized.Links.WorkItemUpdates);
@@ -26,7 +28,7 @@ namespace UnitTest
         public void DeserializeWorkItemUpdatesResponse()
         {
             var responsesDeserialized = JsonSerializer.Deserialize<ListResponse<WorkItemUpdate>>(
-                File.ReadAllText(Path.Combine("JsonExample", "workitemupdates.json")), Program.SerializerOptions);
+                File.ReadAllText(Path.Combine(ExampleFolder, "workitemupdates.json")), Program.SerializerOptions);
 
             Assert.NotNull(responsesDeserialized);
         }
@@ -35,10 +37,10 @@ namespace UnitTest
         public void GroupByPerson()
         {
             var workItem = JsonSerializer.Deserialize<WorkItem>(
-                File.ReadAllText(Path.Combine("JsonExample", "workitem.json")), Program.SerializerOptions);
+                File.ReadAllText(Path.Combine(ExampleFolder, "workitem.json")), Program.SerializerOptions);
 
             var workItemUpdates = JsonSerializer.Deserialize<ListResponse<WorkItemUpdate>>(
-                File.ReadAllText(Path.Combine("JsonExample", "workitemupdates.json")), Program.SerializerOptions);
+                File.ReadAllText(Path.Combine(ExampleFolder, "workitemupdates.json")), Program.SerializerOptions);
 
             var groupBy = new Dictionary<string, MemberVelocity>();
 

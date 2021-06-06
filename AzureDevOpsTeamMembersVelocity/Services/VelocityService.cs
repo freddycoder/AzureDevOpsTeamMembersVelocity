@@ -2,6 +2,7 @@
 using AzureDevOpsTeamMembersVelocity.Model;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -95,7 +96,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
 
         private static double Parse(string sx)
         {
-            if (double.TryParse(sx.Replace(".", ","), out var x))
+            if (double.TryParse(sx.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator), out var x))
             {
                 return x;
             }
