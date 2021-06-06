@@ -34,6 +34,10 @@ To try the app, you'll need to create an access token inside your azure devops a
 
 The app can list you each member and calculate the total of working hours for each members of a team based on a selected sprint.
 
+### Additional information
+
+The code documentation can be found inside the wiki at https://github.com/freddycoder/AzureDevOpsTeamMembersVelocity/wiki/Code-documentation
+
 ### Additionnal links
 
 Generate html from from c# xml documentation
