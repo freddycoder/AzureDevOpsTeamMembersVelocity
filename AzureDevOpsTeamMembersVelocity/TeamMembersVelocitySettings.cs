@@ -16,8 +16,6 @@ namespace AzureDevOpsTeamMembersVelocity
 
         public string Team { get; set; }
 
-        public string Board { get; set; }
-
         private string _apiKey;
         private bool _authKeyChanged;
         private AuthenticationHeaderValue _authenticationHeader;

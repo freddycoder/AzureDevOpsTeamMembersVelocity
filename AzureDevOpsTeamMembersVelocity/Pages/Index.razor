@@ -14,12 +14,12 @@ Welcome to the team members velocity app.
         </div>
         <div class="form-group">
             <label for="inputOrganisation">Organisation</label>
-            <input id="inputOrganisation" autocomplete="new-password" @bind="Organisation" @bind:event="oninput" type="text" class="form-control" aria-describedby="describeOrganisation" placeholder="Organisation">
+            <input id="inputOrganisation" autocomplete="new-password" @bind="Organisation" type="text" class="form-control" aria-describedby="describeOrganisation" placeholder="Organisation">
             <small id="describeOrganisation" class="form-text text-muted">dev.azure.com/{organisation}</small>
         </div>
         <div class="form-group">
             <label for="inputTeamProject">Team Project</label>
-            <input id="inputTeamProject" autocomplete="new-password" list="teamProjectSuggestion" @bind="TeamProject" @bind:event="oninput" type="text" class="form-control" aria-describedby="describeTeamProject" placeholder="Team project">
+            <input id="inputTeamProject" autocomplete="new-password" list="teamProjectSuggestion" @bind="TeamProject" @bind:event="oninput" @onfocus="GetProjects" type="text" class="form-control" aria-describedby="describeTeamProject" placeholder="Team project">
             @if (TeamProjects != null)
             {
                 <datalist id="teamProjectSuggestion">
@@ -33,7 +33,7 @@ Welcome to the team members velocity app.
         </div>
         <div class="form-group">
             <label for="inputTeam">Team</label>
-            <input id="inputTeam" autocomplete="new-password" list="teamSuggestion" @bind="Team" @bind:event="oninput" type="text" class="form-control" aria-describedby="describeTeam" placeholder="Team">
+            <input id="inputTeam" autocomplete="new-password" list="teamSuggestion" @bind="Team" @bind:event="oninput" @onfocus="GetTeams" @onchange="GetSprints" type="text" class="form-control" aria-describedby="describeTeam" placeholder="Team">
             <datalist id="teamSuggestion">
                 @foreach (var team in Teams)
                 {
@@ -89,6 +89,8 @@ Welcome to the team members velocity app.
         {
             _org = value;
             NeedToSaveConfig = true;
+
+            AppSettings.Organisation = _org;
         }
     }
 
@@ -104,6 +106,8 @@ Welcome to the team members velocity app.
         {
             _teamProject = value;
             NeedToSaveConfig = true;
+
+            AppSettings.TeamProject = _teamProject;
         }
     }
 
@@ -119,21 +123,8 @@ Welcome to the team members velocity app.
         {
             _team = value;
             NeedToSaveConfig = true;
-        }
-    }
 
-    private string _board;
-    [Parameter]
-    public string Board
-    {
-        get
-        {
-            return _board;
-        }
-        set
-        {
-            _board = value;
-            NeedToSaveConfig = true;
+            AppSettings.Team = _team;
         }
     }
 
@@ -149,6 +140,8 @@ Welcome to the team members velocity app.
         {
             _apiKey = value;
             NeedToSaveConfig = true;
+
+            AppSettings.ApiKey = _apiKey;
         }
     }
 
@@ -185,7 +178,6 @@ Welcome to the team members velocity app.
             AppSettings.Organisation = Organisation;
             AppSettings.TeamProject = TeamProject;
             AppSettings.Team = Team;
-            AppSettings.Board = Board;
             AppSettings.ApiKey = ApiKey;
 
             await File.WriteAllTextAsync("AzureDevOpsTeamMemberVelocity.json", JsonSerializer.Serialize(AppSettings));

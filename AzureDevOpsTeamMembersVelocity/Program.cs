@@ -27,7 +27,6 @@ namespace AzureDevOpsTeamMembersVelocity
                 settings.Organisation = savedSettings.Organisation;
                 settings.TeamProject = savedSettings.TeamProject;
                 settings.Team = savedSettings.Team;
-                settings.Board = savedSettings.Board;
                 settings.ApiKey = savedSettings.ApiKey;
             }
             else
