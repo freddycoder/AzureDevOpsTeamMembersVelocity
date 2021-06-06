@@ -1,0 +1,7 @@
+﻿@inherits InputText
+
+<input @attributes="AdditionalAttributes"
+       class="@CssClass"
+       autocomplete="new-password"
+       @bind="CurrentValueAsString"
+       @bind:event="oninput" />

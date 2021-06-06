@@ -7,16 +7,33 @@ using System.Threading.Tasks;
 
 namespace AzureDevOpsTeamMembersVelocity.Services
 {
+    /// <summary>
+    /// Service use to aggregate and group history of a sprint
+    /// </summary>
     public class VelocityService
     {
         private readonly DevOpsService _devOpsService;
 
+        /// <summary>
+        /// Constructor with dependencies
+        /// </summary>
+        /// <param name="devOpsService">Instance of DevOpsService use to fetch data needed</param>
         public VelocityService(DevOpsService devOpsService)
         {
             _devOpsService = devOpsService;
         }
 
-        public async IAsyncEnumerable<MemberVelocity> MemberVelocities(string sprintUrl, List<Capacity>? capacities = null, Sprint? sprint = null, TeamDaysOff? teamDaysOff = null, TeamSettings? teamSettings = null)
+        /// <summary>
+        /// Asynchronously enumerate each member's velocity. 
+        /// Previously return member also updates if needed at each iteration.
+        /// </summary>
+        /// <param name="sprintUrl">Sprint to analyse</param>
+        /// <param name="capacities">Capacities informations to enhance result</param>
+        /// <param name="sprint">Sprint information is use to enhance result</param>
+        /// <param name="teamDaysOff">Team days off is use to enhance result and do the right calculation</param>
+        /// <param name="teamSettings">Team settings is use to enhance result and do the right calculation</param>
+        /// <returns></returns>
+        public async IAsyncEnumerable<MemberVelocity> MemberVelocities(string sprintUrl, List<Capacity>? capacities = null, Sprint? sprint = null, Microsoft.TeamFoundation.Work.WebApi.TeamSettingsDaysOff? teamDaysOff = null, Microsoft.TeamFoundation.Work.WebApi.TeamSetting? teamSettings = null)
         {
             var items = (await _devOpsService.WorkItems(sprintUrl))?.WorkItemRelations;
 
@@ -36,7 +53,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             }
         }
 
-        private static MemberVelocity EnhanceMemberVolocityInfo(MemberVelocity velocity, List<Capacity>? capacities = null, Sprint? sprint = null, TeamDaysOff? teamDaysOff = null, TeamSettings? teamSettings = null)
+        private static MemberVelocity EnhanceMemberVolocityInfo(MemberVelocity velocity, List<Capacity>? capacities = null, Sprint? sprint = null, Microsoft.TeamFoundation.Work.WebApi.TeamSettingsDaysOff? teamDaysOff = null, Microsoft.TeamFoundation.Work.WebApi.TeamSetting? teamSettings = null)
         {
             if (capacities != default)
             {
@@ -116,6 +133,12 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             return null;
         }
 
+        /// <summary>
+        /// Group the list of updates into the MemberVelocity object associate with the person name
+        /// </summary>
+        /// <param name="groupByPerson">Dictionary used to to the group by, can be pre-populated</param>
+        /// <param name="workItem">Work item</param>
+        /// <param name="workItemUpdates">List of updates to group</param>
         public static void GroupByPerson(Dictionary<string, MemberVelocity> groupByPerson, WorkItem workItem, List<WorkItemUpdate>? workItemUpdates)
         {
             if (workItemUpdates == null) return;

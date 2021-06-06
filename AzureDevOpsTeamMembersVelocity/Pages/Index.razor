@@ -8,19 +8,37 @@
 Welcome to the team members velocity app.
 
 <div class="row">
-    <div class="col-4 mt-2">
+    <EditForm class="col-4 mt-2" Model="AppSettings" OnValidSubmit="SaveSettings">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
         <div class="form-group">
             <label for="exampleInputPassword1">Api Key</label>
-            <input @bind="ApiKey" autocomplete="new-password" type="password" class="form-control" id="apiKey" placeholder="API KEY">
+            <SafeTextInput id="apiKey" 
+                           class="form-control" 
+                           @bind-Value="ApiKey"
+                           type="password"
+                           placeholder="API KEY" />
         </div>
         <div class="form-group">
             <label for="inputOrganisation">Organisation</label>
-            <input id="inputOrganisation" autocomplete="new-password" @bind="Organisation" type="text" class="form-control" aria-describedby="describeOrganisation" placeholder="Organisation">
+            <SafeTextInput id="inputOrganisation" 
+                           class="form-control" 
+                           @bind-Value="Organisation" 
+                           type="text" 
+                           aria-describedby="describeOrganisation" 
+                           placeholder="Organisation" />
             <small id="describeOrganisation" class="form-text text-muted">dev.azure.com/{organisation}</small>
         </div>
         <div class="form-group">
             <label for="inputTeamProject">Team Project</label>
-            <input id="inputTeamProject" autocomplete="new-password" list="teamProjectSuggestion" @bind="TeamProject" @bind:event="oninput" @onfocus="GetProjects" type="text" class="form-control" aria-describedby="describeTeamProject" placeholder="Team project">
+            <SafeTextInput id="inputTeamProject" 
+                           class="form-control" 
+                           @bind-Value="TeamProject" 
+                           @onfocus="GetProjects" 
+                           type="text" 
+                           list="teamProjectSuggestion" 
+                           aria-describedby="describeTeamProject" 
+                           placeholder="Team project" />
             @if (TeamProjects != null)
             {
                 <datalist id="teamProjectSuggestion">
@@ -34,7 +52,15 @@ Welcome to the team members velocity app.
         </div>
         <div class="form-group">
             <label for="inputTeam">Team</label>
-            <input id="inputTeam" autocomplete="new-password" list="teamSuggestion" @bind="Team" @bind:event="oninput" @onfocus="GetTeams" @onchange="GetSprints" type="text" class="form-control" aria-describedby="describeTeam" placeholder="Team">
+            <SafeTextInput id="inputTeam" 
+                           class="form-control" 
+                           @bind-Value="Team" 
+                           @onfocus="GetTeams" 
+                           @onchange="GetSprints" 
+                           type="text" 
+                           list="teamSuggestion" 
+                           aria-describedby="describeTeam" 
+                           placeholder="Team" />
             <datalist id="teamSuggestion">
                 @if (Teams != null)
                 {
@@ -46,8 +72,8 @@ Welcome to the team members velocity app.
             </datalist>
             <small id="describeTeam" class="form-text text-muted">dev.azure.com/@Organisation/_apis/projects/@TeamProject/teams?api-version=6.0</small>
         </div>
-        <button @onclick="SaveSettings" class="btn btn-primary">Save settings</button>
-    </div>
+        <button class="btn btn-secondary">Persist settings</button>
+    </EditForm>
 
     <div class="col-md-2">
 
@@ -80,6 +106,7 @@ Welcome to the team members velocity app.
 @code {
     private string? _org;
     [Parameter]
+    [StringLength(256, ErrorMessage = "Organisation is too long.")]
     public string? Organisation
     {
         get
@@ -97,6 +124,7 @@ Welcome to the team members velocity app.
 
     private string? _teamProject;
     [Parameter]
+    [StringLength(64, ErrorMessage = "TeamProject is too long.")]
     public string? TeamProject
     {
         get
@@ -114,6 +142,7 @@ Welcome to the team members velocity app.
 
     private string? _team;
     [Parameter]
+    [StringLength(64, ErrorMessage = "Team is too long.")]
     public string? Team
     {
         get
@@ -131,6 +160,7 @@ Welcome to the team members velocity app.
 
     private string? _apiKey;
     [Parameter]
+    [StringLength(256, ErrorMessage = "ApiKey is too long.")]
     public string? ApiKey
     {
         get

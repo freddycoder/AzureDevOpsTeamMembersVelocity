@@ -352,3 +352,4 @@ MigrationBackup/
 # Custom
 AzureDevOpsTeamMemberVelocity.json
 key-*.xml
+Documentation.xml

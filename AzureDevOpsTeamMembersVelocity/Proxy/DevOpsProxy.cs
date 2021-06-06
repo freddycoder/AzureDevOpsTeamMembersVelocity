@@ -2,43 +2,49 @@
 using RateLimiter;
 using System;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using ComposableAsync;
-using System.IO;
 
 namespace AzureDevOpsTeamMembersVelocity.Proxy
 {
+    /// <summary>
+    /// DevOpsProxy class is used to call Azure DevOps REST API. 
+    /// Implement rate-limiting and ensure URL validation.
+    /// </summary>
     public class DevOpsProxy
     {
         private static readonly TimeLimiter TimeConstrainte = TimeLimiter.GetFromMaxCountByInterval(30, TimeSpan.FromSeconds(1));
         private readonly TeamMembersVelocitySettings _appSettings;
         private readonly ILogger<DevOpsProxy> _logger;
-        private readonly HttpClient client;
+        private readonly HttpClient _client;
 
+        /// <summary>
+        /// Constructor with dependencies
+        /// </summary>
+        /// <param name="client">HttpClient to used</param>
+        /// <param name="appSettings">App settings, to acces AuthenticationHeader</param>
+        /// <param name="logger">Logger to log information and critical error</param>
         public DevOpsProxy(HttpClient client, TeamMembersVelocitySettings appSettings, ILogger<DevOpsProxy> logger)
         {
             _appSettings = appSettings;
             _logger = logger;
-            this.client = client;
+            _client = client;
         }
 
+        /// <summary>
+        /// Get the body content of a response according to a fullUrl
+        /// </summary>
+        /// <param name="fullUrl">Complete URL of the resource to fetch. Must start with https://dev.azure.com/</param>
+        /// <returns>The response body as a string</returns>
         public async Task<string?> GetAsync(string fullUrl)
         {
             _logger.LogInformation($"Try fetch {fullUrl}");
 
             try
             {
-                client.DefaultRequestHeaders.Authorization = _appSettings.AuthenticationHeader;
-
-                await TimeConstrainte;
-
-                using HttpResponseMessage response = await client.GetAsync(fullUrl);
+                using HttpResponseMessage response = await GetResponseAsync(fullUrl);
                 
-                response.EnsureSuccessStatusCode();
-
                 return await response.Content.ReadAsStringAsync();
             }
             catch (Exception ex)
@@ -49,20 +55,19 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
             return default;
         }
 
+        /// <summary>
+        /// Get the body content of a response according to a fullUrl
+        /// </summary>
+        /// <typeparam name="T">Type used in deserialization</typeparam>
+        /// <param name="fullUrl">Complete URL of the resource to fetch. Must start with https://dev.azure.com/</param>
+        /// <returns>The response body Deserialized as T</returns>
         public async Task<T?> GetAsync<T>(string fullUrl)
         {
             _logger.LogInformation($"Try fetch {fullUrl}");
 
             try
             {
-                var personalaccesstoken = _appSettings.ApiKey;
-                client.DefaultRequestHeaders.Authorization = _appSettings.AuthenticationHeader;
-
-                await TimeConstrainte;
-
-                using HttpResponseMessage response = await client.GetAsync(fullUrl);
-
-                response.EnsureSuccessStatusCode();
+                using HttpResponseMessage response = await GetResponseAsync(fullUrl);
 
                 var responseBody = await response.Content.ReadAsByteArrayAsync();
 
@@ -76,6 +81,24 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
             }
 
             return default;
+        }
+
+        private async Task<HttpResponseMessage> GetResponseAsync(string fullUrl)
+        {
+            if (fullUrl.TrimStart().StartsWith("https://dev.azure.com/", StringComparison.OrdinalIgnoreCase) == false)
+            {
+                throw new InvalidOperationException("DevOpsProxy fullUrl must start with 'https://dev.azure.com'");
+            }
+
+            _client.DefaultRequestHeaders.Authorization = _appSettings.AuthenticationHeader;
+
+            await TimeConstrainte;
+
+            var response = await _client.GetAsync(fullUrl);
+
+            response.EnsureSuccessStatusCode();
+
+            return response;
         }
     }
 }
