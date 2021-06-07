@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace AzureDevOpsTeamMembersVelocity.Model
 {
     /// <summary>
     /// MemberVelocity is the model used to display stat about the velocity of a member.
     /// </summary>
-    public class MemberVelocity : IComparable<MemberVelocity>
+    public class MemberVelocity
     {
         /// <summary>
         /// The name of the member
@@ -34,11 +33,37 @@ namespace AzureDevOpsTeamMembersVelocity.Model
         public List<WorkItemUpdate> Updates { get; } = new List<WorkItemUpdate>();
 
         /// <summary>
-        /// Comparer MemberVelocity by HoursOfWorkDone
+        /// Compare two object, if it is of type MemberVelocity, only the DisplayName is goind to be used. Otherwise it is the
+        /// object.Equals(this, obj) that is going to be called
         /// </summary>
-        public int CompareTo(MemberVelocity? other)
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object? obj)
         {
-            return HoursOfWorkDone.CompareTo(other?.HoursOfWorkDone ?? 0.0) * -1;
+            if (obj is MemberVelocity velocity)
+            {
+                return DisplayName == velocity.DisplayName;
+            }
+
+            return object.Equals(this, obj);
+        }
+
+        /// <summary>
+        /// Get the hashcode of the member velocity object.
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode()
+        {
+            return DisplayName?.GetHashCode() ?? 0;
+        }
+
+        /// <summary>
+        /// Return the name of the member velocity instance.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return DisplayName;
         }
     }
 }

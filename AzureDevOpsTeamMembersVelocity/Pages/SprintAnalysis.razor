@@ -68,7 +68,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var velocity in MembersVelocities) 
+            @foreach (var velocity in MembersVelocities.OrderByDescending(v => v.HoursOfWorkDone))
             {
                 var updates = velocity.Updates;
 
@@ -104,7 +104,7 @@ else
 
     public Microsoft.TeamFoundation.Work.WebApi.TeamSettingsDaysOff? TeamDaysOff { get; set; }
 
-    public SortedSet<MemberVelocity>? MembersVelocities { get; set; }
+    public HashSet<MemberVelocity>? MembersVelocities { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -135,7 +135,7 @@ else
                     if (TeamSettings != null) StateHasChanged();
                 }
 
-                MembersVelocities = new SortedSet<MemberVelocity>();
+                MembersVelocities = new HashSet<MemberVelocity>();
 
                 await foreach (var velocity in VelocityService.MemberVelocities(sprintUrl, Capacities, Sprint, TeamDaysOff, TeamSettings))
                 {
