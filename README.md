@@ -53,7 +53,7 @@ Then go to : http://localhost:45000
 
 ```
 docker build -t <username>/azuredevopsteammembersvelocity:<tag> .
-docker push <username>/azuredevopsteammembersvelocity:<tag> .
+docker push <username>/azuredevopsteammembersvelocity:<tag>
 ```
 
 ### Additional information
