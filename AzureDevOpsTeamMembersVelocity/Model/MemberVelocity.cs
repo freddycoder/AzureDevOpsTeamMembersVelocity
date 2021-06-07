@@ -61,7 +61,7 @@ namespace AzureDevOpsTeamMembersVelocity.Model
         /// Return the name of the member velocity instance.
         /// </summary>
         /// <returns></returns>
-        public override string ToString()
+        public override string? ToString()
         {
             return DisplayName;
         }
