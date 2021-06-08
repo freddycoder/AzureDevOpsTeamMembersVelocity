@@ -38,9 +38,9 @@ namespace AzureDevOpsTeamMembersVelocity
 
                 return client;
             });
+            services.AddSingleton<IDevOpsProxy, DevOpsProxy>();
             services.AddSingleton<TeamMembersVelocitySettings>();
             services.AddSingleton<DevOpsService>();
-            services.AddSingleton<DevOpsProxy>();
             services.AddSingleton<VelocityService>();
         }
 

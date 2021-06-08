@@ -11,13 +11,13 @@ namespace AzureDevOpsTeamMembersVelocity.Services
     /// </summary>
     public class DevOpsService
     {
-        private readonly DevOpsProxy _proxy;
+        private readonly IDevOpsProxy _proxy;
 
         /// <summary>
         /// Constructor with dependencies
         /// </summary>
         /// <param name="proxy">The proxy used to call the REST API</param>
-        public DevOpsService(DevOpsProxy proxy)
+        public DevOpsService(IDevOpsProxy proxy)
         {
             _proxy = proxy;
         }
@@ -25,12 +25,15 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// <summary>
         /// Get the list of projects of an organization.
         /// </summary>
+        /// <remarks>
+        /// See microsoft doc : https://docs.microsoft.com/en-us/rest/api/azure/devops/core/projects/list?view=azure-devops-rest-6.0
+        /// </remarks>
         /// <param name="organization">Name of the organization. https://dev.azure.com/{organization}</param>
         /// <returns>List of TeamProject</returns>
         public Task<ListResponse<TeamProject>?> Projects(string organization)
         {
             return _proxy.GetAsync<ListResponse<TeamProject>>(
-                $"https://dev.azure.com/{organization}/_apis/projects");
+                $"https://dev.azure.com/{organization}/_apis/projects?api-version=6.0");
         }
 
         /// <summary>
@@ -130,7 +133,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// <returns>The WorkItem deserialized</returns>
         public Task<WorkItem?> WorkItem(string workItemUrl)
         {
-            return _proxy.GetAsync<WorkItem>(workItemUrl);
+            return _proxy.GetAsync<WorkItem>($"{workItemUrl}?api-version=6.0");
         }
 
         /// <summary>

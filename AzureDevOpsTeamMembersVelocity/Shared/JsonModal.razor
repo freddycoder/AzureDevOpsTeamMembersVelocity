@@ -1,4 +1,4 @@
-﻿@inject DevOpsProxy DevOpsProxy
+﻿@inject IDevOpsProxy DevOpsProxy
 
 <div>
     <pre class="text">
@@ -19,7 +19,7 @@
     {
         if (HistoryUrl != null)
         {
-            Json = (await DevOpsProxy.GetAsync(HistoryUrl))?.FormatJson();
+            Json = (await DevOpsProxy.GetAsync($"{HistoryUrl}?api-version=6.0"))?.FormatJson();
         }
     }
 }

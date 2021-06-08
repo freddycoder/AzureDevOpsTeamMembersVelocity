@@ -86,7 +86,6 @@ namespace AzureDevOpsTeamMembersVelocity.Model
             if (teamDaysOff?.DaysOff?.Any() == true)
                 initial -= teamDaysOff.DaysOff.Select(d => (d.End - d.Start).TotalDays).Sum();
 
-
             return initial;
         }
     }

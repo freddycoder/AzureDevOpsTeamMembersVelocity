@@ -12,7 +12,7 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
     /// DevOpsProxy class is used to call Azure DevOps REST API. 
     /// Implement rate-limiting and ensure URL validation.
     /// </summary>
-    public class DevOpsProxy
+    public class DevOpsProxy : IDevOpsProxy
     {
         private static readonly TimeLimiter TimeConstrainte = TimeLimiter.GetFromMaxCountByInterval(30, TimeSpan.FromSeconds(1));
         private readonly TeamMembersVelocitySettings _appSettings;
