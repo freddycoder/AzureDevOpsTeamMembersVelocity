@@ -85,9 +85,13 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
 
         private async Task<HttpResponseMessage> GetResponseAsync(string fullUrl)
         {
-            if (fullUrl.TrimStart().StartsWith("https://dev.azure.com/", StringComparison.OrdinalIgnoreCase) == false)
+            if (fullUrl.StartsWith("https://dev.azure.com/", StringComparison.OrdinalIgnoreCase) == false)
             {
                 throw new InvalidOperationException("DevOpsProxy fullUrl must start with 'https://dev.azure.com'");
+            }
+            if (fullUrl.Contains('\n'))
+            {
+                throw new InvalidOperationException("DevOpsProxy fullUrl must not contains any '\\n'");
             }
 
             _client.DefaultRequestHeaders.Authorization = _appSettings.AuthenticationHeader;

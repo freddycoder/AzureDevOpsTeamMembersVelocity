@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using static System.Environment;
 
 namespace AzureDevOpsTeamMembersVelocity
 {
@@ -59,6 +60,12 @@ namespace AzureDevOpsTeamMembersVelocity
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Add("X-Frame-Options", GetEnvironmentVariable("X-FRAME-OPTIONS") ?? "DENY");
+                await next();
+            });
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
