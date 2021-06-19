@@ -1,3 +1,4 @@
+using AzureDevOpsTeamMembersVelocity.Data;
 using AzureDevOpsTeamMembersVelocity.Extensions;
 using AzureDevOpsTeamMembersVelocity.Proxy;
 using AzureDevOpsTeamMembersVelocity.Services;
@@ -5,8 +6,10 @@ using Blazored.Modal;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -54,8 +57,15 @@ namespace AzureDevOpsTeamMembersVelocity
         /// <summary>
         /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
+            if (! string.Equals(GetEnvironmentVariable("USE_STARTUP_MIGRATION"), bool.FalseString, System.StringComparison.OrdinalIgnoreCase))
+            {
+                var database = serviceProvider.GetRequiredService<IdentityContext>();
+
+                database.Database.Migrate();
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

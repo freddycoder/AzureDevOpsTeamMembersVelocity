@@ -353,3 +353,4 @@ MigrationBackup/
 AzureDevOpsTeamMemberVelocity.json
 key-*.xml
 Documentation.xml
+AzureDevOpsTeamMembersVelocity.db

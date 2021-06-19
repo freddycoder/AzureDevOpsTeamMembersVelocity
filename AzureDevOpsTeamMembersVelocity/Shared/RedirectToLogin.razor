@@ -1,7 +1,7 @@
 ﻿@inject NavigationManager Navigation
+@inject AuthUrlPagesProvider AuthUrlProvider
 
 @code {
-
     [CascadingParameter]
     private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
 
@@ -19,9 +19,20 @@
             var returnUrl = Navigation.ToBaseRelativePath(Navigation.Uri);
 
             if (string.IsNullOrWhiteSpace(returnUrl))
-                Navigation.NavigateTo("Login", true);
+            {
+                if (AuthUrlProvider.Schema == "Identity.Application")
+                {
+                    Navigation.NavigateTo($"{AuthUrlProvider.LoginPage}?returnUrl=/", true);
+                }
+                else
+                {
+                    Navigation.NavigateTo(AuthUrlProvider.LoginPage, true);
+                }
+            }
             else
-                Navigation.NavigateTo($"Login?returnUrl={returnUrl}", true);
+            {
+                Navigation.NavigateTo($"{AuthUrlProvider.LoginPage}?returnUrl={returnUrl}", true);
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 @inherits LayoutComponentBase
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AuthUrlPagesProvider AuthUrlProvider
 
 <div class="page">
     <div class="sidebar">
@@ -8,10 +9,18 @@
 
     <div class="main">
         <div class="top-row px-4">
-            @if (ClaimsPrincipal?.Identity?.IsAuthenticated == true)
-            {
-                <span>Welcome @ClaimsPrincipal.Identity.Name</span>
-            }
+            <AuthorizeView>
+                <Authorized>
+                    @if (AuthUrlProvider.IsIdentity)
+                    {
+                        <a href="/identity/account/manage">Welcome (@context?.User?.Identity?.Name)</a>
+                    }
+                    else
+                    {
+                        <span>Welcome (@context?.User?.Identity?.Name)</span>
+                    }
+                </Authorized>
+            </AuthorizeView>
         </div>
 
         <div class="content px-4">
