@@ -15,14 +15,16 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
             {
                 services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                         .AddCookie();
+
+                services.AddScoped<IHostEnvironmentAuthenticationStateProvider>(sp =>
+                    (ServerAuthenticationStateProvider)sp.GetRequiredService<AuthenticationStateProvider>());
+
             }
             else
             {
-                services.AddSingleton<AllowAnonymous>();
+                services.AddScoped<AllowAnonymousStateProvider>();
+                services.AddScoped<IHostEnvironmentAuthenticationStateProvider>(sp => sp.GetRequiredService<AllowAnonymousStateProvider>());
             }
-
-            services.AddScoped<IHostEnvironmentAuthenticationStateProvider>(sp =>
-                    (ServerAuthenticationStateProvider)sp.GetRequiredService<AuthenticationStateProvider>());
 
             return services;
         }
