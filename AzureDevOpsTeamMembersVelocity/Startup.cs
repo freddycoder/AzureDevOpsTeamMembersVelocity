@@ -1,3 +1,4 @@
+using AzureDevOpsTeamMembersVelocity.Extensions;
 using AzureDevOpsTeamMembersVelocity.Proxy;
 using AzureDevOpsTeamMembersVelocity.Services;
 using Blazored.Modal;
@@ -28,9 +29,13 @@ namespace AzureDevOpsTeamMembersVelocity
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddBlazoredModal();
+
+            services.AddTeamMemberVelocityAutorisation();
+
             services.AddDataProtection()
                     .PersistKeysToFileSystem(new DirectoryInfo(Directory.GetCurrentDirectory()))
                     .SetApplicationName(nameof(AzureDevOpsTeamMembersVelocity));
+            
             services.AddSingleton(sp =>
             {
                 var client = new HttpClient();
@@ -39,6 +44,7 @@ namespace AzureDevOpsTeamMembersVelocity
 
                 return client;
             });
+
             services.AddSingleton<IDevOpsProxy, DevOpsProxy>();
             services.AddSingleton<TeamMembersVelocitySettings>();
             services.AddSingleton<DevOpsService>();
@@ -72,8 +78,12 @@ namespace AzureDevOpsTeamMembersVelocity
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
