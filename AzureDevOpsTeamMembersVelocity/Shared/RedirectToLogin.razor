@@ -1,0 +1,27 @@
+﻿@inject NavigationManager Navigation
+
+@code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationStateTask == default)
+        {
+            throw new InvalidProgramException($"{nameof(AuthenticationStateTask)} cannot be null");
+        }
+
+        var authenticationState = await AuthenticationStateTask;
+
+        if (authenticationState?.User?.Identity is null || !authenticationState.User.Identity.IsAuthenticated)
+        {
+            var returnUrl = Navigation.ToBaseRelativePath(Navigation.Uri);
+
+            if (string.IsNullOrWhiteSpace(returnUrl))
+                Navigation.NavigateTo("Login", true);
+            else
+                Navigation.NavigateTo($"Login?returnUrl={returnUrl}", true);
+        }
+    }
+}

@@ -1,0 +1,20 @@
+﻿@inject IHostEnvironmentAuthenticationStateProvider? HostAuthentication
+@inject AuthenticationStateProvider? AuthenticationStateProvider
+
+<h3>Logout</h3>
+
+<p>You are now logout.</p>
+
+@code {
+    protected override Task OnInitializedAsync()
+    {
+        if (HostAuthentication == null)
+        {
+            throw new InvalidProgramException($"{HostAuthentication} cannot be null");
+        }
+
+        HostAuthentication.SetAuthenticationState(Task.FromResult(new AuthenticationState(new ClaimsPrincipal())));
+
+        return base.OnInitializedAsync();
+    }
+}

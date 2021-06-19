@@ -1,0 +1,106 @@
+﻿@page "/Login"
+@inject IHostEnvironmentAuthenticationStateProvider? HostAuthentication
+@inject AuthenticationStateProvider? AuthenticationStateProvider
+@inject NavigationManager NavManager
+
+<h1>Login</h1>
+<div class="row">
+    <EditForm class="col-4 mt-2" EditContext="FormContext" OnValidSubmit="LoginMethod">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label for="User.Email">Email</label>
+            <InputText id="useremail"
+                       class="form-control"
+                       @bind-Value="User.Email"
+                       type="text"
+                       list="teamProjectSuggestion"
+                       aria-describedby="describeTeamProject"
+                       placeholder="Email" />
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword1">Password</label>
+            <InputText id="apiKey"
+                       class="form-control"
+                       @bind-Value="User.Password"
+                       type="password"
+                       placeholder="Password" />
+        </div>
+        <button class="btn btn-secondary">Login</button>
+    </EditForm>
+</div>
+
+
+@code {
+    public class LoginUser
+    {
+        [Required]
+        [EmailAddress]
+        public string? Email { get; set; }
+
+        [DataType(DataType.Password)]
+        public string? Password { get; set; }
+    }
+
+    public EditContext? FormContext { get; set; }
+
+    public LoginUser User { get; set; } = new LoginUser();
+
+    protected override void OnInitialized()
+    {
+        FormContext = new EditContext(User);
+    }
+
+    public async Task LoginMethod()
+    {
+        if (FormContext == null)
+        {
+            throw new InvalidProgramException($"{nameof(FormContext)} cannot be null");
+        }
+
+        if (User?.Email == null)
+        {
+            var field = FormContext.Field(nameof(LoginUser.Email));
+
+            return;
+        }
+
+        if (!(User.Email == Environment.GetEnvironmentVariable("COOKIEAUTH_USER") &&
+              User.Password == Environment.GetEnvironmentVariable("COOKIEAUTH_PASSWORD")))
+        {
+            var field = FormContext.Field(nameof(LoginUser.Email));
+
+            return;
+        }
+
+        var claims = new List<Claim>
+{
+            new Claim(ClaimTypes.Name, "User"),
+            new Claim(ClaimTypes.Email, User.Email),
+        };
+
+        var claimsIdentity = new ClaimsIdentity(
+            claims,
+            CookieAuthenticationDefaults.AuthenticationScheme);
+
+        ClaimsPrincipal principal = new ClaimsPrincipal(claimsIdentity);
+
+        HostAuthentication!.SetAuthenticationState(Task.FromResult(new AuthenticationState(principal)));
+
+        AuthenticationState authState = await AuthenticationStateProvider!.GetAuthenticationStateAsync();
+
+        var navigateToUrl = "/";
+
+        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var returnUrl))
+        {
+            if (returnUrl.ToString().StartsWith("/"))
+            {
+                navigateToUrl = returnUrl.ToString();
+            }
+        }
+
+        NavManager.NavigateTo(navigateToUrl);
+    }
+}
