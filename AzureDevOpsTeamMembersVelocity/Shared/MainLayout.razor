@@ -13,11 +13,11 @@
                 <Authorized>
                     @if (AuthUrlProvider.IsIdentity)
                     {
-                        <a href="/identity/account/manage">Welcome (@context?.User?.Identity?.Name)</a>
+                        <a href="/identity/account/manage">Welcome @context?.User?.Identity?.Name</a>
                     }
                     else
                     {
-                        <span>Welcome (@context?.User?.Identity?.Name)</span>
+                        <span>Welcome @context?.User?.Identity?.Name</span>
                     }
                 </Authorized>
             </AuthorizeView>

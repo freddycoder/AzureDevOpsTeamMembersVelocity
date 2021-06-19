@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using AzureDevOpsTeamMembersVelocity.Services;
 
 namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
 {
@@ -15,18 +16,20 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LogoutModel> _logger;
+        private readonly AuthUrlPagesProvider _authUrlProvider;
 
-        public LogoutModel(SignInManager<IdentityUser> signInManager, ILogger<LogoutModel> logger)
+        public LogoutModel(SignInManager<IdentityUser> signInManager, ILogger<LogoutModel> logger, AuthUrlPagesProvider authUrlPages)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _authUrlProvider = authUrlPages;
         }
 
         public void OnGet()
         {
         }
 
-        public async Task<IActionResult> OnPost(string returnUrl = null)
+        public async Task<IActionResult> OnPost(string? returnUrl = null)
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
@@ -36,7 +39,7 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
             }
             else
             {
-                return RedirectToPage();
+                return LocalRedirect($"{_authUrlProvider.LoginPage}?returnUrl=/");
             }
         }
     }
