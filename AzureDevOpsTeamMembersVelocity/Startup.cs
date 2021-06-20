@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Web.UI;
 using System;
@@ -84,9 +85,20 @@ namespace AzureDevOpsTeamMembersVelocity
             if ((! string.Equals(GetEnvironmentVariable("USE_STARTUP_MIGRATION"), bool.FalseString, StringComparison.OrdinalIgnoreCase)) &&
                    string.Equals(GetEnvironmentVariable("USE_IDENTITY"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
             {
-                var database = serviceProvider.GetRequiredService<IdentityContext>();
+                try
+                {
+                    var database = serviceProvider.GetRequiredService<IdentityContext>();
 
-                database.Database.Migrate();
+                    database.Database.Migrate();
+                }
+                catch (Exception e)
+                {
+                    var logger = serviceProvider.GetRequiredService<ILogger<Startup>>();
+
+                    logger.LogCritical(e, "An error occure during the migration of the database. The app will be able to start.");
+
+                    throw;
+                }
             }
 
             if (env.IsDevelopment())

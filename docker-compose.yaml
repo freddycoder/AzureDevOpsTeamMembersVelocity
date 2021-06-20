@@ -1,0 +1,18 @@
+version: "3"
+services:
+  azuredevopsteammembersvelocity:
+    image: "azuredevopsteammembersvelocity:auth"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_URLS: "https://+;"
+      ASPNETCORE_Kestrel__Certificates__Default__Password: password
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/aspnetapp-web-api.pfx
+      AzureAD:TenantId: $TENANT_ID
+      AzureAD:ClientId: $CLIENT_ID
+    ports:
+      - "45001:443"
+    volumes:
+      - ./AzureDevOpsTeamMembersVelocity/certs:/https/
+      - type: bind # Using a bind volume as only this single file from `certs` directory should end up in the container.
+        source: ./certs/aspnetapp-root-cert.cer
+        target: /https-root/aspnetapp-root-cert.cer
