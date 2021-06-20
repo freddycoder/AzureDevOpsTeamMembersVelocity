@@ -1,4 +1,6 @@
 @inherits LayoutComponentBase
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AuthUrlPagesProvider AuthUrlProvider
 
 <div class="page">
     <div class="sidebar">
@@ -7,7 +9,18 @@
 
     <div class="main">
         <div class="top-row px-4">
-            <a href="https://github.com/freddycoder/" target="_blank">About</a>
+            <AuthorizeView>
+                <Authorized>
+                    @if (AuthUrlProvider.IsIdentity)
+                    {
+                        <a href="/identity/account/manage">Welcome @context?.User?.Identity?.Name</a>
+                    }
+                    else
+                    {
+                        <span>Welcome @context?.User?.Identity?.Name</span>
+                    }
+                </Authorized>
+            </AuthorizeView>
         </div>
 
         <div class="content px-4">
@@ -15,3 +28,14 @@
         </div>
     </div>
 </div>
+
+@code {
+    public ClaimsPrincipal? ClaimsPrincipal { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        ClaimsPrincipal = authState.User;
+    }
+}

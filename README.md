@@ -18,6 +18,56 @@ Then go to : http://localhost:45000
 
 Demo : https://youtu.be/Ecl3QeIxSfM
 
+## Run the app with authentication
+
+### 1. Environment variable user
+
+Only a username
+```
+docker run -e COOKIEAUTH_USER=admin@teamvelocity.com -p 45000:80 erabliereapi/azuredevopsteammembersvelocity:auth
+```
+
+A username and a password
+```
+docker run -e COOKIEAUTH_USER=admin@teamvelocity.com -e COOKIEAUTH_PASSWORD=admin -p 45000:80 erabliereapi/azuredevopsteammembersvelocity:auth
+```
+
+### 2. Microsoft Identity self hosted
+
+Use the default asp.net scafolding Identity pages and logic
+```
+docker run -e USE_IDENTITY=true -e -p 45000:80 erabliereapi/azuredevopsteammembersvelocity:auth
+```
+
+### 3. AzureAD
+
+You must register the app inside AzureAD first.
+
+For example you can register an app with 
+- Single Tenant
+- Redirect url : https://localhost:45000/signin-oidc
+
+After registrer the app, go to the Authentication page off the newly created app.
+
+Set front-chanel logout to : https://localhost:45001/signout-oidc
+
+Select the tokens you would like to be issued by the authorization endpoint: ```ID tokens```
+
+And save the settings. Now the AzureAD authentication will work with the container.
+
+This one is a little bit more complicated since we must use https.
+
+For this on we are going to use a script inside this repo, and also use the docker compose file from this repo.
+```
+./setup-docker-ssl.ps1
+
+docker compose up -d
+```
+
+### Note on https
+
+To use https with other authentication method that AzureAD, you can hack the docker-compose.yaml file to fit with the environment variable of the authentication method you want to use. Then you can launch the script ```setup-docker-ssl.ps1``` and run ```docker compose up -d```.
+
 ## Build the app
 
 ### Dependency
@@ -43,8 +93,8 @@ Then go to : http://localhost:5000 or https://localhost:5001
 ```
 git clone https://github.com/freddycoder/AzureDevOpsTeamMembersVelocity.git
 cd AzureDevOpsTeamMembersVelocity
-docker build -t azuredevopsteammembersvelocity:initial .
-docker run -p 45000:80 azuredevopsteammembersvelocity:initial
+docker build -t azuredevopsteammembersvelocity:auth .
+docker run -p 45000:80 azuredevopsteammembersvelocity:auth
 ```
 
 Then go to : http://localhost:45000

@@ -1,11 +1,21 @@
+using AzureDevOpsTeamMembersVelocity.Data;
+using AzureDevOpsTeamMembersVelocity.Extensions;
 using AzureDevOpsTeamMembersVelocity.Proxy;
 using AzureDevOpsTeamMembersVelocity.Services;
 using Blazored.Modal;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Identity.Client;
+using Microsoft.Identity.Web.UI;
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -19,18 +29,46 @@ namespace AzureDevOpsTeamMembersVelocity
     public class Startup
     {
         /// <summary>
+        /// Configuration of the app. Use when AzureAD authentication method is used.
+        /// </summary>
+        public IConfiguration Configuration { get; }
+
+        /// <summary>
+        /// Constructor of the startup class with the configuration object in parameter
+        /// </summary>
+        /// <param name="configuration"></param>
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        /// <summary>
         /// This method gets called by the runtime. Use this method to add services to the container.
         /// For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         /// </summary>
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRazorPages();
+            var mvcBuilder = services.AddRazorPages();
+            if (AddAuthentificationExtension.IsAzureADAuth())
+            {
+                mvcBuilder.AddMvcOptions(options =>
+                {
+                    var policy = new AuthorizationPolicyBuilder()
+                                  .RequireAuthenticatedUser()
+                                  .Build();
+                    options.Filters.Add(new AuthorizeFilter(policy));
+                }).AddMicrosoftIdentityUI();
+            }
             services.AddServerSideBlazor();
             services.AddBlazoredModal();
+
+            services.AddTeamMemberVelocityAutorisation(Configuration);
+
             services.AddDataProtection()
                     .PersistKeysToFileSystem(new DirectoryInfo(Directory.GetCurrentDirectory()))
                     .SetApplicationName(nameof(AzureDevOpsTeamMembersVelocity));
+            
             services.AddSingleton(sp =>
             {
                 var client = new HttpClient();
@@ -39,6 +77,7 @@ namespace AzureDevOpsTeamMembersVelocity
 
                 return client;
             });
+
             services.AddSingleton<IDevOpsProxy, DevOpsProxy>();
             services.AddSingleton<TeamMembersVelocitySettings>();
             services.AddSingleton<DevOpsService>();
@@ -48,8 +87,27 @@ namespace AzureDevOpsTeamMembersVelocity
         /// <summary>
         /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
+            if ((! string.Equals(GetEnvironmentVariable("USE_STARTUP_MIGRATION"), bool.FalseString, StringComparison.OrdinalIgnoreCase)) &&
+                   string.Equals(GetEnvironmentVariable("USE_IDENTITY"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    var database = serviceProvider.GetRequiredService<IdentityContext>();
+
+                    database.Database.Migrate();
+                }
+                catch (Exception e)
+                {
+                    var logger = serviceProvider.GetRequiredService<ILogger<Startup>>();
+
+                    logger.LogCritical(e, "An error occure during the migration of the database. The app will be able to start.");
+
+                    throw;
+                }
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -72,8 +130,12 @@ namespace AzureDevOpsTeamMembersVelocity
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });

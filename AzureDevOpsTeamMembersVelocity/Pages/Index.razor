@@ -2,6 +2,8 @@
 @inject TeamMembersVelocitySettings AppSettings
 @inject DevOpsService DevOpsService
 @inject IDataProtectionProvider DataProtectionProvider
+@inject AzureDevOpsTeamMembersVelocity.Services.TokenProvider TokenProvider
+@attribute [Authorize]
 
 <h1>Team members velocity</h1>
 
@@ -13,31 +15,31 @@ Welcome to the team members velocity app.
         <ValidationSummary />
         <div class="form-group">
             <label for="exampleInputPassword1">Api Key</label>
-            <SafeTextInput id="apiKey" 
-                           class="form-control" 
+            <SafeTextInput id="apiKey"
+                           class="form-control"
                            @bind-Value="ApiKey"
                            type="password"
                            placeholder="API KEY" />
         </div>
         <div class="form-group">
             <label for="inputOrganisation">Organisation</label>
-            <SafeTextInput id="inputOrganisation" 
-                           class="form-control" 
-                           @bind-Value="Organisation" 
-                           type="text" 
-                           aria-describedby="describeOrganisation" 
+            <SafeTextInput id="inputOrganisation"
+                           class="form-control"
+                           @bind-Value="Organisation"
+                           type="text"
+                           aria-describedby="describeOrganisation"
                            placeholder="Organisation" />
             <small id="describeOrganisation" class="form-text text-muted">dev.azure.com/{organisation}</small>
         </div>
         <div class="form-group">
             <label for="inputTeamProject">Team Project</label>
-            <SafeTextInput id="inputTeamProject" 
-                           class="form-control" 
-                           @bind-Value="TeamProject" 
-                           @onfocus="GetProjects" 
-                           type="text" 
-                           list="teamProjectSuggestion" 
-                           aria-describedby="describeTeamProject" 
+            <SafeTextInput id="inputTeamProject"
+                           class="form-control"
+                           @bind-Value="TeamProject"
+                           @onfocus="GetProjects"
+                           type="text"
+                           list="teamProjectSuggestion"
+                           aria-describedby="describeTeamProject"
                            placeholder="Team project" />
             @if (TeamProjects != null)
             {
@@ -52,14 +54,14 @@ Welcome to the team members velocity app.
         </div>
         <div class="form-group">
             <label for="inputTeam">Team</label>
-            <SafeTextInput id="inputTeam" 
-                           class="form-control" 
-                           @bind-Value="Team" 
-                           @onfocus="GetTeams" 
-                           @onchange="GetSprints" 
-                           type="text" 
-                           list="teamSuggestion" 
-                           aria-describedby="describeTeam" 
+            <SafeTextInput id="inputTeam"
+                           class="form-control"
+                           @bind-Value="Team"
+                           @onfocus="GetTeams"
+                           @onchange="GetSprints"
+                           type="text"
+                           list="teamSuggestion"
+                           aria-describedby="describeTeam"
                            placeholder="Team" />
             <datalist id="teamSuggestion">
                 @if (Teams != null)
@@ -72,6 +74,7 @@ Welcome to the team members velocity app.
             </datalist>
             <small id="describeTeam" class="form-text text-muted">dev.azure.com/@Organisation/_apis/projects/@TeamProject/teams?api-version=6.0</small>
         </div>
+        <input name="__RequestVerificationToken" type="hidden" value="@TokenProvider.XsrfToken">
         <button class="btn btn-secondary">Persist settings</button>
     </EditForm>
 
