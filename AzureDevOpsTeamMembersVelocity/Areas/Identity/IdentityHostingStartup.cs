@@ -10,8 +10,15 @@ using Microsoft.Extensions.DependencyInjection;
 [assembly: HostingStartup(typeof(AzureDevOpsTeamMembersVelocity.Areas.Identity.IdentityHostingStartup))]
 namespace AzureDevOpsTeamMembersVelocity.Areas.Identity
 {
+    /// <summary>
+    /// Hosting startup class to add Identity services in the app
+    /// </summary>
     public class IdentityHostingStartup : IHostingStartup
     {
+        /// <summary>
+        /// Method call at runtime to configure Identity
+        /// </summary>
+        /// <param name="builder"></param>
         public void Configure(IWebHostBuilder builder)
         {
             builder.ConfigureServices((context, services) => {

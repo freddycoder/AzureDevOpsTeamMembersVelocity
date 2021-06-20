@@ -23,10 +23,10 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
         }
 
         [BindProperty]
-        public InputModel Input { get; set; }
+        public InputModel? Input { get; set; }
 
         [TempData]
-        public string StatusMessage { get; set; }
+        public string? StatusMessage { get; set; }
 
         public class InputModel
         {
@@ -34,12 +34,12 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "New password")]
-            public string NewPassword { get; set; }
+            public string? NewPassword { get; set; }
 
             [DataType(DataType.Password)]
             [Display(Name = "Confirm new password")]
             [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
-            public string ConfirmPassword { get; set; }
+            public string? ConfirmPassword { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -62,7 +62,7 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || Input == null)
             {
                 return Page();
             }

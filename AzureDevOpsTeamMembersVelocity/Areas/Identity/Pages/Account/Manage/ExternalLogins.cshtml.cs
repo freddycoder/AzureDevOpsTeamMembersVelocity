@@ -9,11 +9,19 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
 {
+    /// <summary>
+    /// External login page model
+    /// </summary>
     public class ExternalLoginsModel : PageModel
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
 
+        /// <summary>
+        /// Constructor with depedencies
+        /// </summary>
+        /// <param name="userManager"></param>
+        /// <param name="signInManager"></param>
         public ExternalLoginsModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager)
@@ -22,14 +30,14 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
         }
 
-        public IList<UserLoginInfo> CurrentLogins { get; set; }
+        public IList<UserLoginInfo>? CurrentLogins { get; set; }
 
-        public IList<AuthenticationScheme> OtherLogins { get; set; }
+        public IList<AuthenticationScheme>? OtherLogins { get; set; }
 
         public bool ShowRemoveButton { get; set; }
 
         [TempData]
-        public string StatusMessage { get; set; }
+        public string? StatusMessage { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
         {

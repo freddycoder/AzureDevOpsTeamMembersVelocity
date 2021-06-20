@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -9,6 +8,9 @@ using Microsoft.Extensions.Logging;
 
 namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
 {
+    /// <summary>
+    /// Generate recovery code page model
+    /// </summary>
     public class GenerateRecoveryCodesModel : PageModel
     {
         private readonly UserManager<IdentityUser> _userManager;
@@ -23,10 +25,10 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
         }
 
         [TempData]
-        public string[] RecoveryCodes { get; set; }
+        public string[]? RecoveryCodes { get; set; }
 
         [TempData]
-        public string StatusMessage { get; set; }
+        public string? StatusMessage { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
         {

@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
 {
+    /// <summary>
+    /// Access denied page model
+    /// </summary>
     public class AccessDeniedModel : PageModel
     {
+        /// <summary>
+        /// Append when the access denid page is GET
+        /// </summary>
         public void OnGet()
         {
 

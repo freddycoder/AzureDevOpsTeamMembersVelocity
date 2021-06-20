@@ -24,16 +24,28 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
             _logger = logger;
         }
 
+        /// <summary>
+        /// Input model of the Delete Personnal Data page
+        /// </summary>
         [BindProperty]
-        public InputModel Input { get; set; }
+        public InputModel? Input { get; set; }
 
+        /// <summary>
+        /// Input model of the Delete Personnal Data page
+        /// </summary>
         public class InputModel
         {
+            /// <summary>
+            /// The password of the user
+            /// </summary>
             [Required]
             [DataType(DataType.Password)]
-            public string Password { get; set; }
+            public string? Password { get; set; }
         }
 
+        /// <summary>
+        /// Indicate if it required password
+        /// </summary>
         public bool RequirePassword { get; set; }
 
         public async Task<IActionResult> OnGet()
@@ -54,6 +66,11 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            if (Input == null)
+            {
+                return Page();
             }
 
             RequirePassword = await _userManager.HasPasswordAsync(user);

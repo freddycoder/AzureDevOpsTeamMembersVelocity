@@ -26,13 +26,13 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
         }
 
         [BindProperty]
-        public InputModel Input { get; set; }
+        public InputModel? Input { get; set; }
 
         public class InputModel
         {
             [Required]
             [EmailAddress]
-            public string Email { get; set; }
+            public string? Email { get; set; }
         }
 
         public void OnGet()
@@ -42,6 +42,11 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            if (Input == null)
             {
                 return Page();
             }
@@ -59,7 +64,7 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
             var callbackUrl = Url.Page(
                 "/Account/ConfirmEmail",
                 pageHandler: null,
-                values: new { userId = userId, code = code },
+                values: new { userId, code },
                 protocol: Request.Scheme);
             await _emailSender.SendEmailAsync(
                 Input.Email,

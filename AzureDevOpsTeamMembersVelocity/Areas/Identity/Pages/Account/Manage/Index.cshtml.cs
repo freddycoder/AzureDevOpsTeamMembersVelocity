@@ -9,11 +9,19 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
 {
+    /// <summary>
+    /// Index model page
+    /// </summary>
     public partial class IndexModel : PageModel
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
 
+        /// <summary>
+        /// Constructor with dependencies
+        /// </summary>
+        /// <param name="userManager"></param>
+        /// <param name="signInManager"></param>
         public IndexModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager)
@@ -22,19 +30,34 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
         }
 
-        public string Username { get; set; }
+        /// <summary>
+        /// The username
+        /// </summary>
+        public string? Username { get; set; }
 
+        /// <summary>
+        /// Status message to show user
+        /// </summary>
         [TempData]
-        public string StatusMessage { get; set; }
+        public string? StatusMessage { get; set; }
 
+        /// <summary>
+        /// Input model of the Index page
+        /// </summary>
         [BindProperty]
-        public InputModel Input { get; set; }
+        public InputModel? Input { get; set; }
 
+        /// <summary>
+        /// Input model of the Index page
+        /// </summary>
         public class InputModel
         {
+            /// <summary>
+            /// The phone number of the user
+            /// </summary>
             [Phone]
             [Display(Name = "Phone number")]
-            public string PhoneNumber { get; set; }
+            public string? PhoneNumber { get; set; }
         }
 
         private async Task LoadAsync(IdentityUser user)
@@ -50,6 +73,10 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
             };
         }
 
+        /// <summary>
+        /// Append when Index page is GET
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> OnGetAsync()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -62,6 +89,10 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
             return Page();
         }
 
+        /// <summary>
+        /// Append on POST of the Index page.
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> OnPostAsync()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -74,6 +105,12 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
             {
                 await LoadAsync(user);
                 return Page();
+            }
+
+            if (Input == null)
+            {
+                StatusMessage = "There is no input at all...";
+                return RedirectToPage();
             }
 
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);

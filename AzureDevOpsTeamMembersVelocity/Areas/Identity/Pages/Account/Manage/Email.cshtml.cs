@@ -13,40 +13,61 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
 {
+    /// <summary>
+    /// Email page model
+    /// </summary>
     public partial class EmailModel : PageModel
     {
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IEmailSender _emailSender;
 
+        /// <summary>
+        /// Constructor with dependencies
+        /// </summary>
         public EmailModel(
             UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
             IEmailSender emailSender)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _emailSender = emailSender;
         }
 
-        public string Username { get; set; }
+        /// <summary>
+        /// Username
+        /// </summary>
+        public string? Username { get; set; }
 
-        public string Email { get; set; }
+        /// <summary>
+        /// Email
+        /// </summary>
+        public string? Email { get; set; }
 
+        /// <summary>
+        /// Is email confirmed
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
 
+        /// <summary>
+        /// Status message
+        /// </summary>
         [TempData]
-        public string StatusMessage { get; set; }
+        public string? StatusMessage { get; set; }
 
         [BindProperty]
-        public InputModel Input { get; set; }
+        public InputModel? Input { get; set; }
 
+        /// <summary>
+        /// Input model of the email page
+        /// </summary>
         public class InputModel
         {
+            /// <summary>
+            /// New email field
+            /// </summary>
             [Required]
             [EmailAddress]
             [Display(Name = "New email")]
-            public string NewEmail { get; set; }
+            public string? NewEmail { get; set; }
         }
 
         private async Task LoadAsync(IdentityUser user)
@@ -82,7 +103,7 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || Input == null)
             {
                 await LoadAsync(user);
                 return Page();
@@ -97,7 +118,7 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
                 var callbackUrl = Url.Page(
                     "/Account/ConfirmEmailChange",
                     pageHandler: null,
-                    values: new { userId = userId, email = Input.NewEmail, code = code },
+                    values: new { userId, email = Input.NewEmail, code },
                     protocol: Request.Scheme);
                 await _emailSender.SendEmailAsync(
                     Input.NewEmail,
@@ -133,7 +154,7 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
             var callbackUrl = Url.Page(
                 "/Account/ConfirmEmail",
                 pageHandler: null,
-                values: new { area = "Identity", userId = userId, code = code },
+                values: new { area = "Identity", userId, code },
                 protocol: Request.Scheme);
             await _emailSender.SendEmailAsync(
                 email,

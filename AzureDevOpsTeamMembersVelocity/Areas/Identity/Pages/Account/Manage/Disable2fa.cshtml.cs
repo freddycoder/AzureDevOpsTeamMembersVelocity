@@ -9,6 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
 {
+    /// <summary>
+    /// Disable Two-Factor authentication page model
+    /// </summary>
     public class Disable2faModel : PageModel
     {
         private readonly UserManager<IdentityUser> _userManager;
@@ -23,7 +26,7 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
         }
 
         [TempData]
-        public string StatusMessage { get; set; }
+        public string? StatusMessage { get; set; }
 
         public async Task<IActionResult> OnGet()
         {

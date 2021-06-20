@@ -24,19 +24,19 @@ Demo : https://youtu.be/Ecl3QeIxSfM
 
 Only a username
 ```
-docker run -e COOKIEAUTH_USER=admin@teamvelocity.com -p 45000:80 azuredevopsteammembersvelocity:auth
+docker run -e COOKIEAUTH_USER=admin@teamvelocity.com -p 45000:80 erabliereapi/azuredevopsteammembersvelocity:auth
 ```
 
 A username and a password
 ```
-docker run -e COOKIEAUTH_USER=admin@teamvelocity.com -e COOKIEAUTH_PASSWORD=admin -p 45000:80 azuredevopsteammembersvelocity:auth
+docker run -e COOKIEAUTH_USER=admin@teamvelocity.com -e COOKIEAUTH_PASSWORD=admin -p 45000:80 erabliereapi/azuredevopsteammembersvelocity:auth
 ```
 
 ### 2. Microsoft Identity self hosted
 
 Use the default asp.net scafolding Identity pages and logic
 ```
-docker run -e USE_IDENTITY=true -e -p 45000:80 azuredevopsteammembersvelocity:auth
+docker run -e USE_IDENTITY=true -e -p 45000:80 erabliereapi/azuredevopsteammembersvelocity:auth
 ```
 
 ### 3. AzureAD

@@ -2,32 +2,36 @@
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
 {
+    /// <summary>
+    /// Register confirmation page model
+    /// </summary>
     [AllowAnonymous]
     public class RegisterConfirmationModel : PageModel
     {
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly IEmailSender _sender;
 
-        public RegisterConfirmationModel(UserManager<IdentityUser> userManager, IEmailSender sender)
+        /// <summary>
+        /// Constructor with dependencies
+        /// </summary>
+        /// <param name="userManager"></param>
+        public RegisterConfirmationModel(UserManager<IdentityUser> userManager)
         {
             _userManager = userManager;
-            _sender = sender;
         }
 
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         public bool DisplayConfirmAccountLink { get; set; }
 
-        public string EmailConfirmationUrl { get; set; }
+        public string? EmailConfirmationUrl { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string email, string returnUrl = null)
+        public async Task<IActionResult> OnGetAsync(string email, string? returnUrl = null)
         {
             if (email == null)
             {
@@ -51,7 +55,7 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
                 EmailConfirmationUrl = Url.Page(
                     "/Account/ConfirmEmail",
                     pageHandler: null,
-                    values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
+                    values: new { area = "Identity", userId, code, returnUrl },
                     protocol: Request.Scheme);
             }
 

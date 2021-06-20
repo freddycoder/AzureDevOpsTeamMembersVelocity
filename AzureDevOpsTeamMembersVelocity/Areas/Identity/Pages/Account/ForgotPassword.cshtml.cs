@@ -26,13 +26,13 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
         }
 
         [BindProperty]
-        public InputModel Input { get; set; }
+        public InputModel? Input { get; set; }
 
         public class InputModel
         {
             [Required]
             [EmailAddress]
-            public string Email { get; set; }
+            public string? Email { get; set; }
         }
 
         public async Task<IActionResult> OnPostAsync()

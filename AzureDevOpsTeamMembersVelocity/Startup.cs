@@ -28,8 +28,15 @@ namespace AzureDevOpsTeamMembersVelocity
     /// </summary>
     public class Startup
     {
+        /// <summary>
+        /// Configuration of the app. Use when AzureAD authentication method is used.
+        /// </summary>
         public IConfiguration Configuration { get; }
 
+        /// <summary>
+        /// Constructor of the startup class with the configuration object in parameter
+        /// </summary>
+        /// <param name="configuration"></param>
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
