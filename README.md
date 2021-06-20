@@ -36,7 +36,7 @@ docker run -e COOKIEAUTH_USER=admin@teamvelocity.com -e COOKIEAUTH_PASSWORD=admi
 
 Use the default asp.net scafolding Identity pages and logic
 ```
-docker run -e USE_IDENTITY=true -e -p 45000:80 erabliereapi/azuredevopsteammembersvelocity:auth
+docker run -e USE_IDENTITY=true -p 45000:80 erabliereapi/azuredevopsteammembersvelocity:auth
 ```
 
 ### 3. AzureAD
