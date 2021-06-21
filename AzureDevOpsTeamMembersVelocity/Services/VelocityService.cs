@@ -1,6 +1,8 @@
 ﻿using AzureDevOpsTeamMembersVelocity.Extensions;
 using AzureDevOpsTeamMembersVelocity.Model;
+using AzureDevOpsTeamMembersVelocity.Repository;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -14,14 +16,16 @@ namespace AzureDevOpsTeamMembersVelocity.Services
     public class VelocityService
     {
         private readonly DevOpsService _devOpsService;
+        private readonly IVelocityRepository _repo;
 
         /// <summary>
         /// Constructor with dependencies
         /// </summary>
         /// <param name="devOpsService">Instance of DevOpsService use to fetch data needed</param>
-        public VelocityService(DevOpsService devOpsService)
+        public VelocityService(DevOpsService devOpsService, IVelocityRepository velocityRepository)
         {
             _devOpsService = devOpsService;
+            _repo = velocityRepository;
         }
 
         /// <summary>
@@ -34,19 +38,27 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// <param name="teamDaysOff">Team days off is use to enhance result and do the right calculation</param>
         /// <param name="teamSettings">Team settings is use to enhance result and do the right calculation</param>
         /// <returns></returns>
-        public async IAsyncEnumerable<MemberVelocity> MemberVelocities(string sprintUrl, List<Capacity>? capacities = null, Sprint? sprint = null, Microsoft.TeamFoundation.Work.WebApi.TeamSettingsDaysOff? teamDaysOff = null, Microsoft.TeamFoundation.Work.WebApi.TeamSetting? teamSettings = null)
+        public async IAsyncEnumerable<MemberVelocity> MemberVelocities(string sprintUrl, List<Capacity>? capacities = null, Sprint? sprint = null, Microsoft.TeamFoundation.Work.WebApi.TeamSettingsDaysOff? teamDaysOff = null, Microsoft.TeamFoundation.Work.WebApi.TeamSetting? teamSettings = null, bool useCache = true)
         {
+            if (useCache && _repo.TryGet(sprintUrl, out IEnumerable<MemberVelocity>? memberVelocities) && memberVelocities != null)
+            {
+                foreach (var memberVelocity in memberVelocities)
+                {
+                    yield return memberVelocity;
+                }
+            }
+
             var items = (await _devOpsService.WorkItems(sprintUrl))?.WorkItemRelations;
 
             if (items != null)
             {
-                var groupByPerson = new Dictionary<string, MemberVelocity>();
+                var personDictionary = new Dictionary<string, MemberVelocity>();
 
                 await foreach (var (workItem, workItemUpdates) in GetWorksAndHistory(items))
                 {
-                    GroupByPerson(groupByPerson, workItem, workItemUpdates);
+                    GroupByPerson(personDictionary, workItem, workItemUpdates);
 
-                    foreach (var value in groupByPerson.Values)
+                    foreach (var value in personDictionary.Values)
                     {
                         yield return EnhanceMemberVolocityInfo(value, capacities, sprint, teamDaysOff, teamSettings);
                     }
@@ -175,6 +187,11 @@ namespace AzureDevOpsTeamMembersVelocity.Services
                     }
                 }
             }
+        }
+
+        public void SaveVelocity(string sprintUrl, IEnumerable<MemberVelocity> memberVelocities)
+        {
+            _repo.Save(sprintUrl, memberVelocities);
         }
     }
 }

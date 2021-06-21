@@ -1,6 +1,7 @@
 using AzureDevOpsTeamMembersVelocity.Data;
 using AzureDevOpsTeamMembersVelocity.Extensions;
 using AzureDevOpsTeamMembersVelocity.Proxy;
+using AzureDevOpsTeamMembersVelocity.Repository;
 using AzureDevOpsTeamMembersVelocity.Services;
 using Blazored.Modal;
 using Microsoft.AspNetCore.Authorization;
@@ -81,6 +82,7 @@ namespace AzureDevOpsTeamMembersVelocity
             services.AddScoped<IDevOpsProxy, DevOpsProxy>();
             services.AddScoped<DevOpsService>();
             services.AddScoped<VelocityService>();
+            services.AddSingleton<IVelocityRepository, VelocityRepository>();
         }
 
         /// <summary>
