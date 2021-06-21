@@ -51,7 +51,7 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
             {
                 services.AddSingleton(new AuthUrlPagesProvider("AzureAD"));
 
-                services.AddMicrosoftIdentityWebAppAuthentication(configuration, "AzureAd");
+                services.AddMicrosoftIdentityWebAppAuthentication(configuration);
             }
             else
             {
@@ -66,6 +66,10 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
             return services;
         }
 
+        /// <summary>
+        /// Method use to validate the configuration of the app. Only one method should be identify.
+        /// </summary>
+        /// <returns></returns>
         public static bool OnlyOneAuthMethodIsUsed()
         {
             int count = 0;
@@ -79,16 +83,28 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
             return count <= 1;
         }
 
+        /// <summary>
+        /// Indicate if the AzureAD authentication mecanism is configure
+        /// </summary>
+        /// <returns></returns>
         public static bool IsAzureADAuth()
         {
             return string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD:TenantId")) == false;
         }
 
+        /// <summary>
+        /// Indicate if the self-hosted Identity authentication mecanism is configure
+        /// </summary>
+        /// <returns></returns>
         public static bool IsIdentityAuth()
         {
             return string.Equals(GetEnvironmentVariable("USE_IDENTITY"), bool.TrueString, StringComparison.OrdinalIgnoreCase);
         }
 
+        /// <summary>
+        /// Indicate if the environment user cookie authentication mecanism is configure
+        /// </summary>
+        /// <returns></returns>
         public static bool IsCookieAuth()
         {
             return string.IsNullOrWhiteSpace(GetEnvironmentVariable("COOKIEAUTH_USER")) == false;
