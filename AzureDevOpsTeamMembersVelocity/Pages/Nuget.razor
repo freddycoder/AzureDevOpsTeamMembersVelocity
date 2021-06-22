@@ -1,8 +1,169 @@
 ﻿@page "/Nuget"
+@inject DevOpsService DevOpsService
+@inject NugetService NugetService
+@inject TeamMembersVelocitySettings Settings
+@inject TokenProvider TokenProvider
 @attribute [Authorize]
 
-<h3>Nuget</h3>
+<div class="row">
+    <div class="col-md-6">
+        <h3>Feeds</h3>
+    </div>
+</div>
+
+<div class="row border">
+    <EditForm class="col-4 mt-2" EditContext="EditContext" OnValidSubmit="GetNugets">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label for="inputTeamProject">Team Project</label>
+            <SafeTextInput id="inputTeamProject"
+                           class="form-control"
+                           @bind-Value="TeamProject"
+                           @onfocus="GetProjects"
+                           type="text"
+                           list="teamProjectSuggestion"
+                           aria-describedby="describeTeamProject"
+                           placeholder="Team project" />
+            @if (TeamProjects != null)
+            {
+                <datalist id="teamProjectSuggestion">
+                    @foreach (var teamProject in TeamProjects)
+                    {
+                        <option value="@teamProject.Name" />
+                    }
+                </datalist>
+            }
+            <small id="describeTeamProject" class="form-text text-muted">You can leave this field empty to list all feeds of the organization</small>
+        </div>
+        <div class="form-group">
+            <label for="inputTeam">Feeds</label>
+            <SafeTextInput id="inputTeam"
+                           class="form-control"
+                           @bind-Value="Feed"
+                           @onfocus="GetFeeds"
+                           @onchange="GetNugets"
+                           type="text"
+                           list="teamSuggestion"
+                           aria-describedby="describeTeam"
+                           placeholder="Team" />
+            <datalist id="teamSuggestion">
+                @if (Feeds != null)
+                {
+                    @foreach (var team in Feeds)
+                    {
+                        <option value="@team.Name" />
+                    }
+                }
+            </datalist>
+            <small id="describeTeam" class="form-text text-muted">dev.azure.com/@Organisation/_apis/projects/@TeamProject/teams</small>
+        </div>
+        <input name="__RequestVerificationToken" type="hidden" value="@TokenProvider.XsrfToken">
+        <button class="btn btn-secondary mb-3">Search</button>
+    </EditForm>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-6">
+        <h3>Nugets</h3>
+    </div>
+</div>
+
+@if (Nugets != null)
+{
+    <div class="row">
+        <table class="table table-striped table-hover table-responsive-md">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Version</th>
+                    <th>Publish date</th>
+                    <th>Json</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var nuget in Nugets)
+                {
+                    <tr>
+                        <td>@nuget.Name</td>
+                        <td>@nuget.Versions.FirstOrDefault()?.Version</td>
+                        <td>@nuget.Versions.FirstOrDefault()?.PublishDate</td>
+                        <td>
+                            <button @onclick="() => ShowJson(nuget)">json</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
 
 @code {
+    public string? Organisation { get; set; }
 
+    public string? TeamProject { get; set; }
+
+    public string? Feed { get; set; }
+
+    public EditContext? EditContext { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        EditContext = new EditContext(this);
+
+        Organisation = Settings.Organisation;
+
+        await GetFeeds();
+        await GetProjects();
+    }
+
+    public List<TeamProject>? TeamProjects { get; set; } = new();
+
+    public async Task GetProjects()
+    {
+        if (Settings.Organisation != null)
+        {
+            TeamProjects = (await DevOpsService.Projects(Settings.Organisation))?.Value;
+
+            StateHasChanged();
+        }
+    }
+
+    public List<Feed>? Feeds { get; set; } = new();
+
+    public async Task GetFeeds()
+    {
+        if (Settings.Organisation != null)
+        {
+            Feeds = (await NugetService.GetFeeds(teamProject: null))?.Value;
+
+            StateHasChanged();
+        }
+    }
+
+    public List<Model.Nuget>? Nugets { get; set; } = new();
+
+    public async Task GetNugets()
+    {
+        var feedNugetsUrl = Feeds?.FirstOrDefault(f => f.Name == Feed)?.Links.Packages?.Href;
+
+        if (feedNugetsUrl != null && Settings.Organisation != null)
+        {
+            Nugets = (await NugetService.GetNugets(feedNugetsUrl))?.Value;
+
+            StateHasChanged();
+        }
+    }
+
+    [CascadingParameter]
+    public IModalService? Modal { get; set; }
+
+    public void ShowJson(Model.Nuget nuget)
+    {
+        var parameters = new ModalParameters();
+
+        parameters.Add("Json", JsonSerializer.Serialize(nuget, Program.SerializerOptions));
+
+        Modal?.Show<JsonModal>("Json view", parameters);
+    }
 }
