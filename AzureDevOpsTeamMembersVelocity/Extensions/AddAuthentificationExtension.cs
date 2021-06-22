@@ -51,6 +51,18 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
             {
                 services.AddSingleton(new AuthUrlPagesProvider("AzureAD"));
 
+                // Support for kubernetes
+                // Colon is not allow in environement variable name
+                if (string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD:ClientId")) && string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD__ClientId")) == false)
+                {
+                    configuration["AzureAD:ClientId"] = GetEnvironmentVariable("AzureAD__ClientId");
+                }
+
+                if (string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD:TenantId")) && string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD__TenantId")) == false)
+                {
+                    configuration["AzureAD:TenantId"] = GetEnvironmentVariable("AzureAD__TenantId");
+                }
+
                 services.AddMicrosoftIdentityWebAppAuthentication(configuration);
             }
             else
@@ -89,7 +101,13 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
         /// <returns></returns>
         public static bool IsAzureADAuth()
         {
-            return string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD:TenantId")) == false;
+            if (string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD:TenantId")) &&
+                string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD__TenantId")))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
