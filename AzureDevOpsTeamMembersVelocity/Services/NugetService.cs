@@ -22,6 +22,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             
             if (string.IsNullOrWhiteSpace(teamProject))
             {
+                // Fetch the organization feeds
                 response = await _proxy.GetAsync<ListResponse<Feed>>
                     ($"https://feeds.dev.azure.com/{_settings.Organisation}/_apis/packaging/feeds?api-version=6.0-preview.1");
             }
