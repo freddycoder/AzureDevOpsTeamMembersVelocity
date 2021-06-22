@@ -56,7 +56,7 @@
                     }
                 }
             </datalist>
-            <small id="describeTeam" class="form-text text-muted">dev.azure.com/@Organisation/_apis/projects/@TeamProject/teams</small>
+            <small id="describeTeam" class="form-text text-muted">The name of the feed</small>
         </div>
         <input name="__RequestVerificationToken" type="hidden" value="@TokenProvider.XsrfToken">
         <button class="btn btn-secondary mb-3">Search</button>
@@ -135,7 +135,7 @@
     {
         if (Settings.Organisation != null)
         {
-            Feeds = (await NugetService.GetFeeds(teamProject: null))?.Value;
+            Feeds = (await NugetService.GetFeeds(TeamProject))?.Value;
 
             StateHasChanged();
         }
