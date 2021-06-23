@@ -63,6 +63,21 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
                     configuration["AzureAD:TenantId"] = GetEnvironmentVariable("AzureAD__TenantId");
                 }
 
+                if (string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD:CallbackPath")) && string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD__CallbackPath")) == false)
+                {
+                    configuration["AzureAD:CallbackPath"] = GetEnvironmentVariable("AzureAD__CallbackPath");
+                }
+
+                if (string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD:SignedOutCallbackPath")) && string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD__SignedOutCallbackPath")) == false)
+                {
+                    configuration["AzureAD:SignedOutCallbackPath"] = GetEnvironmentVariable("AzureAD__SignedOutCallbackPath");
+                }
+
+                if (string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD:Instance")) && string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD__Instance")) == false)
+                {
+                    configuration["AzureAD:Instance"] = GetEnvironmentVariable("AzureAD__Instance");
+                }
+
                 services.AddMicrosoftIdentityWebAppAuthentication(configuration);
             }
             else
