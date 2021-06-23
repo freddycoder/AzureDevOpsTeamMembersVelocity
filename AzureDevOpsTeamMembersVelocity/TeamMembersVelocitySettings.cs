@@ -17,12 +17,18 @@ namespace AzureDevOpsTeamMembersVelocity
         /// <summary>
         /// Organization selected
         /// </summary>
+        /// <remarks>
+        /// Organisation corespond to the first parameter in the route. https://dev.azure.com/{organization}
+        /// </remarks>
         [StringLength(256, ErrorMessage = "Organisation is too long.")]
         public string? Organisation { get; set; }
 
         /// <summary>
         /// Team project selected
         /// </summary>
+        /// <remarks>
+        /// Organisation corespond to the first parameter in the route. https://dev.azure.com/{organization}/{teamProject}
+        /// </remarks>
         [StringLength(64, ErrorMessage = "TeamProject is too long.")]
         public string? TeamProject { get; set; }
 

@@ -1,6 +1,7 @@
 using AzureDevOpsTeamMembersVelocity.Data;
 using AzureDevOpsTeamMembersVelocity.Extensions;
 using AzureDevOpsTeamMembersVelocity.Proxy;
+using AzureDevOpsTeamMembersVelocity.Repository;
 using AzureDevOpsTeamMembersVelocity.Services;
 using Blazored.Modal;
 using Microsoft.AspNetCore.Authorization;
@@ -13,7 +14,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Identity.Client;
 using Microsoft.Identity.Web.UI;
 using System;
 using System.IO;
@@ -69,7 +69,7 @@ namespace AzureDevOpsTeamMembersVelocity
                     .PersistKeysToFileSystem(new DirectoryInfo(Directory.GetCurrentDirectory()))
                     .SetApplicationName(nameof(AzureDevOpsTeamMembersVelocity));
             
-            services.AddSingleton(sp =>
+            services.AddScoped(sp =>
             {
                 var client = new HttpClient();
 
@@ -78,10 +78,12 @@ namespace AzureDevOpsTeamMembersVelocity
                 return client;
             });
 
-            services.AddSingleton<IDevOpsProxy, DevOpsProxy>();
             services.AddSingleton<TeamMembersVelocitySettings>();
-            services.AddSingleton<DevOpsService>();
-            services.AddSingleton<VelocityService>();
+            services.AddScoped<IDevOpsProxy, DevOpsProxy>();
+            services.AddScoped<DevOpsService>();
+            services.AddScoped<VelocityService>();
+            services.AddScoped<NugetService>();
+            services.AddSingleton<IVelocityRepository, VelocityRepository>();
         }
 
         /// <summary>
@@ -122,6 +124,7 @@ namespace AzureDevOpsTeamMembersVelocity
             app.Use(async (context, next) =>
             {
                 context.Response.Headers.Add("X-Frame-Options", GetEnvironmentVariable("X-FRAME-OPTIONS") ?? "DENY");
+                context.Response.Headers.Add("X-Content-Type-Options", GetEnvironmentVariable("X-Content-Type-Options") ?? "nosniff");
                 await next();
             });
 

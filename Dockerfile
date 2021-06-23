@@ -21,5 +21,4 @@ RUN dotnet publish "AzureDevOpsTeamMembersVelocity.csproj" -c Release -o /app/pu
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-RUN chmod u+x docker-entrypoint.sh
 ENTRYPOINT ["dotnet", "AzureDevOpsTeamMembersVelocity.dll"]

@@ -11,15 +11,16 @@
     BlazoredModalInstance? ModalInstance { get; set; }
 
     [Parameter]
-    public string? HistoryUrl { get; set; }
+    public string? Url { get; set; }
 
+    [Parameter]
     public string? Json { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
-        if (HistoryUrl != null)
+        if (Url != null)
         {
-            Json = (await DevOpsProxy.GetAsync($"{HistoryUrl}?api-version=6.0"))?.FormatJson();
+            Json = (await DevOpsProxy.GetAsync($"{Url}?api-version=6.0"))?.FormatJson();
         }
     }
 }

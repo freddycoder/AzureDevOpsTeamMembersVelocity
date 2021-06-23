@@ -1,7 +1,7 @@
 version: "3"
 services:
   azuredevopsteammembersvelocity:
-    image: "erabliereapi/azuredevopsteammembersvelocity:auth"
+    image: "erabliereapi/azuredevopsteammembersvelocity:latest"
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
       ASPNETCORE_URLS: "https://+;"

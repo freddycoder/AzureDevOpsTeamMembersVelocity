@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 
 namespace AzureDevOpsTeamMembersVelocity.Model
 {
@@ -34,6 +35,7 @@ namespace AzureDevOpsTeamMembersVelocity.Model
         /// <summary>
         /// Uri instance of the Href property
         /// </summary>
+        [JsonIgnore]
         public Uri? UriInfo { get; private set; }
 
         private string? _href;
