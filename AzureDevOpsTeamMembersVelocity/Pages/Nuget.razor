@@ -2,6 +2,7 @@
 @inject DevOpsService DevOpsService
 @inject NugetService NugetService
 @inject TeamMembersVelocitySettings Settings
+@inject IUserPreferenceRepository UserPreference
 @inject TokenProvider TokenProvider
 @attribute [Authorize]
 
@@ -21,7 +22,7 @@
                     <label for="inputTeamProject">Team Project</label>
                     <SafeTextInput id="inputTeamProject"
                                    class="form-control"
-                                   @bind-Value="TeamProject"
+                                   @bind-Value="NugetSettings.TeamProject"
                                    @onfocus="GetProjects"
                                    type="text"
                                    list="teamProjectSuggestion"
@@ -42,7 +43,7 @@
                     <label for="inputSearchTerm">Search</label>
                     <SafeTextInput id="inputSearchTerm"
                                    class="form-control"
-                                   @bind-Value="SearchTerm"
+                                   @bind-Value="NugetSettings.SearchTerm"
                                    @onchange="GetNugets"
                                    type="text"
                                    aria-describedby="describeSearchTerm"
@@ -55,7 +56,7 @@
                     <label for="inputTeam">Feeds</label>
                     <SafeTextInput id="inputTeam"
                                    class="form-control"
-                                   @bind-Value="Feed"
+                                   @bind-Value="NugetSettings.Feed"
                                    @onfocus="GetFeeds"
                                    @onchange="GetNugets"
                                    type="text"
@@ -77,7 +78,7 @@
                     <label for="checkOnlyAlpha">Only alpha</label>
                     <InputCheckbox id="checkOnlyAlpha"
                                    class="form-control"
-                                   @bind-Value="OnlyAlpha"
+                                   @bind-Value="NugetSettings.OnlyAlpha"
                                    aria-describedby="describeOnlyAlpha"
                                    placeholder="Team project" />
                     <small id="describeOnlyAlpha" class="form-text text-muted">If checked, only the nuget with the alpha version will be shown</small>
@@ -110,7 +111,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var nuget in Nugets.Where(n => OnlyAlpha == false || (n.Versions.FirstOrDefault()?.Version?.Contains('-') == true)))
+                @foreach (var nuget in Nugets.Where(n => NugetSettings.OnlyAlpha == false || (n.Versions.FirstOrDefault()?.Version?.Contains('-') == true)))
                 {
                     <tr>
                         <td>@nuget.Name</td>
@@ -127,23 +128,17 @@
 }
 
 @code {
-    public string? Organisation { get; set; }
-
-    public string? TeamProject { get; set; }
-
-    public string? Feed { get; set; }
-
-    public string? SearchTerm { get; set; }
-
-    public bool OnlyAlpha { get; set; }
+    public NugetPageSettings NugetSettings { get; set; } = new NugetPageSettings();
 
     public EditContext? EditContext { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        EditContext = new EditContext(this);
+        NugetSettings = UserPreference.Get<NugetPageSettings>();
 
-        Organisation = Settings.Organisation;
+        EditContext = new EditContext(NugetSettings);
+
+        NugetSettings.Organisation = Settings.Organisation;
 
         await GetFeeds();
         await GetProjects();
@@ -167,11 +162,11 @@
     {
         if (Settings.Organisation != null)
         {
-            Feeds = (await NugetService.GetFeeds(TeamProject))?.Value;
+            Feeds = (await NugetService.GetFeeds(NugetSettings.TeamProject))?.Value;
 
             if (Feeds != null)
             {
-                Feed = Feeds.LastOrDefault()?.Name;
+                NugetSettings.Feed = Feeds.LastOrDefault()?.Name;
 
                 await GetNugets();
             }
@@ -184,24 +179,23 @@
 
     public async Task GetNugets()
     {
-        var feedNugetsUrl = Feeds?.FirstOrDefault(f => f.Name == Feed)?.Links.Packages?.Href;
+        var feedNugetsUrl = Feeds?.FirstOrDefault(f => f.Name == NugetSettings.Feed)?.Links.Packages?.Href;
 
         if (feedNugetsUrl != null && Settings.Organisation != null)
         {
-            var feedUrl = $"{feedNugetsUrl}";
-
-            if (string.IsNullOrWhiteSpace(SearchTerm) == false)
-            {
-                feedUrl += $"?packageNameQuery={SearchTerm}";
-            }
-
-            Nugets = (await NugetService.GetNugets(feedUrl))?.Value;
+            Nugets = (await NugetService.GetNugets(feedNugetsUrl, NugetSettings.SearchTerm))?.Value;
 
             StateHasChanged();
         }
     }
 
-    [CascadingParameter]
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        UserPreference.Set(NugetSettings);
+    }
+
+        [CascadingParameter]
     public IModalService? Modal { get; set; }
 
     public void ShowJson(Model.Nuget nuget)
