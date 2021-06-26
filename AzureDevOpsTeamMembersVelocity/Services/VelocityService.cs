@@ -22,6 +22,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// Constructor with dependencies
         /// </summary>
         /// <param name="devOpsService">Instance of DevOpsService use to fetch data needed</param>
+        /// <param name="velocityRepository">The velocity repository to store and retrive calculated results</param>
         public VelocityService(DevOpsService devOpsService, IVelocityRepository velocityRepository)
         {
             _devOpsService = devOpsService;
@@ -37,6 +38,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// <param name="sprint">Sprint information is use to enhance result</param>
         /// <param name="teamDaysOff">Team days off is use to enhance result and do the right calculation</param>
         /// <param name="teamSettings">Team settings is use to enhance result and do the right calculation</param>
+        /// <param name="useCache">Indicate if the value can be get from memory or the results is calculated</param>
         /// <returns></returns>
         public async IAsyncEnumerable<MemberVelocity> MemberVelocities(string sprintUrl, List<Capacity>? capacities = null, Sprint? sprint = null, Microsoft.TeamFoundation.Work.WebApi.TeamSettingsDaysOff? teamDaysOff = null, Microsoft.TeamFoundation.Work.WebApi.TeamSetting? teamSettings = null, bool useCache = true)
         {
@@ -189,6 +191,11 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             }
         }
 
+        /// <summary>
+        /// Store the member velocities associate with a strintUrl
+        /// </summary>
+        /// <param name="sprintUrl"></param>
+        /// <param name="memberVelocities"></param>
         public void SaveVelocity(string sprintUrl, IEnumerable<MemberVelocity> memberVelocities)
         {
             _repo.Save(sprintUrl, memberVelocities);

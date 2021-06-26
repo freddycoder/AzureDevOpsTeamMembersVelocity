@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -49,6 +51,15 @@ namespace AzureDevOpsTeamMembersVelocity
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            if (string.Equals(GetEnvironmentVariable("Forwarded_headers"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
+            {
+                services.Configure<ForwardedHeadersOptions>(options =>
+                {
+                    options.ForwardedHeaders =
+                        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                });
+            }
+
             var mvcBuilder = services.AddRazorPages();
             if (AddAuthentificationExtension.IsAzureADAuth())
             {
@@ -79,7 +90,8 @@ namespace AzureDevOpsTeamMembersVelocity
             });
 
             services.AddSingleton<TeamMembersVelocitySettings>();
-            services.AddScoped<IDevOpsProxy, DevOpsProxy>();
+            services.AddScoped<DevOpsProxy>();
+            services.AddScoped<IDevOpsProxy, DevOpsProxyCache>();
             services.AddScoped<DevOpsService>();
             services.AddScoped<VelocityService>();
             services.AddScoped<GitService>();
@@ -91,7 +103,7 @@ namespace AzureDevOpsTeamMembersVelocity
         /// <summary>
         /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider, ILogger<Startup> logger)
         {
             if ((! string.Equals(GetEnvironmentVariable("USE_STARTUP_MIGRATION"), bool.FalseString, StringComparison.OrdinalIgnoreCase)) &&
                    string.Equals(GetEnvironmentVariable("USE_IDENTITY"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
@@ -104,8 +116,6 @@ namespace AzureDevOpsTeamMembersVelocity
                 }
                 catch (Exception e)
                 {
-                    var logger = serviceProvider.GetRequiredService<ILogger<Startup>>();
-
                     logger.LogCritical(e, "An error occure during the migration of the database. The app will be able to start.");
 
                     throw;
@@ -115,10 +125,70 @@ namespace AzureDevOpsTeamMembersVelocity
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                if (string.Equals(GetEnvironmentVariable("Forwarded_headers"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
+                {
+                    app.UseForwardedHeaders();
+
+                    if ((string.Equals(GetEnvironmentVariable("Debug_headers"), bool.TrueString, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        app.Use(async (context, next) =>
+                        {
+                            context.Response.ContentType = "text/plain";
+
+                            // Request method, scheme, and path
+                            logger.LogDebug("Request Method: {Method}", context.Request.Method);
+                            logger.LogDebug("Request Scheme: {Scheme}", context.Request.Scheme);
+                            logger.LogDebug("Request Path: {Path}", context.Request.Path);
+
+                            // Headers
+                            foreach (var header in context.Request.Headers)
+                            {
+                                logger.LogDebug("Header: {Key}: {Value}", header.Key, header.Value);
+                            }
+
+                            // Connection: RemoteIp
+                            logger.LogDebug("Request RemoteIp: {RemoteIpAddress}",
+                                context.Connection.RemoteIpAddress);
+
+                            await next();
+                        });
+                    }
+                }
             }
             else
             {
                 app.UseExceptionHandler("/Error");
+                
+                if (string.Equals(GetEnvironmentVariable("Forwarded_headers"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
+                {
+                    app.UseForwardedHeaders();
+
+                    if ((string.Equals(GetEnvironmentVariable("Debug_headers"), bool.TrueString, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        app.Use(async (context, next) =>
+                        {
+                            context.Response.ContentType = "text/plain";
+
+                            // Request method, scheme, and path
+                            logger.LogDebug("Request Method: {Method}", context.Request.Method);
+                            logger.LogDebug("Request Scheme: {Scheme}", context.Request.Scheme);
+                            logger.LogDebug("Request Path: {Path}", context.Request.Path);
+
+                            // Headers
+                            foreach (var header in context.Request.Headers)
+                            {
+                                logger.LogDebug("Header: {Key}: {Value}", header.Key, header.Value);
+                            }
+
+                            // Connection: RemoteIp
+                            logger.LogDebug("Request RemoteIp: {RemoteIpAddress}",
+                                context.Connection.RemoteIpAddress);
+
+                            await next();
+                        });
+                    }
+                }
+
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
@@ -131,6 +201,7 @@ namespace AzureDevOpsTeamMembersVelocity
             });
 
             app.UseHttpsRedirection();
+
             app.UseStaticFiles();
 
             app.UseRouting();

@@ -11,7 +11,7 @@ namespace UnitTest
 {
     public class UnitTest1
     {
-        private static string ExampleFolder = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "JsonExample");
+        private static readonly string ExampleFolder = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "JsonExample");
 
         [Fact]
         public void DeserializeWorkItemUpdatesLink()

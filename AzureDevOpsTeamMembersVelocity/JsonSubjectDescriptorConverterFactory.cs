@@ -9,14 +9,17 @@ namespace AzureDevOpsTeamMembersVelocity
     {
         public override SubjectDescriptor Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var sujetString = reader.GetString();
+            var sujetString = reader.GetString()?.Split('.');
 
-            return new SubjectDescriptor("", sujetString);
+            if (sujetString != null) 
+                return new SubjectDescriptor(sujetString[0], sujetString[1]);
+
+            return new SubjectDescriptor();
         }
 
         public override void Write(Utf8JsonWriter writer, SubjectDescriptor value, JsonSerializerOptions options)
         {
-            writer.WriteStringValue(value.Identifier + value.SubjectType);
+            writer.WriteStringValue(value.SubjectType + "." + value.Identifier);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using AzureDevOpsTeamMembersVelocity.Model;
 using AzureDevOpsTeamMembersVelocity.Proxy;
-using System;
 using System.Threading.Tasks;
 
 namespace AzureDevOpsTeamMembersVelocity.Services
@@ -12,18 +11,16 @@ namespace AzureDevOpsTeamMembersVelocity.Services
     {
         private readonly IDevOpsProxy _proxy;
         private readonly TeamMembersVelocitySettings _settings;
-        private readonly DevOpsService _devOpsService;
 
         /// <summary>
         /// Constructor with dependencies
         /// </summary>
         /// <param name="proxy">The proxy to call the azure devops API</param>
         /// <param name="settings">Settings of the app to access Organization name and TeamProject name</param>
-        public GitService(IDevOpsProxy proxy, TeamMembersVelocitySettings settings, DevOpsService devOpsService)
+        public GitService(IDevOpsProxy proxy, TeamMembersVelocitySettings settings)
         {
             _proxy = proxy;
             _settings = settings;
-            _devOpsService = devOpsService;
         }
 
         /// <summary>
@@ -37,7 +34,11 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             return _proxy.GetAsync<ListResponse<GitRepository>>(url);
         }
 
-
+        /// <summary>
+        /// Fetch a git repository informations
+        /// </summary>
+        /// <param name="gitRepositoryUrl">Url of the resource</param>
+        /// <returns>A task that return the GitRepository instance</returns>
         public Task<GitRepository?> GetRepository(string gitRepositoryUrl)
         {
             return _proxy.GetAsync<GitRepository>($"{gitRepositoryUrl}?api-version=6.0");
