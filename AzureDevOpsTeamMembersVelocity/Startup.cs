@@ -128,6 +128,16 @@ namespace AzureDevOpsTeamMembersVelocity
                 }
             }
 
+            if (string.Equals(GetEnvironmentVariable("OVERRIDE_SCHEMA_TO_HTTPS"), bool.TrueString, StringComparison.CurrentCultureIgnoreCase))
+            {
+                app.Use(async (context, next) =>
+                {
+                    context.Request.Scheme = "https";
+
+                    await next();
+                });
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
