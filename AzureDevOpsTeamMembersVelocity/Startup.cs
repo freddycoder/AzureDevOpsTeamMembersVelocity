@@ -128,83 +128,17 @@ namespace AzureDevOpsTeamMembersVelocity
                 }
             }
 
-            if (string.Equals(GetEnvironmentVariable("OVERRIDE_SCHEMA_TO_HTTPS"), bool.TrueString, StringComparison.CurrentCultureIgnoreCase))
-            {
-                app.Use(async (context, next) =>
-                {
-                    context.Request.Scheme = "https";
-
-                    await next();
-                });
-            }
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
 
-                if (string.Equals(GetEnvironmentVariable("Forwarded_headers"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
-                {
-                    app.UseForwardedHeaders();
-
-                    if ((string.Equals(GetEnvironmentVariable("Debug_headers"), bool.TrueString, StringComparison.OrdinalIgnoreCase)))
-                    {
-                        app.Use(async (context, next) =>
-                        {
-                            //context.Response.ContentType = "text/plain";
-
-                            // Request method, scheme, and path
-                            logger.LogDebug("Request Method: {Method}", context.Request.Method);
-                            logger.LogDebug("Request Scheme: {Scheme}", context.Request.Scheme);
-                            logger.LogDebug("Request Path: {Path}", context.Request.Path);
-
-                            // Headers
-                            foreach (var header in context.Request.Headers)
-                            {
-                                logger.LogDebug("Header: {Key}: {Value}", header.Key, header.Value);
-                            }
-
-                            // Connection: RemoteIp
-                            logger.LogDebug("Request RemoteIp: {RemoteIpAddress}",
-                                context.Connection.RemoteIpAddress);
-
-                            await next();
-                        });
-                    }
-                }
+                app.UseTeamMembersVelocityForwardedHeadersRules(logger);
             }
             else
             {
                 app.UseExceptionHandler("/Error");
-                
-                if (string.Equals(GetEnvironmentVariable("Forwarded_headers"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
-                {
-                    app.UseForwardedHeaders();
 
-                    if (string.Equals(GetEnvironmentVariable("Debug_headers"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
-                    {
-                        app.Use(async (context, next) =>
-                        {
-                            //context.Response.ContentType = "text/plain";
-
-                            // Request method, scheme, and path
-                            logger.LogDebug("Request Method: {Method}", context.Request.Method);
-                            logger.LogDebug("Request Scheme: {Scheme}", context.Request.Scheme);
-                            logger.LogDebug("Request Path: {Path}", context.Request.Path);
-
-                            // Headers
-                            foreach (var header in context.Request.Headers)
-                            {
-                                logger.LogDebug("Header: {Key}: {Value}", header.Key, header.Value);
-                            }
-
-                            // Connection: RemoteIp
-                            logger.LogDebug("Request RemoteIp: {RemoteIpAddress}",
-                                context.Connection.RemoteIpAddress);
-
-                            await next();
-                        });
-                    }
-                }
+                app.UseTeamMembersVelocityForwardedHeadersRules(logger);
 
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
