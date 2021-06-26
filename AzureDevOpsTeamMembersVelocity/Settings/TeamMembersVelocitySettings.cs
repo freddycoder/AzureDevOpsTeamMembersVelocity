@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -72,8 +71,8 @@ namespace AzureDevOpsTeamMembersVelocity
             {
                 if (_authKeyChanged)
                 {
-                    _authenticationHeader = new AuthenticationHeaderValue("Basic",
-                    Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(string.Format("{0}:{1}", "", _apiKey))));
+                    _authenticationHeader = new AuthenticationHeaderValue("Basic", 
+                        Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(string.Format("{0}:{1}", "", _apiKey))));
 
                     _authKeyChanged = false;
                 }

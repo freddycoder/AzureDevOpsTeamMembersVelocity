@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.Services.Common;
 
 namespace AzureDevOpsTeamMembersVelocity
 {
@@ -83,6 +84,8 @@ namespace AzureDevOpsTeamMembersVelocity
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 WriteIndented = true
             };
+
+            settings.Converters.Add(new JsonSubjectDescriptorConverter());
 
             settings.Converters.Add(new JsonStringEnumConverter());
 

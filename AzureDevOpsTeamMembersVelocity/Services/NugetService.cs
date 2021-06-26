@@ -36,8 +36,13 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             return response;
         }
 
-        public async Task<ListResponse<Model.Nuget>?> GetNugets(string feedUrl)
+        public async Task<ListResponse<Model.Nuget>?> GetNugets(string feedUrl, string? searchTerm = null)
         {
+            if (string.IsNullOrWhiteSpace(searchTerm) == false)
+            {
+                feedUrl += $"?packageNameQuery={searchTerm}";
+            }
+
             var response = await _proxy.GetAsync<ListResponse<Model.Nuget>>(feedUrl);
 
             return response;

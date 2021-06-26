@@ -1,7 +1,120 @@
-﻿@page "/Git" 
+﻿@page "/Git"
+@inject GitService GitService
+@inject TeamMembersVelocitySettings Settings
+@inject IUserPreferenceRepository UserPreference
+@inject TokenProvider TokenProvider
+@attribute [Authorize]
 
-<h3>Git</h3>
+<div class="row">
+    <div class="col-md-6">
+        <h3>Git</h3>
+    </div>
+</div>
 
-@code {
+<div class="row border">
+    <EditForm class="m-2 col-md-12" EditContext="EditContext" >
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="inputTeamProject">Repository</label>
+                    <InputSelect ValueExpression="() => GitSettings.Repository"
+                                 ValueChanged="(string repositoryName) => UpdateAndGetPullRequests(repositoryName)"
+                                 class="form-control">
+                        <option value="">Select repository...</option>
+                        @if (Repositories != null)
+                        {
+                            @foreach (var repo in Repositories)
+                            {
+                                if (repo.Name == GitSettings.Repository)
+                                {
+                                    <option value="@repo.Name" selected="selected">@repo.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@repo.Name">@repo.Name</option>
+                                }
+                            }
+                        }
+                    </InputSelect>
+                </div>
 
+                @if (string.IsNullOrWhiteSpace(GitSettings.Repository) == false)
+                {
+                    <div class="form-group col-md-4">
+                        <label for="inputTeamProject">Pull Request</label>
+                        <InputSelect @bind-Value="GitSettings.PullRequest" class="form-control">
+                            <option value="">Select a PR...</option>
+                            @if (PullRequests != null)
+                            {
+                                @foreach (var pr in PullRequests)
+                                {
+                                    <option value="@pr.PullRequestId">@pr.Title</option>
+                                }
+                            }
+                        </InputSelect>
+                    </div>
+                }
+            </div>
+            <div class="form-row">
+                <input name="__RequestVerificationToken" type="hidden" value="@TokenProvider.XsrfToken">
+                <button class="btn btn-secondary mb-3">Search</button>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+@code { 
+    public GitPageSettings GitSettings { get; set; } = new GitPageSettings();
+
+    public EditContext? EditContext { get; set; }
+
+    public IEnumerable<GitRepository>? Repositories { get; set; }
+
+    public GitRepository? Repository { get; set; }
+
+    public IEnumerable<PullRequest>? PullRequests { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        GitSettings = UserPreference.Get<GitPageSettings>();
+
+        EditContext = new EditContext(GitSettings);
+
+        Repositories = (await GitService.GetRepositories())?.Value;
+
+        await GetPullRequests();
+    }
+
+    public Task UpdateAndGetPullRequests(string repositoryName)
+    {
+        GitSettings.Repository = repositoryName;
+
+        return GetPullRequests();
+    }
+
+    public async Task GetPullRequests()
+    {
+        var selectedRepository = Repositories?.FirstOrDefault(r => r.Name == GitSettings.Repository);
+
+        if (selectedRepository != null &&
+            string.IsNullOrWhiteSpace(GitSettings.Repository) == false)
+        {
+            Repository = await GitService.GetRepository(selectedRepository.Url);
+
+            if (Repository?.Links?.PullRequests?.Href != null)
+            {
+                PullRequests = (await GitService.GetPullRequests(Repository.Links.PullRequests.Href))?.Value;
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        UserPreference.Set(GitSettings);
+    }
 }

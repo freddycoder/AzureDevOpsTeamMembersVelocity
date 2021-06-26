@@ -82,8 +82,10 @@ namespace AzureDevOpsTeamMembersVelocity
             services.AddScoped<IDevOpsProxy, DevOpsProxy>();
             services.AddScoped<DevOpsService>();
             services.AddScoped<VelocityService>();
+            services.AddScoped<GitService>();
             services.AddScoped<NugetService>();
             services.AddSingleton<IVelocityRepository, VelocityRepository>();
+            services.AddSingleton<IUserPreferenceRepository, UserPreferenceRepository>();
         }
 
         /// <summary>
