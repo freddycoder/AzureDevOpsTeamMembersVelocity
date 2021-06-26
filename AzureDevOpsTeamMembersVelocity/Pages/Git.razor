@@ -20,14 +20,21 @@
                 <div class="form-group col-md-4">
                     <label for="inputTeamProject">Repository</label>
                     <InputSelect ValueExpression="() => GitSettings.Repository"
-                                 ValueChanged="(string repositoryName) => UpdateAndGetPullRequests(repositoryName)" 
+                                 ValueChanged="(string repositoryName) => UpdateAndGetPullRequests(repositoryName)"
                                  class="form-control">
                         <option value="">Select repository...</option>
                         @if (Repositories != null)
                         {
                             @foreach (var repo in Repositories)
                             {
-                                <option value="@repo.Name">@repo.Name</option>
+                                if (repo.Name == GitSettings.Repository)
+                                {
+                                    <option value="@repo.Name" selected="selected">@repo.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@repo.Name">@repo.Name</option>
+                                }
                             }
                         }
                     </InputSelect>
@@ -63,9 +70,11 @@
 
     public EditContext? EditContext { get; set; }
 
-    public IEnumerable<Microsoft.TeamFoundation.SourceControl.WebApi.GitRepository>? Repositories { get; set; }
+    public IEnumerable<GitRepository>? Repositories { get; set; }
 
-    public IEnumerable<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest>? PullRequests { get; set; }
+    public GitRepository? Repository { get; set; }
+
+    public IEnumerable<PullRequest>? PullRequests { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -92,7 +101,12 @@
         if (selectedRepository != null &&
             string.IsNullOrWhiteSpace(GitSettings.Repository) == false)
         {
-            PullRequests = (await GitService.GetPullRequests(selectedRepository.Id))?.Value;
+            Repository = await GitService.GetRepository(selectedRepository.Url);
+
+            if (Repository?.Links?.PullRequests?.Href != null)
+            {
+                PullRequests = (await GitService.GetPullRequests(Repository.Links.PullRequests.Href))?.Value;
+            }
 
             StateHasChanged();
         }

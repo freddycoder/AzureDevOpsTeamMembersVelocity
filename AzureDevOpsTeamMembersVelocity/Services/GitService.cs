@@ -1,7 +1,6 @@
-﻿using AzureDevOpsTeamMembersVelocity.Proxy;
-using Microsoft.TeamFoundation.SourceControl.WebApi;
+﻿using AzureDevOpsTeamMembersVelocity.Model;
+using AzureDevOpsTeamMembersVelocity.Proxy;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AzureDevOpsTeamMembersVelocity.Services
@@ -33,31 +32,25 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// <returns>A task that list Repositories</returns>
         public Task<ListResponse<GitRepository>?> GetRepositories()
         {
-            return _proxy.GetAsync<ListResponse<GitRepository>>(
-                $"https://dev.azure.com/{_settings.Organisation}/{_settings.TeamProject}/_apis/git/repositories?api-version=6.0");
+            var url = $"https://dev.azure.com/{_settings.Organisation}/{_settings.TeamProject}/_apis/git/repositories?api-version=6.0";
+
+            return _proxy.GetAsync<ListResponse<GitRepository>>(url);
+        }
+
+
+        public Task<GitRepository?> GetRepository(string gitRepositoryUrl)
+        {
+            return _proxy.GetAsync<GitRepository>($"{gitRepositoryUrl}?api-version=6.0");
         }
 
         /// <summary>
         /// List all pull request of a repository
         /// </summary>
-        /// <param name="repositoryId">The Id of the repostiry</param>
+        /// <param name="pullRequestUrl">The pull request url from a GitRepositoryUrl</param>
         /// <returns>A task that list pull requests</returns>
-        public async Task<ListResponse<GitPullRequest>?> GetPullRequests(Guid repositoryId)
+        public Task<ListResponse<PullRequest>?> GetPullRequests(string pullRequestUrl)
         {
-            if (_settings.Organisation == null)
-            {
-                throw new InvalidOperationException("The Organization field of the TeamVelocitySettings must not be null to fetch pull requests");
-            }
-
-            var idTeamProject = (await _devOpsService.Projects(_settings.Organisation))?
-                                                     .Value?
-                                                     .FirstOrDefault(t => t.Name == _settings.TeamProject)?
-                                                     .Id;
-
-            // searchCriteria.sourceRepositoryId={repositoryId}&
-
-            return await _proxy.GetAsync<ListResponse<GitPullRequest>>(
-                $"https://dev.azure.com/{_settings.Organisation}/{idTeamProject}/_apis/git/pullrequests?api-version=6.0");
+            return _proxy.GetAsync<ListResponse<PullRequest>>($"{pullRequestUrl}?api-version=6.0");
         }
     }
 }
