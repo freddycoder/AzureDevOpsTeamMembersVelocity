@@ -10,6 +10,7 @@ services:
       AzureAD:TenantId: $TENANT_ID
       AzureAD:ClientId: $CLIENT_ID
     ports:
+      - "45000:80"
       - "45001:443"
     volumes:
       - ./AzureDevOpsTeamMembersVelocity/certs:/https/
