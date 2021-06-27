@@ -5,6 +5,13 @@
 @inject TokenProvider TokenProvider
 @attribute [Authorize]
 
+@if (Error != null)
+{
+    <ul class="list-group mb-3">
+        <li class="list-group-item list-group-item-danger">@Error</li>
+    </ul>
+}
+
 <div class="row">
     <div class="col-md-6">
         <h3>Git</h3>
@@ -12,7 +19,7 @@
 </div>
 
 <div class="row border">
-    <EditForm class="m-2 col-md-12" EditContext="EditContext" >
+    <EditForm class="m-2 col-md-12" EditContext="EditContext">
         <DataAnnotationsValidator />
         <ValidationSummary />
         <div class="form-group">
@@ -47,12 +54,12 @@
                         <InputSelect @bind-Value="GitSettings.PullRequest" class="form-control">
                             <option value="">Select a PR...</option>
                             @if (PullRequests != null)
-                            {
-                                @foreach (var pr in PullRequests)
                                 {
+                                @foreach (var pr in PullRequests)
+                                    {
                                     <option value="@pr.PullRequestId">@pr.Title</option>
+                                    }
                                 }
-                            }
                         </InputSelect>
                     </div>
                 }
@@ -65,7 +72,9 @@
     </EditForm>
 </div>
 
-@code { 
+@code {
+    public string? Error { get; set; }
+
     public GitPageSettings GitSettings { get; set; } = new GitPageSettings();
 
     public EditContext? EditContext { get; set; }
@@ -82,7 +91,10 @@
 
         EditContext = new EditContext(GitSettings);
 
-        Repositories = (await GitService.GetRepositories())?.Value;
+        var (repositories, error) = (await GitService.GetRepositories());
+
+        Repositories = repositories?.Value;
+        Error = error;
 
         await GetPullRequests();
     }
@@ -101,11 +113,17 @@
         if (selectedRepository != null &&
             string.IsNullOrWhiteSpace(GitSettings.Repository) == false)
         {
-            Repository = await GitService.GetRepository(selectedRepository.Url);
+            var (repository, error) = (await GitService.GetRepository(selectedRepository.Url));
+
+            Repository = repository;
+            Error = error;
 
             if (Repository?.Links?.PullRequests?.Href != null)
             {
-                PullRequests = (await GitService.GetPullRequests(Repository.Links.PullRequests.Href))?.Value;
+                var (pullRequests, errorPr) = (await GitService.GetPullRequests(Repository.Links.PullRequests.Href));
+
+                PullRequests = pullRequests?.Value;
+                Error = errorPr;
             }
 
             StateHasChanged();

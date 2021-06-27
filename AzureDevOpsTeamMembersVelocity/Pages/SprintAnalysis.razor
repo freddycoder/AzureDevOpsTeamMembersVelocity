@@ -4,6 +4,13 @@
 @inject DevOpsService DevOpsService
 @attribute [Authorize]
 
+@if (Error != null)
+{
+    <ul class="list-group mb-3">
+        <li class="list-group-item list-group-item-danger">@Error</li>
+    </ul>
+}
+
 <h3>SprintAnalysis</h3>
 
 @if (Sprint != null)
@@ -102,6 +109,8 @@ else
 }
 
 @code {
+    public string? Error { get; set; }
+
     [CascadingParameter]
     public IModalService? Modal { get; set; }
 
@@ -121,7 +130,7 @@ else
 
         if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("sprints", out var sprintUrl))
         {
-            Sprint = await DevOpsService.Sprint(sprintUrl);
+            Sprint = (await DevOpsService.Sprint(sprintUrl)).Item1;
 
             StateHasChanged();
 
@@ -129,17 +138,17 @@ else
             {
                 if (string.IsNullOrWhiteSpace(Sprint.Links?.Capacity?.Href) == false)
                 {
-                    Capacities = (await DevOpsService.Capacities(Sprint.Links.Capacity.Href))?.Value;
+                    Capacities = (await DevOpsService.Capacities(Sprint.Links.Capacity.Href)).Item1?.Value;
                 }
 
                 if (string.IsNullOrWhiteSpace(Sprint.Links?.TeamDaysOff?.Href) == false)
                 {
-                    TeamDaysOff = await DevOpsService.TeamDaysOff(Sprint.Links.TeamDaysOff.Href);
+                    TeamDaysOff = (await DevOpsService.TeamDaysOff(Sprint.Links.TeamDaysOff.Href)).Item1;
                 }
 
                 if (string.IsNullOrWhiteSpace(Sprint.Links?.TeamSettings?.Href) == false)
                 {
-                    TeamSettings = await DevOpsService.TeamSettings(Sprint.Links.TeamSettings.Href);
+                    TeamSettings = (await DevOpsService.TeamSettings(Sprint.Links.TeamSettings.Href)).Item1;
 
                     if (TeamSettings != null) StateHasChanged();
                 }

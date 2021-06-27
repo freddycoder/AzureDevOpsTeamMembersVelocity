@@ -6,6 +6,13 @@
 @inject TokenProvider TokenProvider
 @attribute [Authorize]
 
+@if (Error != null)
+{
+    <ul class="list-group mb-3">
+        <li class="list-group-item list-group-item-danger">@Error</li>
+    </ul>
+}
+
 <div class="row">
     <div class="col-md-6">
         <h3>Feeds</h3>
@@ -115,8 +122,8 @@
                 {
                     <tr>
                         <td>@nuget.Name</td>
-                        <td>@nuget.Versions.FirstOrDefault()?.Version</td>
-                        <td>@nuget.Versions.FirstOrDefault()?.PublishDate</td>
+                        <td>@nuget.Versions?.FirstOrDefault()?.Version</td>
+                        <td>@nuget.Versions?.FirstOrDefault()?.PublishDate</td>
                         <td>
                             <button @onclick="() => ShowJson(nuget)">json</button>
                         </td>
@@ -128,6 +135,8 @@
 }
 
 @code {
+    public string? Error { get; set; }
+
     public NugetPageSettings NugetSettings { get; set; } = new NugetPageSettings();
 
     public EditContext? EditContext { get; set; }
@@ -150,7 +159,10 @@
     {
         if (Settings.Organisation != null)
         {
-            TeamProjects = (await DevOpsService.Projects(Settings.Organisation))?.Value;
+            var (teamProjects, error) = (await DevOpsService.Projects(Settings.Organisation));
+
+            TeamProjects = teamProjects?.Value;
+            Error = error;
 
             StateHasChanged();
         }
@@ -179,11 +191,11 @@
 
     public async Task GetNugets()
     {
-        var feedNugetsUrl = Feeds?.FirstOrDefault(f => f.Name == NugetSettings.Feed)?.Links.Packages?.Href;
+        var feedNugetsUrl = Feeds?.FirstOrDefault(f => f.Name == NugetSettings.Feed)?.Links?.Packages?.Href;
 
         if (feedNugetsUrl != null && Settings.Organisation != null)
         {
-            Nugets = (await NugetService.GetNugets(feedNugetsUrl, NugetSettings.SearchTerm))?.Value;
+            Nugets = (await NugetService.GetNugets(feedNugetsUrl, NugetSettings.SearchTerm)).Item1?.Value;
 
             StateHasChanged();
         }
@@ -195,7 +207,7 @@
         UserPreference.Set(NugetSettings);
     }
 
-        [CascadingParameter]
+    [CascadingParameter]
     public IModalService? Modal { get; set; }
 
     public void ShowJson(Model.Nuget nuget)

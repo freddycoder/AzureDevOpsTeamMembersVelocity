@@ -20,7 +20,7 @@
     {
         if (Url != null)
         {
-            Json = (await DevOpsProxy.GetAsync($"{Url}?api-version=6.0"))?.FormatJson();
+            Json = (await DevOpsProxy.GetAsync($"{Url}?api-version=6.0")).Item1?.FormatJson();
         }
     }
 }

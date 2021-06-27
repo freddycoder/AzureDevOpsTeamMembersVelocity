@@ -14,7 +14,7 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
     /// </summary>
     public class DevOpsProxy : IDevOpsProxy
     {
-        private static readonly TimeLimiter TimeConstrainte = TimeLimiter.GetFromMaxCountByInterval(30, TimeSpan.FromSeconds(1));
+        private static readonly TimeLimiter TimeConstrainte = TimeLimiter.GetFromMaxCountByInterval(29, TimeSpan.FromSeconds(1));
         private readonly TeamMembersVelocitySettings _appSettings;
         private readonly ILogger<DevOpsProxy> _logger;
         private readonly HttpClient _client;
@@ -37,7 +37,7 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
         /// </summary>
         /// <param name="fullUrl">Complete URL of the resource to fetch. Must start with https://dev.azure.com/</param>
         /// <returns>The response body as a string</returns>
-        public async Task<string?> GetAsync(string fullUrl)
+        public async Task<(string?, string?)> GetAsync(string fullUrl)
         {
             _logger.LogInformation($"Try fetch {fullUrl}");
 
@@ -45,14 +45,14 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
             {
                 using HttpResponseMessage response = await GetResponseAsync(fullUrl);
                 
-                return await response.Content.ReadAsStringAsync();
+                return (await response.Content.ReadAsStringAsync(), default);
             }
             catch (Exception ex)
             {
                 _logger.LogCritical(ex, ex.Message);
-            }
 
-            return default;
+                return (default, ex.Message);
+            }
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
         /// <typeparam name="T">Type used in deserialization</typeparam>
         /// <param name="fullUrl">Complete URL of the resource to fetch. Must start with https://dev.azure.com/</param>
         /// <returns>The response body Deserialized as T</returns>
-        public async Task<T?> GetAsync<T>(string fullUrl)
+        public async Task<(T?, string?)> GetAsync<T>(string fullUrl)
         {
             _logger.LogInformation($"Try fetch {fullUrl}");
 
@@ -73,14 +73,14 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
 
                 var responsesDeserialized = JsonSerializer.Deserialize<T>(responseBody, Program.SerializerOptions);
 
-                return responsesDeserialized;
+                return (responsesDeserialized, default);
             }
             catch (Exception ex)
             {
                 _logger.LogCritical(ex, ex.Message);
-            }
 
-            return default;
+                return (default, ex.Message);
+            }
         }
 
         private async Task<HttpResponseMessage> GetResponseAsync(string fullUrl)

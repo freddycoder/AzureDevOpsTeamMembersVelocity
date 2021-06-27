@@ -21,13 +21,13 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
             _logger = logger;
         }
 
-        public async Task<string?> GetAsync(string fullUrl)
+        public async Task<(string?, string?)> GetAsync(string fullUrl)
         {
             if (StringCache.TryGetValue(fullUrl, out var cacheInstance))
             {
                 if (cacheInstance.Expiration > DateTime.Now)
                 {
-                    return cacheInstance.Instance;
+                    return (cacheInstance.Instance, default);
                 }
                 else
                 {
@@ -44,9 +44,9 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
 
             var response = await _proxy.GetAsync(fullUrl);
 
-            if (response != null)
+            if (response.Item1 != null)
             {
-                StringCache.TryAdd(fullUrl, new CacheInstance<string>(DateTime.Now + CacheSeconde, response));
+                StringCache.TryAdd(fullUrl, new CacheInstance<string>(DateTime.Now + CacheSeconde, response.Item1));
             }
 
             return response;
@@ -54,13 +54,13 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
 
         private ConcurrentDictionary<string, CacheInstance<object>> ObjectCache { get; set; } = new();
 
-        public async Task<T?> GetAsync<T>(string fullUrl)
+        public async Task<(T?, string?)> GetAsync<T>(string fullUrl)
         {
             if (ObjectCache.TryGetValue(fullUrl, out var cacheInstance))
             {
                 if (cacheInstance.Expiration > DateTime.Now)
                 {
-                    return (T) cacheInstance.Instance;
+                    return ((T) cacheInstance.Instance, default);
                 }
                 else
                 {
@@ -77,9 +77,9 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
 
             var response = await _proxy.GetAsync<T>(fullUrl);
 
-            if (response != null)
+            if (response.Item1 != null)
             {
-                ObjectCache.TryAdd(fullUrl, new CacheInstance<object>(DateTime.Now + CacheSeconde, response));
+                ObjectCache.TryAdd(fullUrl, new CacheInstance<object>(DateTime.Now + CacheSeconde, response.Item1));
             }
 
             return response;

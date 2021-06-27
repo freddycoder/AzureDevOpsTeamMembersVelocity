@@ -27,7 +27,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// List all repository of the current selected Organisation and TeamProject
         /// </summary>
         /// <returns>A task that list Repositories</returns>
-        public Task<ListResponse<GitRepository>?> GetRepositories()
+        public Task<(ListResponse<GitRepository>?, string?)> GetRepositories()
         {
             var url = $"https://dev.azure.com/{_settings.Organisation}/{_settings.TeamProject}/_apis/git/repositories?api-version=6.0";
 
@@ -39,7 +39,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// </summary>
         /// <param name="gitRepositoryUrl">Url of the resource</param>
         /// <returns>A task that return the GitRepository instance</returns>
-        public Task<GitRepository?> GetRepository(string gitRepositoryUrl)
+        public Task<(GitRepository?, string?)> GetRepository(string gitRepositoryUrl)
         {
             return _proxy.GetAsync<GitRepository>($"{gitRepositoryUrl}?api-version=6.0");
         }
@@ -49,7 +49,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// </summary>
         /// <param name="pullRequestUrl">The pull request url from a GitRepositoryUrl</param>
         /// <returns>A task that list pull requests</returns>
-        public Task<ListResponse<PullRequest>?> GetPullRequests(string pullRequestUrl)
+        public Task<(ListResponse<PullRequest>?,string?)> GetPullRequests(string pullRequestUrl)
         {
             return _proxy.GetAsync<ListResponse<PullRequest>>($"{pullRequestUrl}?api-version=6.0");
         }

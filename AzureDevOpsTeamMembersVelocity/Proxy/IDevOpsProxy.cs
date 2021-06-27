@@ -12,7 +12,7 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
         /// </summary>
         /// <param name="fullUrl">The full url of the devops resource</param>
         /// <returns>The body as a string</returns>
-        Task<string?> GetAsync(string fullUrl);
+        Task<(string?, string?)> GetAsync(string fullUrl);
 
         /// <summary>
         /// Get and deserialize a resource
@@ -20,6 +20,6 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
         /// <typeparam name="T">Type of the resource</typeparam>
         /// <param name="fullUrl">The full url of the devops resource</param>
         /// <returns>An instance of the response deserialize</returns>
-        Task<T?> GetAsync<T>(string fullUrl);
+        Task<(T?, string?)> GetAsync<T>(string fullUrl);
     }
 }

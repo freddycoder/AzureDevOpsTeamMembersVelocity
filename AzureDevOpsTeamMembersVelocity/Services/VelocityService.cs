@@ -50,7 +50,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
                 }
             }
 
-            var items = (await _devOpsService.WorkItems(sprintUrl))?.WorkItemRelations;
+            var items = (await _devOpsService.WorkItems(sprintUrl)).Item1?.WorkItemRelations;
 
             if (items != null)
             {
@@ -130,7 +130,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
 
                     if (result.Links?.WorkItemUpdates?.Href != null)
                     {
-                        workItemUpdate = (await _devOpsService.Updates(result.Links.WorkItemUpdates.Href))?.Value;
+                        workItemUpdate = (await _devOpsService.Updates(result.Links.WorkItemUpdates.Href)).Item1?.Value;
                     }
 
                     yield return (result, workItemUpdate);
@@ -142,7 +142,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         {
             if (workItem.Source != null && workItem.Target != null)
             {
-                return await _devOpsService.WorkItem(workItem.Target.Url);
+                return (await _devOpsService.WorkItem(workItem.Target.Url)).Item1;
             }
 
             return null;

@@ -30,7 +30,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// </remarks>
         /// <param name="organization">Name of the organization. https://dev.azure.com/{organization}</param>
         /// <returns>List of TeamProject</returns>
-        public Task<ListResponse<TeamProject>?> Projects(string organization)
+        public Task<(ListResponse<TeamProject>?, string?)> Projects(string organization)
         {
             return _proxy.GetAsync<ListResponse<TeamProject>>(
                 $"https://dev.azure.com/{organization}/_apis/projects?api-version=6.0");
@@ -42,7 +42,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// <param name="organization">Name of the organization. https://dev.azure.com/{organization}</param>
         /// <param name="teamProjectId">Id of the organization team project selected</param>
         /// <returns>List of teams</returns>
-        public Task<ListResponse<WebApiTeam>?> Teams(string organization, Guid teamProjectId)
+        public Task<(ListResponse<WebApiTeam>?, string?)> Teams(string organization, Guid teamProjectId)
         {
             return _proxy.GetAsync<ListResponse<WebApiTeam>>(
                 $"https://dev.azure.com/{organization}/_apis/projects/{teamProjectId}/teams?api-version=6.0");
@@ -55,7 +55,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// The api-version used is 6.0, and the caller is not expected to specify the version in the URL.
         /// </remarks>
         /// <param name="teamIterationDaysOffUrl">URL of team days off to fetch</param>
-        public Task<Microsoft.TeamFoundation.Work.WebApi.TeamSettingsDaysOff?> TeamDaysOff(string teamIterationDaysOffUrl)
+        public Task<(Microsoft.TeamFoundation.Work.WebApi.TeamSettingsDaysOff?, string?)> TeamDaysOff(string teamIterationDaysOffUrl)
         {
             return _proxy.GetAsync<Microsoft.TeamFoundation.Work.WebApi.TeamSettingsDaysOff>(
                 $"{teamIterationDaysOffUrl}?api-version=6.0");
@@ -69,7 +69,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// </remarks>
         /// <param name="teamSettingsUrl">The teamSettings full URL without the api-version</param>
         /// <returns>The teamSetting instance</returns>
-        public Task<Microsoft.TeamFoundation.Work.WebApi.TeamSetting?> TeamSettings(string teamSettingsUrl)
+        public Task<(Microsoft.TeamFoundation.Work.WebApi.TeamSetting?, string?)> TeamSettings(string teamSettingsUrl)
         {
             return _proxy.GetAsync<Microsoft.TeamFoundation.Work.WebApi.TeamSetting>(
                 $"{teamSettingsUrl}?api-version=6.0");
@@ -82,7 +82,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// <param name="project"></param>
         /// <param name="team"></param>
         /// <returns></returns>
-        public Task<ListResponse<Sprint>?> Sprints(string organization, string project, string team)
+        public Task<(ListResponse<Sprint>?, string?)> Sprints(string organization, string project, string team)
         {
             return _proxy.GetAsync<ListResponse<Sprint>>(
                 $"https://dev.azure.com/{organization}/{project}/{team}/_apis/work/teamsettings/iterations?api-version=6.0");
@@ -96,7 +96,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// </remarks>
         /// <param name="sprintUrl">The full URL of the sprint.</param>
         /// <returns>The instance of the sprint</returns>
-        public Task<Sprint?> Sprint(string sprintUrl)
+        public Task<(Sprint?, string?)> Sprint(string sprintUrl)
         {
             return _proxy.GetAsync<Sprint>($"{sprintUrl}?api-version=6.0");
         }
@@ -109,7 +109,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// </remarks>
         /// <param name="capacityUrl">The full URL of the capacity information.</param>
         /// <returns>The list of capacities</returns>
-        public Task<ListResponse<Capacity>?> Capacities(string capacityUrl)
+        public Task<(ListResponse<Capacity>?, string?)> Capacities(string capacityUrl)
         {
             return _proxy.GetAsync<ListResponse<Capacity>>(
                 $"{capacityUrl}?api-version=6.0");
@@ -120,7 +120,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// </summary>
         /// <param name="sprintUrl">The URL of the sprint has returned by the <see cref="Sprints(string, string, string)" /> method/></param>
         /// <returns>A work item with details</returns>
-        public Task<WorkItems?> WorkItems(string sprintUrl)
+        public Task<(WorkItems?, string?)> WorkItems(string sprintUrl)
         {
             return _proxy.GetAsync<WorkItems>(
                 $"{sprintUrl}/workitems?api-version=6.0-preview.1");
@@ -131,7 +131,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// </summary>
         /// <param name="workItemUrl">workItem fullUrl</param>
         /// <returns>The WorkItem deserialized</returns>
-        public Task<WorkItem?> WorkItem(string workItemUrl)
+        public Task<(WorkItem?, string?)> WorkItem(string workItemUrl)
         {
             return _proxy.GetAsync<WorkItem>($"{workItemUrl}?api-version=6.0");
         }
@@ -143,7 +143,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// The api-version used is 6.0, and the caller is not expected to specify the version in the URL.
         /// </remarks>
         /// <param name="updatesUrl">URL of updates to fetch</param>
-        public Task<ListResponse<WorkItemUpdate>?> Updates(string updatesUrl)
+        public Task<(ListResponse<WorkItemUpdate>?, string?)> Updates(string updatesUrl)
         {
             return _proxy.GetAsync<ListResponse<WorkItemUpdate>>($"{updatesUrl}?api-version=6.0");
         }

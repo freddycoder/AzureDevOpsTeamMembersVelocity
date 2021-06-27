@@ -5,6 +5,13 @@
 @inject AzureDevOpsTeamMembersVelocity.Services.TokenProvider TokenProvider
 @attribute [Authorize]
 
+@if (Error != null)
+{
+    <ul class="list-group mb-3">
+        <li class="list-group-item list-group-item-danger">@Error</li>
+    </ul>
+}
+
 <h1>Team members velocity</h1>
 
 Welcome to the team members velocity app.
@@ -107,6 +114,8 @@ Welcome to the team members velocity app.
 
 
 @code {
+    public string? Error { get; set; }
+
     private string? _org;
     [Parameter]
     [StringLength(256, ErrorMessage = "Organisation is too long.")]
@@ -232,7 +241,10 @@ Welcome to the team members velocity app.
     {
         if (Organisation != null)
         {
-            TeamProjects = (await DevOpsService.Projects(Organisation))?.Value;
+            var (teamProjects, error) = (await DevOpsService.Projects(Organisation));
+
+            TeamProjects = teamProjects?.Value;
+            Error = error;
 
             StateHasChanged();
         }
@@ -244,7 +256,10 @@ Welcome to the team members velocity app.
     {
         if (Organisation != null && TeamProjects != null)
         {
-            Teams = (await DevOpsService.Teams(Organisation, TeamProjects.First(t => t.Name == TeamProject).Id))?.Value;
+            var (teams, error) = (await DevOpsService.Teams(Organisation, TeamProjects.First(t => t.Name == TeamProject).Id));
+
+            Teams = teams?.Value;
+            Error = error;
 
             StateHasChanged();
         }
@@ -256,7 +271,10 @@ Welcome to the team members velocity app.
     {
         if (Organisation != null && TeamProject != null && Team != null)
         {
-            Sprints = (await DevOpsService.Sprints(Organisation, TeamProject, Team))?.Value;
+            var (sprints, error) = (await DevOpsService.Sprints(Organisation, TeamProject, Team));
+
+            Sprints = sprints?.Value;
+            Error = error;
 
             StateHasChanged();
         }

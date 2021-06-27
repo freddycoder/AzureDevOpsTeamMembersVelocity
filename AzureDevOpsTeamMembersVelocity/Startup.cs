@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +17,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web.UI;
 using System;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using static System.Environment;
@@ -51,20 +49,7 @@ namespace AzureDevOpsTeamMembersVelocity
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
-            if (string.Equals(GetEnvironmentVariable("Forwarded_headers"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
-            {
-                services.Configure<ForwardedHeadersOptions>(options =>
-                {
-                    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-
-                    foreach (var network in GetEnvironmentVariable("KNOW_NETWORKS")?.Split(';') ?? Array.Empty<string>())
-                    {
-                        var ipInfo = network.Split("/");
-
-                        options.KnownNetworks.Add(new IPNetwork(IPAddress.Parse(ipInfo[0]), int.Parse(ipInfo[1])));
-                    }
-                });
-            }
+            services.AddTeamVelocityForwardedHeaders();
 
             var mvcBuilder = services.AddRazorPages();
             if (AddAuthentificationExtension.IsAzureADAuth())
