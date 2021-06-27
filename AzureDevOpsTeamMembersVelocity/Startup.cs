@@ -80,7 +80,8 @@ namespace AzureDevOpsTeamMembersVelocity
                 return client;
             });
 
-            services.AddSingleton<TeamMembersVelocitySettings>();
+            services.AddDistributedCaching();
+
             services.AddScoped<DevOpsProxy>();
             services.AddScoped<IDevOpsProxy, DevOpsProxyCache>();
             services.AddScoped<DevOpsService>();
@@ -88,7 +89,6 @@ namespace AzureDevOpsTeamMembersVelocity
             services.AddScoped<GitService>();
             services.AddScoped<NugetService>();
             services.AddSingleton<IVelocityRepository, VelocityRepository>();
-            services.AddSingleton<IUserPreferenceRepository, UserPreferenceRepository>();
         }
 
         /// <summary>

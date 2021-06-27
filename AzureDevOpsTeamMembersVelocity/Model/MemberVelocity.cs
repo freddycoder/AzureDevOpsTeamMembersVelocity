@@ -15,7 +15,26 @@ namespace AzureDevOpsTeamMembersVelocity.Model
         /// <summary>
         /// The hours of work done. Normally calculated from the History according to the member.
         /// </summary>
+        /// <remarks>
+        /// This value is calculated from the sum of every update
+        /// </remarks>
         public double HoursOfWorkDone { get; set; }
+
+        /// <summary>
+        /// Number of hours added that were not in the planning of the sprint.
+        /// </summary>
+        /// <remarks>
+        /// This value is the sum of all negative hours changes
+        /// </remarks>
+        public double HoursAdded { get; set; }
+
+        /// <summary>
+        /// The number of hours removed by the team member. 
+        /// </summary>
+        /// <remarks>
+        /// THis value is the sum of all positive hours changes
+        /// </remarks>
+        public double HoursRemoved { get; set; }
 
         /// <summary>
         /// The capacity saved. Normally based on the response of the Capacity REST API.

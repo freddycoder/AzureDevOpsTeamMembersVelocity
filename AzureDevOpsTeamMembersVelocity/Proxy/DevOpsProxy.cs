@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using ComposableAsync;
+using AzureDevOpsTeamMembersVelocity.Repository;
 
 namespace AzureDevOpsTeamMembersVelocity.Proxy
 {
@@ -15,7 +16,7 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
     public class DevOpsProxy : IDevOpsProxy
     {
         private static readonly TimeLimiter TimeConstrainte = TimeLimiter.GetFromMaxCountByInterval(29, TimeSpan.FromSeconds(1));
-        private readonly TeamMembersVelocitySettings _appSettings;
+        private readonly IUserPreferenceRepository _appSettings;
         private readonly ILogger<DevOpsProxy> _logger;
         private readonly HttpClient _client;
 
@@ -25,7 +26,7 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
         /// <param name="client">HttpClient to used</param>
         /// <param name="appSettings">App settings, to acces AuthenticationHeader</param>
         /// <param name="logger">Logger to log information and critical error</param>
-        public DevOpsProxy(HttpClient client, TeamMembersVelocitySettings appSettings, ILogger<DevOpsProxy> logger)
+        public DevOpsProxy(HttpClient client, IUserPreferenceRepository appSettings, ILogger<DevOpsProxy> logger)
         {
             _appSettings = appSettings;
             _logger = logger;
@@ -95,7 +96,9 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
                 throw new InvalidOperationException("DevOpsProxy fullUrl must not contains any '\\n'");
             }
 
-            _client.DefaultRequestHeaders.Authorization = _appSettings.AuthenticationHeader;
+            var settings = await _appSettings.GetAsync<TeamMembersVelocitySettings>();
+
+            _client.DefaultRequestHeaders.Authorization = settings.AuthenticationHeader;
 
             await TimeConstrainte;
 

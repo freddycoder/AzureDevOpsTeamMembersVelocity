@@ -351,6 +351,9 @@ MigrationBackup/
 
 # Custom
 AzureDevOpsTeamMemberVelocity.json
+NugetPageSettings.json
+GitPageSettings.json
+
 key-*.xml
 Documentation.xml
 AzureDevOpsTeamMembersVelocity.db

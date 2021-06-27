@@ -1,4 +1,5 @@
 ﻿using AzureDevOpsTeamMembersVelocity.Autorization;
+using AzureDevOpsTeamMembersVelocity.Repository;
 using AzureDevOpsTeamMembersVelocity.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -39,6 +40,8 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
 
                 services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                         .AddCookie();
+
+                services.AddSingleton<IUserPreferenceRepository, UserPreferenceFromFileSystemRepository>();
             }
             else if (IsIdentityAuth())
             {
@@ -46,6 +49,8 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
 
                 services.AddAuthentication("Identity.Application")
                         .AddCookie();
+
+                services.AddScoped<IUserPreferenceRepository, UserPreferenceFromCacheRepository>();
             }
             else if (IsAzureADAuth())
             {
@@ -79,10 +84,14 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
                 }
 
                 services.AddMicrosoftIdentityWebAppAuthentication(configuration);
+
+                services.AddScoped<IUserPreferenceRepository, UserPreferenceFromCacheRepository>();
             }
             else
             {
                 services.AddSingleton(new AuthUrlPagesProvider(""));
+
+                services.AddSingleton<IUserPreferenceRepository, UserPreferenceFromFileSystemRepository>();
 
                 services.AddSingleton<IHostEnvironmentAuthenticationStateProvider, AllowAnonymousStateProvider>();
                 services.AddSingleton<IAuthorizationHandler, AllowAnonymousAuthorizationHandler>();

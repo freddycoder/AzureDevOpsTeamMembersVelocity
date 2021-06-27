@@ -1,5 +1,6 @@
 ﻿using AzureDevOpsTeamMembersVelocity.Model;
 using AzureDevOpsTeamMembersVelocity.Proxy;
+using AzureDevOpsTeamMembersVelocity.Repository;
 using System.Threading.Tasks;
 
 namespace AzureDevOpsTeamMembersVelocity.Services
@@ -10,14 +11,14 @@ namespace AzureDevOpsTeamMembersVelocity.Services
     public class NugetService
     {
         private readonly IDevOpsProxy _proxy;
-        private readonly TeamMembersVelocitySettings _settings;
+        private readonly IUserPreferenceRepository _settings;
 
         /// <summary>
         /// Constructor with dependencies
         /// </summary>
         /// <param name="proxy"></param>
         /// <param name="settings"></param>
-        public NugetService(IDevOpsProxy proxy, TeamMembersVelocitySettings settings)
+        public NugetService(IDevOpsProxy proxy, IUserPreferenceRepository settings)
         {
             _proxy = proxy;
             _settings = settings;
@@ -31,18 +32,20 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         public async Task<ListResponse<Feed>?> GetFeeds(string? teamProject = null)
         {
             ListResponse<Feed>? response;
+
+            var settings = await _settings.GetAsync<TeamMembersVelocitySettings>();
             
             if (string.IsNullOrWhiteSpace(teamProject))
             {
                 // Fetch the organization feeds
                 response = await _proxy.GetAsync<ListResponse<Feed>>
-                    ($"https://feeds.dev.azure.com/{_settings.Organisation}/_apis/packaging/feeds?api-version=6.0-preview.1");
+                    ($"https://feeds.dev.azure.com/{settings.Organisation}/_apis/packaging/feeds?api-version=6.0-preview.1");
             }
             else
             {
                 // Fetch the team project feeds
                 response = await _proxy.GetAsync<ListResponse<Feed>>
-                    ($"https://feeds.dev.azure.com/{_settings.Organisation}/{teamProject}/_apis/packaging/feeds?api-version=6.0-preview.1");
+                    ($"https://feeds.dev.azure.com/{settings.Organisation}/{teamProject}/_apis/packaging/feeds?api-version=6.0-preview.1");
             }
 
             return response;

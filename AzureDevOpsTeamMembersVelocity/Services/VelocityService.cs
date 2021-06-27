@@ -2,7 +2,6 @@
 using AzureDevOpsTeamMembersVelocity.Model;
 using AzureDevOpsTeamMembersVelocity.Repository;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -180,6 +179,15 @@ namespace AzureDevOpsTeamMembersVelocity.Services
                     var delta = GetDelta(remaningWork.OldValue, remaningWork.NewValue);
 
                     velocity.HoursOfWorkDone += delta;
+
+                    if (delta < 0)
+                    {
+                        velocity.HoursAdded += Math.Abs(delta);
+                    }
+                    else
+                    {
+                        velocity.HoursRemoved += delta;
+                    }
 
                     if (update != null)
                     {

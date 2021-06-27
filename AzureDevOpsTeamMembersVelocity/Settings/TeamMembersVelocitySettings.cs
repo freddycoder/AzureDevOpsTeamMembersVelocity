@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AzureDevOpsTeamMembersVelocity.Settings;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -11,7 +12,7 @@ namespace AzureDevOpsTeamMembersVelocity
     /// This is the main configuration of the app. 
     /// Those settings can be saved on disk using the persist button on the index.html page.
     /// </summary>
-    public class TeamMembersVelocitySettings
+    public class TeamMembersVelocitySettings : AbstractSettings
     {
         /// <summary>
         /// Organization selected
@@ -20,7 +21,17 @@ namespace AzureDevOpsTeamMembersVelocity
         /// Organisation corespond to the first parameter in the route. https://dev.azure.com/{organization}
         /// </remarks>
         [StringLength(256, ErrorMessage = "Organisation is too long.")]
-        public string? Organisation { get; set; }
+        public string? Organisation 
+        {
+            get => _organization;
+            set
+            {
+                _asChanged = _organization == value;
+                _organization = value;
+            }
+        }
+
+        private string? _organization;
 
         /// <summary>
         /// Team project selected
@@ -29,13 +40,33 @@ namespace AzureDevOpsTeamMembersVelocity
         /// Organisation corespond to the first parameter in the route. https://dev.azure.com/{organization}/{teamProject}
         /// </remarks>
         [StringLength(64, ErrorMessage = "TeamProject is too long.")]
-        public string? TeamProject { get; set; }
+        public string? TeamProject 
+        {
+            get => _teamProject;
+            set
+            {
+                _asChanged = _teamProject == value;
+                _teamProject = value;
+            }
+        }
+
+        private string? _teamProject;
 
         /// <summary>
         /// Team selected
         /// </summary>
         [StringLength(64, ErrorMessage = "Team is too long.")]
-        public string? Team { get; set; }
+        public string? Team 
+        {
+            get => _team;
+            set
+            {
+                _asChanged = _team == value;
+                _team = value;
+            }
+        }
+
+        private string? _team;
 
         private string? _apiKey;
         private bool _authKeyChanged;
@@ -53,6 +84,7 @@ namespace AzureDevOpsTeamMembersVelocity
             }
             set
             {
+                _asChanged = _apiKey == value;
                 _apiKey = value;
                 _authKeyChanged = true;
             }

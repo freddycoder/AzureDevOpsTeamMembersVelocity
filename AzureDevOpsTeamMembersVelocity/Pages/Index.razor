@@ -1,6 +1,7 @@
 @page "/"
-@inject TeamMembersVelocitySettings AppSettings
+@inject IUserPreferenceRepository UserSettings
 @inject DevOpsService DevOpsService
+@inject AuthUrlPagesProvider AuthUrlProvider
 @inject IDataProtectionProvider DataProtectionProvider
 @inject AzureDevOpsTeamMembersVelocity.Services.TokenProvider TokenProvider
 @attribute [Authorize]
@@ -116,6 +117,8 @@ Welcome to the team members velocity app.
 @code {
     public string? Error { get; set; }
 
+    public TeamMembersVelocitySettings AppSettings { get; set; } = new TeamMembersVelocitySettings();
+
     private string? _org;
     [Parameter]
     [StringLength(256, ErrorMessage = "Organisation is too long.")]
@@ -192,6 +195,8 @@ Welcome to the team members velocity app.
 
     protected override async Task OnInitializedAsync()
     {
+        AppSettings = await UserSettings.GetAsync<TeamMembersVelocitySettings>();
+
         Organisation = AppSettings?.Organisation;
         TeamProject = AppSettings?.TeamProject;
         Team = AppSettings?.Team;
@@ -223,13 +228,7 @@ Welcome to the team members velocity app.
             AppSettings.Team = Team;
             AppSettings.ApiKey = ApiKey;
 
-            var appSettingsJson = JsonSerializer.Serialize(AppSettings);
-
-            var dateProtector = DataProtectionProvider.CreateProtector(nameof(AzureDevOpsTeamMembersVelocity));
-
-            var encryptedText = dateProtector.Protect(appSettingsJson);
-
-            await File.WriteAllTextAsync("AzureDevOpsTeamMemberVelocity.json", encryptedText);
+            await UserSettings.SetAsync(AppSettings);
 
             NeedToSaveConfig = false;
         }
@@ -241,6 +240,8 @@ Welcome to the team members velocity app.
     {
         if (Organisation != null)
         {
+            await UserSettings.SetAsync(AppSettings);
+
             var (teamProjects, error) = (await DevOpsService.Projects(Organisation));
 
             TeamProjects = teamProjects?.Value;
@@ -256,6 +257,8 @@ Welcome to the team members velocity app.
     {
         if (Organisation != null && TeamProjects != null)
         {
+            await UserSettings.SetAsync(AppSettings);
+
             var (teams, error) = (await DevOpsService.Teams(Organisation, TeamProjects.First(t => t.Name == TeamProject).Id));
 
             Teams = teams?.Value;
@@ -271,6 +274,8 @@ Welcome to the team members velocity app.
     {
         if (Organisation != null && TeamProject != null && Team != null)
         {
+            await UserSettings.SetAsync(AppSettings);
+
             var (sprints, error) = (await DevOpsService.Sprints(Organisation, TeamProject, Team));
 
             Sprints = sprints?.Value;

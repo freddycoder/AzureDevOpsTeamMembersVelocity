@@ -1,6 +1,5 @@
 ﻿@page "/Git"
 @inject GitService GitService
-@inject TeamMembersVelocitySettings Settings
 @inject IUserPreferenceRepository UserPreference
 @inject TokenProvider TokenProvider
 @attribute [Authorize]
@@ -75,6 +74,8 @@
 @code {
     public string? Error { get; set; }
 
+    public TeamMembersVelocitySettings Settings { get; set; } = new TeamMembersVelocitySettings();
+
     public GitPageSettings GitSettings { get; set; } = new GitPageSettings();
 
     public EditContext? EditContext { get; set; }
@@ -87,7 +88,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        GitSettings = UserPreference.Get<GitPageSettings>();
+        Settings = await UserPreference.GetAsync<TeamMembersVelocitySettings>();
+        GitSettings = await UserPreference.GetAsync<GitPageSettings>();
 
         EditContext = new EditContext(GitSettings);
 
@@ -130,9 +132,9 @@
         }
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        base.OnAfterRender(firstRender);
-        UserPreference.Set(GitSettings);
+        await base.OnAfterRenderAsync(firstRender);
+        await UserPreference.SetAsync(GitSettings);
     }
 }

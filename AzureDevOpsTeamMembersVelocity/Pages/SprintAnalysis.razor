@@ -78,6 +78,8 @@ else
             <tr>
                 <th>Person</th>
                 <th>Hours of work done</th>
+                <th>Hours added</th>
+                <th>Hours removed</th>
                 <th>Estimated Capacity</th>
                 <th>Real capacity</th>
                 <th></th>
@@ -90,8 +92,10 @@ else
 
                 <tr>
                     <td>@velocity.DisplayName</td>
-                    <td>@velocity.HoursOfWorkDone</td>
-                    <td>@velocity.CapacitySaved</td>
+                    <td>@velocity.HoursOfWorkDone.ToString("F2")</td>
+                    <td>@velocity.HoursAdded.ToString("F2")</td>
+                    <td>@velocity.HoursRemoved.ToString("F2")</td>
+                    <td>@velocity.CapacitySaved.ToString("F2")</td>
                     <td>@velocity.RealCapacity.ToString("F2")</td>
                     <td>
                         <button class="btn btn-primary" @onclick="() => ShowUpdates(updates)">Show history</button>

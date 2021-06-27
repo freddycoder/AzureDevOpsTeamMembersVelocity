@@ -1,9 +1,29 @@
 ﻿namespace AzureDevOpsTeamMembersVelocity.Settings
 {
-    public class GitPageSettings
+    public class GitPageSettings : AbstractSettings
     {
-        public string? Repository { get; set; }
+        public string? Repository 
+        {
+            get => _repository;
+            set
+            {
+                _asChanged = _repository == value;
+                _repository = value;
+            }
+        }
 
-        public int? PullRequest { get; set; }
+        private string? _repository;
+
+        public int? PullRequest 
+        {
+            get => _pullRequest;
+            set
+            {
+                _asChanged = _pullRequest == value;
+                _pullRequest = value;
+            }
+        }
+
+        private int? _pullRequest;
     }
 }

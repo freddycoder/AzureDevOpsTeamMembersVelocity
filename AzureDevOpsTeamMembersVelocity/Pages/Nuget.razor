@@ -1,7 +1,6 @@
 ﻿@page "/Nuget"
 @inject DevOpsService DevOpsService
 @inject NugetService NugetService
-@inject TeamMembersVelocitySettings Settings
 @inject IUserPreferenceRepository UserPreference
 @inject TokenProvider TokenProvider
 @attribute [Authorize]
@@ -118,7 +117,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var nuget in Nugets.Where(n => NugetSettings.OnlyAlpha == false || (n.Versions.FirstOrDefault()?.Version?.Contains('-') == true)))
+                @foreach (var nuget in Nugets.Where(n => NugetSettings.OnlyAlpha == false || (n.Versions?.FirstOrDefault()?.Version?.Contains('-') == true)))
                 {
                     <tr>
                         <td>@nuget.Name</td>
@@ -139,11 +138,14 @@
 
     public NugetPageSettings NugetSettings { get; set; } = new NugetPageSettings();
 
+    public TeamMembersVelocitySettings Settings { get; set; } = new TeamMembersVelocitySettings();
+
     public EditContext? EditContext { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        NugetSettings = UserPreference.Get<NugetPageSettings>();
+        Settings = await UserPreference.GetAsync<TeamMembersVelocitySettings>();
+        NugetSettings = await UserPreference.GetAsync<NugetPageSettings>();
 
         EditContext = new EditContext(NugetSettings);
 
@@ -201,10 +203,10 @@
         }
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        base.OnAfterRender(firstRender);
-        UserPreference.Set(NugetSettings);
+        await base.OnAfterRenderAsync(firstRender);
+        await UserPreference.SetAsync(NugetSettings);
     }
 
     [CascadingParameter]
