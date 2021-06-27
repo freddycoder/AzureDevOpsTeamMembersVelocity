@@ -68,6 +68,30 @@ docker compose up -d
 
 To use https with other authentication method that AzureAD, you can hack the docker-compose.yaml file to fit with the environment variable of the authentication method you want to use. Then you can launch the script ```setup-docker-ssl.ps1``` and run ```docker compose up -d```.
 
+## Working behind a reverse proxy
+
+To help deploy the application in a reverse proxy environment and use AzureAD authentication, you may need to use these environments variables : 
+
+Kubernetes YAML
+```
+        - name: Forwarded_headers
+          value: "true"
+        - name: USE_SCHEMA_FROM_PROXY
+          value: "true"
+```
+
+The 'Forwarded_headers' parameter is the ForwardedHeaders middleware from asp.net core.
+
+The 'USE_SCHEMA_FROM_PROXY' gonna change the request scheme using the one from the X-Forwarded-Proto. 
+
+To debug the headers.
+```
+        - name: Debug_headers
+           value: "true"
+        - name: Logging__LogLevel__Default
+           value: "Debug"
+```
+
 ## Build the app
 
 ### Dependency
