@@ -16,18 +16,23 @@
         // - "organizations" to sign in users in any work or school account
         // - "common" to sign in users with any work or school account or Microsoft personal account
         // - "consumers" to sign in users with a Microsoft personal account only
-        "AzureAD:TenantId": "c383c74f-8edf-4f51-9bf3-c2bc352996bd",
+        //"AzureAD:TenantId": "<your-tenantid>",
 
         // Client ID (application ID) obtained from the Azure portal
-        "AzureAD:ClientId": "90d698ca-c372-46c2-b8e7-dd40187fa403",
+        //"AzureAD:ClientId": "<your-clientId>",
 
         // Cache response of the Azure DevOps REST API for reuse
         // If the value is not set, a default cache a 1 seconds is apply
         // Cache is apply for a Scope instance of the DevOpsProxy class
         "DevOpsProxyCacheSeconds": "3"
+
+        // Work in progress, possibility to use Redis cache
+        // docker pull redis
+        // docker run -d -p 6379:6379 redis
+        //"REDIS_HOSTNAME": "localhost"
       },
       "dotnetRunMessages": "true",
-      "applicationUrl": "https://0.0.0.0:5001;http://0.0.0.0:5000"
+      "applicationUrl": "https://localhost:5001;http://localhost:5000"
     }
   }
 }

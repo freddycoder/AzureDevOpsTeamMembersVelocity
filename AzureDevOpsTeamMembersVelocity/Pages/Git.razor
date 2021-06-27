@@ -6,9 +6,9 @@
 
 @if (Error != null)
 {
-    <ul class="list-group mb-3">
-        <li class="list-group-item list-group-item-danger">@Error</li>
-    </ul>
+<ul class="list-group mb-3">
+    <li class="list-group-item list-group-item-danger">@Error</li>
+</ul>
 }
 
 <div class="row">
@@ -18,57 +18,60 @@
 </div>
 
 <div class="row border">
-    <EditForm class="m-2 col-md-12" EditContext="EditContext">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <div class="form-group">
-            <div class="form-row">
-                <div class="form-group col-md-4">
-                    <label for="inputTeamProject">Repository</label>
-                    <InputSelect ValueExpression="() => GitSettings.Repository"
-                                 ValueChanged="(string repositoryName) => UpdateAndGetPullRequests(repositoryName)"
-                                 class="form-control">
-                        <option value="">Select repository...</option>
-                        @if (Repositories != null)
-                        {
-                            @foreach (var repo in Repositories)
+    @if (EditContext != null)
+    {
+        <EditForm class="m-2 col-md-12" EditContext="EditContext">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="inputTeamProject">Repository</label>
+                        <InputSelect ValueExpression="() => GitSettings.Repository"
+                                     ValueChanged="async (string repositoryName) => await UpdateRepositoryAndGetPullRequests(repositoryName)"
+                                     class="form-control">
+                            <option value="">Select repository...</option>
+                            @if (Repositories != null)
                             {
-                                if (repo.Name == GitSettings.Repository)
+                            @foreach (var repo in Repositories)
                                 {
-                                    <option value="@repo.Name" selected="selected">@repo.Name</option>
-                                }
-                                else
-                                {
-                                    <option value="@repo.Name">@repo.Name</option>
+                                    if (repo.Name == GitSettings.Repository)
+                                    {
+                            <option value="@repo.Name" selected="selected">@repo.Name</option>
+                                    }
+                                    else
+                                    {
+                            <option value="@repo.Name">@repo.Name</option>
+                                    }
                                 }
                             }
-                        }
-                    </InputSelect>
-                </div>
+                        </InputSelect>
+                    </div>
 
-                @if (string.IsNullOrWhiteSpace(GitSettings.Repository) == false)
-                {
+                    @if (string.IsNullOrWhiteSpace(GitSettings.Repository) == false)
+                    {
                     <div class="form-group col-md-4">
                         <label for="inputTeamProject">Pull Request</label>
                         <InputSelect @bind-Value="GitSettings.PullRequest" class="form-control">
                             <option value="">Select a PR...</option>
                             @if (PullRequests != null)
-                                {
-                                @foreach (var pr in PullRequests)
                                     {
-                                    <option value="@pr.PullRequestId">@pr.Title</option>
+                            @foreach (var pr in PullRequests)
+                                        {
+                            <option value="@pr.PullRequestId">@pr.Title</option>
+                                        }
                                     }
-                                }
                         </InputSelect>
                     </div>
-                }
+                    }
+                </div>
+                <div class="form-row">
+                    <input name="__RequestVerificationToken" type="hidden" value="@TokenProvider.XsrfToken">
+                    <button class="btn btn-secondary mb-3">Search</button>
+                </div>
             </div>
-            <div class="form-row">
-                <input name="__RequestVerificationToken" type="hidden" value="@TokenProvider.XsrfToken">
-                <button class="btn btn-secondary mb-3">Search</button>
-            </div>
-        </div>
-    </EditForm>
+        </EditForm>
+    }
 </div>
 
 @code {
@@ -101,11 +104,11 @@
         await GetPullRequests();
     }
 
-    public Task UpdateAndGetPullRequests(string repositoryName)
+    public async Task UpdateRepositoryAndGetPullRequests(string repositoryName)
     {
         GitSettings.Repository = repositoryName;
 
-        return GetPullRequests();
+        await GetPullRequests();
     }
 
     public async Task GetPullRequests()

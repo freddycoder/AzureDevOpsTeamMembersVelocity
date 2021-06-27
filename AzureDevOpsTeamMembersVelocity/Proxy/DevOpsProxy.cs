@@ -26,11 +26,11 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
         /// <param name="client">HttpClient to used</param>
         /// <param name="appSettings">App settings, to acces AuthenticationHeader</param>
         /// <param name="logger">Logger to log information and critical error</param>
-        public DevOpsProxy(HttpClient client, IUserPreferenceRepository appSettings, ILogger<DevOpsProxy> logger)
+        public DevOpsProxy(IHttpClientFactory client, IUserPreferenceRepository appSettings, ILogger<DevOpsProxy> logger)
         {
             _appSettings = appSettings;
             _logger = logger;
-            _client = client;
+            _client = client.CreateClient(nameof(DevOpsProxy));
         }
 
         /// <summary>

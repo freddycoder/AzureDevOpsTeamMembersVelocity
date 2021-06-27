@@ -19,83 +19,86 @@
 </div>
 
 <div class="row border">
-    <EditForm class="m-2 col-md-12" EditContext="EditContext" OnValidSubmit="GetNugets">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <div class="form-group">
-            <div class="form-row">
-                <div class="form-group col-md-4">
-                    <label for="inputTeamProject">Team Project</label>
-                    <SafeTextInput id="inputTeamProject"
-                                   class="form-control"
-                                   @bind-Value="NugetSettings.TeamProject"
-                                   @onfocus="GetProjects"
-                                   type="text"
-                                   list="teamProjectSuggestion"
-                                   aria-describedby="describeTeamProject"
-                                   placeholder="Team project" />
-                    @if (TeamProjects != null)
-                    {
-                        <datalist id="teamProjectSuggestion">
-                            @foreach (var teamProject in TeamProjects)
+    @if (EditContext != null)
+    {
+        <EditForm class="m-2 col-md-12" EditContext="EditContext" OnValidSubmit="GetNugets">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="inputTeamProject">Team Project</label>
+                        <SafeTextInput id="inputTeamProject"
+                                       class="form-control"
+                                       @bind-Value="NugetSettings.TeamProject"
+                                       @onfocus="GetProjects"
+                                       type="text"
+                                       list="teamProjectSuggestion"
+                                       aria-describedby="describeTeamProject"
+                                       placeholder="Team project" />
+                        @if (TeamProjects != null)
+                        {
+                            <datalist id="teamProjectSuggestion">
+                                @foreach (var teamProject in TeamProjects)
+                                {
+                                    <option value="@teamProject.Name" />
+                                }
+                            </datalist>
+                        }
+                        <small id="describeTeamProject" class="form-text text-muted">You can leave this field empty to list all feeds of the organization</small>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="inputSearchTerm">Search</label>
+                        <SafeTextInput id="inputSearchTerm"
+                                       class="form-control"
+                                       @bind-Value="NugetSettings.SearchTerm"
+                                       @onchange="GetNugets"
+                                       type="text"
+                                       aria-describedby="describeSearchTerm"
+                                       placeholder="Team project" />
+                        <small id="describeSearchTerm" class="form-text text-muted">Search term sent to the REST API</small>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="inputTeam">Feeds</label>
+                        <SafeTextInput id="inputTeam"
+                                       class="form-control"
+                                       @bind-Value="NugetSettings.Feed"
+                                       @onfocus="GetFeeds"
+                                       @onchange="GetNugets"
+                                       type="text"
+                                       list="teamSuggestion"
+                                       aria-describedby="describeTeam"
+                                       placeholder="Team" />
+                        <datalist id="teamSuggestion">
+                            @if (Feeds != null)
                             {
-                                <option value="@teamProject.Name" />
+                                @foreach (var team in Feeds)
+                                {
+                                    <option value="@team.Name" />
+                                }
                             }
                         </datalist>
-                    }
-                    <small id="describeTeamProject" class="form-text text-muted">You can leave this field empty to list all feeds of the organization</small>
+                        <small id="describeTeam" class="form-text text-muted">The name of the feed</small>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="checkOnlyAlpha">Only alpha</label>
+                        <InputCheckbox id="checkOnlyAlpha"
+                                       class="form-control"
+                                       @bind-Value="NugetSettings.OnlyAlpha"
+                                       aria-describedby="describeOnlyAlpha"
+                                       placeholder="Team project" />
+                        <small id="describeOnlyAlpha" class="form-text text-muted">If checked, only the nuget with the alpha version will be shown</small>
+                    </div>
                 </div>
-                <div class="form-group col-md-4">
-                    <label for="inputSearchTerm">Search</label>
-                    <SafeTextInput id="inputSearchTerm"
-                                   class="form-control"
-                                   @bind-Value="NugetSettings.SearchTerm"
-                                   @onchange="GetNugets"
-                                   type="text"
-                                   aria-describedby="describeSearchTerm"
-                                   placeholder="Team project" />
-                    <small id="describeSearchTerm" class="form-text text-muted">Search term sent to the REST API</small>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-md-4">
-                    <label for="inputTeam">Feeds</label>
-                    <SafeTextInput id="inputTeam"
-                                   class="form-control"
-                                   @bind-Value="NugetSettings.Feed"
-                                   @onfocus="GetFeeds"
-                                   @onchange="GetNugets"
-                                   type="text"
-                                   list="teamSuggestion"
-                                   aria-describedby="describeTeam"
-                                   placeholder="Team" />
-                    <datalist id="teamSuggestion">
-                        @if (Feeds != null)
-                        {
-                            @foreach (var team in Feeds)
-                            {
-                                <option value="@team.Name" />
-                            }
-                        }
-                    </datalist>
-                    <small id="describeTeam" class="form-text text-muted">The name of the feed</small>
-                </div>
-                <div class="form-group col-md-4">
-                    <label for="checkOnlyAlpha">Only alpha</label>
-                    <InputCheckbox id="checkOnlyAlpha"
-                                   class="form-control"
-                                   @bind-Value="NugetSettings.OnlyAlpha"
-                                   aria-describedby="describeOnlyAlpha"
-                                   placeholder="Team project" />
-                    <small id="describeOnlyAlpha" class="form-text text-muted">If checked, only the nuget with the alpha version will be shown</small>
+                <div class="form-row">
+                    <input name="__RequestVerificationToken" type="hidden" value="@TokenProvider.XsrfToken">
+                    <button class="btn btn-secondary mb-3">Search</button>
                 </div>
             </div>
-            <div class="form-row">
-                <input name="__RequestVerificationToken" type="hidden" value="@TokenProvider.XsrfToken">
-                <button class="btn btn-secondary mb-3">Search</button>
-            </div>
-        </div>
-    </EditForm>
+        </EditForm>
+    }
 </div>
 
 <div class="row mt-3">

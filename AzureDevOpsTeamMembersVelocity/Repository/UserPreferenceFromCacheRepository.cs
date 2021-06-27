@@ -1,6 +1,7 @@
 ﻿using AzureDevOpsTeamMembersVelocity.Settings;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -13,18 +14,19 @@ namespace AzureDevOpsTeamMembersVelocity.Repository
     public class UserPreferenceFromCacheRepository : IUserPreferenceRepository
     {
         private readonly IDistributedCache _cache;
-
         private readonly AuthenticationStateProvider _authenticationStateProvider;
+        private readonly ILogger<UserPreferenceFromCacheRepository> _logger;
 
         /// <summary>
         /// Constructor with dependencies
         /// </summary>
         /// <param name="cache">The sitributed cache</param>
         /// <param name="authenticationStateProvider">AuthenticationStateProvider to fetch user info</param>
-        public UserPreferenceFromCacheRepository(IDistributedCache cache, AuthenticationStateProvider authenticationStateProvider)
+        public UserPreferenceFromCacheRepository(IDistributedCache cache, AuthenticationStateProvider authenticationStateProvider, ILogger<UserPreferenceFromCacheRepository> logger)
         {
             _cache = cache;
             _authenticationStateProvider = authenticationStateProvider;
+            _logger = logger;
         }
 
         /// <summary>
@@ -34,6 +36,8 @@ namespace AzureDevOpsTeamMembersVelocity.Repository
         /// <returns></returns>
         public async Task<T> GetAsync<T>() where T : AbstractSettings
         {
+            _logger.LogInformation($"Load {typeof(T).Name} from cache");
+
             var user = await _authenticationStateProvider.GetAuthenticationStateAsync();
 
             var cacheValue = await _cache.GetStringAsync(KeyOf<T>(user));
@@ -63,6 +67,8 @@ namespace AzureDevOpsTeamMembersVelocity.Repository
             if (settings == null) return;
 
             var user = await _authenticationStateProvider.GetAuthenticationStateAsync();
+
+            _logger.LogInformation($"Set {typeof(T).Name} in cache");
 
             await _cache.SetStringAsync(KeyOf<T>(user), JsonSerializer.Serialize(settings, Program.SerializerOptions));
         }

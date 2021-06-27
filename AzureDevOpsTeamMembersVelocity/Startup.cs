@@ -70,14 +70,10 @@ namespace AzureDevOpsTeamMembersVelocity
             services.AddDataProtection()
                     .PersistKeysToFileSystem(new DirectoryInfo(Directory.GetCurrentDirectory()))
                     .SetApplicationName(nameof(AzureDevOpsTeamMembersVelocity));
-            
-            services.AddScoped(sp =>
+
+            services.AddHttpClient(nameof(DevOpsProxy), client =>
             {
-                var client = new HttpClient();
-
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                return client;
             });
 
             services.AddDistributedCaching();
