@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace AzureDevOpsTeamMembersVelocity.Settings
+﻿namespace AzureDevOpsTeamMembersVelocity.Settings
 {
+    /// <summary>
+    /// Abstract settings class use to represent a settings class. Mainly used to represent user settings or preferences.
+    /// </summary>
     public abstract class AbstractSettings
     {
         protected bool _asChanged;

@@ -107,6 +107,8 @@ namespace AzureDevOpsTeamMembersVelocity.Repository
             }
 
             StoreInMemory(settings);
+
+            settings.Saved();
         }
 
         private void StoreInMemory<T>(T settings) where T : AbstractSettings

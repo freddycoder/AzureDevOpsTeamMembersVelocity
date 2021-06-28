@@ -76,6 +76,8 @@ namespace AzureDevOpsTeamMembersVelocity
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             });
 
+            services.AddSession();
+
             services.AddDistributedCaching();
 
             services.AddScoped<DevOpsProxy>();
@@ -137,6 +139,8 @@ namespace AzureDevOpsTeamMembersVelocity
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseSession();
 
             app.UseAuthentication();
             app.UseAuthorization();

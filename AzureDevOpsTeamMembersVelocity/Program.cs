@@ -1,16 +1,7 @@
-using System;
-using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using AzureDevOpsTeamMembersVelocity.Extensions;
-using AzureDevOpsTeamMembersVelocity.Repository;
-using AzureDevOpsTeamMembersVelocity.Services;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace AzureDevOpsTeamMembersVelocity
 {

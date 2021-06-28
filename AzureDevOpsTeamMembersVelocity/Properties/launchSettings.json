@@ -9,7 +9,7 @@
         //"COOKIEAUTH_USER": "admin@teamvelocity.com",
         //"COOKIEAUTH_PASSWORD": "admin",
 
-        //"USE_IDENTITY": "true",
+        "USE_IDENTITY": "true",
 
         // Azure AD audience among:
         // - "TenantId" as a GUID obtained from the Azure portal to sign in users in your organization
@@ -24,12 +24,12 @@
         // Cache response of the Azure DevOps REST API for reuse
         // If the value is not set, a default cache a 1 seconds is apply
         // Cache is apply for a Scope instance of the DevOpsProxy class
-        "DevOpsProxyCacheSeconds": "3"
+        "DevOpsProxyCacheSeconds": "3",
 
-        // Work in progress, possibility to use Redis cache
+        // If Redis_hostname is initialized, a Redis cache will be use
         // docker pull redis
         // docker run -d -p 6379:6379 redis
-        //"REDIS_HOSTNAME": "localhost"
+        "REDIS_HOSTNAME": "localhost"
       },
       "dotnetRunMessages": "true",
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
