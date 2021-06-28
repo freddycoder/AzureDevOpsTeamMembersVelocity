@@ -1,14 +1,14 @@
 name: AzureDevOpsTeamMembersVelocity-Image
 
 on:
-  # Trigger the workflow on push or pull request,
-  # but only for the main branch
   push:
     branches:
       - main
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 env:
-  REGISTRY_HOSTNAME: erabliereapi
+  REGISTRY_NAME: erabliereapi
   IMAGE_NAME: azuredevopsteammembersvelocity
   IMAGE_TAG: latest
 
@@ -29,8 +29,10 @@ jobs:
         
       # Tag the images
       - name: Docker tag
-        run: docker tag $IMAGE_NAME:$IMAGE_TAG $REGISTRY_HOSTNAME/$IMAGE_NAME:$IMAGE_TAG
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: docker tag $IMAGE_NAME:$IMAGE_TAG $REGISTRY_NAME/$IMAGE_NAME:$IMAGE_TAG
 
       # Push the image
       - name: Docker push
-        run: docker push $REGISTRY_HOSTNAME/$IMAGE_NAME:$IMAGE_TAG
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: docker push $REGISTRY_NAME/$IMAGE_NAME:$IMAGE_TAG
