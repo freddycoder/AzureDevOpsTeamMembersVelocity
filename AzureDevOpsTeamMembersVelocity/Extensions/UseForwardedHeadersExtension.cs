@@ -8,6 +8,9 @@ using static System.Environment;
 
 namespace AzureDevOpsTeamMembersVelocity.Extensions
 {
+    /// <summary>
+    /// Class containing extention method to add Forwarded Headers middleware base on environment variable of the app.
+    /// </summary>
     public static class UseForwardedHeadersExtension
     {
         public static IServiceCollection AddTeamVelocityForwardedHeaders(this IServiceCollection services)

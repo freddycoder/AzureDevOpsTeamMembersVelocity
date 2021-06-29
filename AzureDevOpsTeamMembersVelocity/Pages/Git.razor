@@ -6,9 +6,9 @@
 
 @if (Error != null)
 {
-<ul class="list-group mb-3">
-    <li class="list-group-item list-group-item-danger">@Error</li>
-</ul>
+    <ul class="list-group mb-3">
+        <li class="list-group-item list-group-item-danger">@Error</li>
+    </ul>
 }
 
 <div class="row">
@@ -17,7 +17,7 @@
     </div>
 </div>
 
-<div class="row border">
+<div class="row border mb-3">
     @if (EditContext != null)
     {
         <EditForm class="m-2 col-md-12" EditContext="EditContext">
@@ -33,15 +33,15 @@
                             <option value="">Select repository...</option>
                             @if (Repositories != null)
                             {
-                            @foreach (var repo in Repositories)
+                                @foreach (var repo in Repositories)
                                 {
                                     if (repo.Name == GitSettings.Repository)
                                     {
-                            <option value="@repo.Name" selected="selected">@repo.Name</option>
+                                        <option value="@repo.Name" selected="selected">@repo.Name</option>
                                     }
                                     else
                                     {
-                            <option value="@repo.Name">@repo.Name</option>
+                                        <option value="@repo.Name">@repo.Name</option>
                                     }
                                 }
                             }
@@ -50,19 +50,28 @@
 
                     @if (string.IsNullOrWhiteSpace(GitSettings.Repository) == false)
                     {
-                    <div class="form-group col-md-4">
-                        <label for="inputTeamProject">Pull Request</label>
-                        <InputSelect @bind-Value="GitSettings.PullRequest" class="form-control">
-                            <option value="">Select a PR...</option>
-                            @if (PullRequests != null)
+                        <div class="form-group col-md-4">
+                            <label for="inputTeamProject">Pull Request</label>
+                            <InputSelect ValueExpression="() => GitSettings.PullRequest"
+                                         ValueChanged="async (int? prId) => await GetPullRequest(prId)"
+                                         class="form-control">
+                                <option value="">Select a PR...</option>
+                                @if (PullRequests != null)
+                                {
+                                    @foreach (var pr in PullRequests)
                                     {
-                            @foreach (var pr in PullRequests)
+                                        if (pr.PullRequestId == GitSettings.PullRequest)
                                         {
-                            <option value="@pr.PullRequestId">@pr.Title</option>
+                                            <option value="@pr.PullRequestId" selected="selected">@pr.Title</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@pr.PullRequestId">@pr.Title</option>
                                         }
                                     }
-                        </InputSelect>
-                    </div>
+                                }
+                            </InputSelect>
+                        </div>
                     }
                 </div>
                 <div class="form-row">
@@ -73,6 +82,8 @@
         </EditForm>
     }
 </div>
+
+<PullRequest PullRequestModel="PullRequest" />
 
 @code {
     public string? Error { get; set; }
@@ -87,7 +98,9 @@
 
     public GitRepository? Repository { get; set; }
 
-    public IEnumerable<PullRequest>? PullRequests { get; set; }
+    public IEnumerable<Model.PullRequest>? PullRequests { get; set; }
+
+    public Model.PullRequest? PullRequest { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -118,6 +131,7 @@
         if (selectedRepository != null &&
             string.IsNullOrWhiteSpace(GitSettings.Repository) == false)
         {
+            // Fetch full information of the repository
             var (repository, error) = (await GitService.GetRepository(selectedRepository.Url));
 
             Repository = repository;
@@ -129,7 +143,27 @@
 
                 PullRequests = pullRequests?.Value;
                 Error = errorPr;
+
+                if (GitSettings.PullRequest != null)
+                {
+                    await GetPullRequest(GitSettings.PullRequest);
+                }
             }
+
+            StateHasChanged();
+        }
+    }
+
+    public async Task GetPullRequest(int? idPR)
+    {
+        var selectedPR = PullRequests?.FirstOrDefault(pr => pr.PullRequestId == idPR);
+
+        if (selectedPR != null && idPR != default)
+        {
+            var (fullPR, error) = (await GitService.GetPullRequest(selectedPR.Url));
+
+            PullRequest = fullPR;
+            Error = error;
 
             StateHasChanged();
         }

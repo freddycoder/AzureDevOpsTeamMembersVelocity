@@ -1,0 +1,19 @@
+﻿@if (PullRequestModel != null)
+{
+    <div class="row">
+        <div class="col-md-6">
+            <h3>@PullRequestModel?.Title</h3>
+        </div>
+    </div>
+
+    <div class="row border">
+        <pre class="text">
+            @AzureDevOpsTeamMembersVelocity.Extensions.JsonExtension.FormatJson(JsonSerializer.Serialize(PullRequestModel, Program.SerializerOptions))
+        </pre>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Model.PullRequest? PullRequestModel { get; set; }
+}
