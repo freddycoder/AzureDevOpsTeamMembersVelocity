@@ -56,5 +56,15 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         {
             return _proxy.GetAsync<ListResponse<PullRequest>>($"{pullRequestUrl}?api-version=6.0");
         }
+
+        /// <summary>
+        /// Get a pull request
+        /// </summary>
+        /// <param name="pullRequestUrl">The pull request url</param>
+        /// <returns>A PR and an error if any</returns>
+        public Task<(PullRequest?, string?)> GetPullRequest(string pullRequestUrl)
+        {
+            return _proxy.GetAsync<PullRequest?>($"{pullRequestUrl}?api-version=6.0");
+        }
     }
 }

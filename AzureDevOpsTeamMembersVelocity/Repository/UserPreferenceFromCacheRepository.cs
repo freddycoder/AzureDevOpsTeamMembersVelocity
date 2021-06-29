@@ -77,7 +77,7 @@ namespace AzureDevOpsTeamMembersVelocity.Repository
         /// <param name="settings">The instance to save</param>
         public async Task SetAsync<T>(T settings) where T : AbstractSettings
         {
-            if (settings == null || settings.AsChanged() == false) return;
+            if (settings == null || settings.AsNotChanged()) return;
 
             var user = await _authenticationStateProvider.GetAuthenticationStateAsync();
 
