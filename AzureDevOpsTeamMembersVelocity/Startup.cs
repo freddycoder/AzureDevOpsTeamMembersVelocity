@@ -4,6 +4,7 @@ using AzureDevOpsTeamMembersVelocity.Proxy;
 using AzureDevOpsTeamMembersVelocity.Repository;
 using AzureDevOpsTeamMembersVelocity.Services;
 using Blazored.Modal;
+using k8s;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -87,6 +88,16 @@ namespace AzureDevOpsTeamMembersVelocity
             services.AddScoped<GitService>();
             services.AddScoped<NugetService>();
             services.AddSingleton<IVelocityRepository, VelocityRepository>();
+
+            services.AddSingleton(sp =>
+            {
+                if (KubernetesClientConfiguration.IsInCluster())
+                {
+                    return new Kubernetes(KubernetesClientConfiguration.InClusterConfig());
+                }
+
+                return new Kubernetes(KubernetesClientConfiguration.BuildConfigFromConfigFile());
+            });
         }
 
         /// <summary>

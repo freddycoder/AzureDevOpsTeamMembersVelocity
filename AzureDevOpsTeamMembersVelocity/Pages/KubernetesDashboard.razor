@@ -1,0 +1,95 @@
+﻿@page "/Kubernetes"
+@inject k8s.Kubernetes Client
+
+<h3>Kubernetes</h3>
+
+<h4>Namespaces</h4>
+
+@if (NamespaceList != null)
+{
+    <table class="table table-hover table-responsive">
+        <caption>Table of kubernetes namespace</caption>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Creation time</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var ns in NamespaceList.Items)
+            {
+                <tr>
+                    <td>@ns.Metadata.Name</td>
+                    <td>@ns.Metadata.CreationTimestamp</td>
+                    <td>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h4>Pods</h4>
+
+    <table class="table table-hover table-responsive">
+        <caption>Table of kubernetes pods</caption>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Creation time</th>
+                <th>Select</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Pods != null && Pods.Items != null)
+            {
+                @foreach (var pod in Pods.Items)
+                {
+                    var p = pod;
+
+                    <tr>
+                        <td>@pod.Metadata.Name</td>
+                        <td>@pod.Metadata.CreationTimestamp</td>
+                        <td>
+                            <input id="@string.Concat(p.Namespace(), p.Name())" type="checkbox" class="form-check oi-check" onchange="registerForStreamNotifications('@p.Namespace()', '@p.Name()')" />
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    <h4>Logs</h4>
+
+    <div id="log-container">
+
+    </div>
+}
+
+@code {
+    public V1NamespaceList? NamespaceList { get; set; }
+
+    public V1PodList? Pods { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        NamespaceList = await Client.ListNamespaceAsync();
+
+        StateHasChanged();
+
+        Pods = new V1PodList();
+
+        Pods.Items = new List<V1Pod>();
+
+        foreach (var ns in NamespaceList.Items)
+        {
+            var podList = await Client.ListNamespacedPodAsync(ns.Metadata.Name);
+
+            foreach (var pod in podList.Items)
+            {
+                Pods.Items.Add(pod);
+            }
+        }
+    }
+}
