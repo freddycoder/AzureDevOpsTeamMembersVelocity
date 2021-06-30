@@ -5,32 +5,53 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
+using System;
 
 namespace AzureDevOpsTeamMembersVelocity.Hubs
 {
+    /// <summary>
+    /// Log stream hub to subscribe to Kubernetes pod logs
+    /// </summary>
+    /// <remarks>
+    /// This class is based on this article : 
+    /// https://donotpanic.azurewebsites.net/2020/01/20/streaming-kubernetes-logs-using-signalr/
+    /// with some code fix suggested by the rolsyn analyser and visual studio async plugin
+    /// </remarks>
     [Authorize]
     public class LogStreamHub : Hub
     {
-        private readonly Kubernetes kubernetesClient;
+        private readonly Kubernetes _kubernetesClient;
 
+        /// <summary>
+        /// Constructor with dependencies
+        /// </summary>
+        /// <param name="kubernetesClient"></param>
         public LogStreamHub(Kubernetes kubernetesClient)
         {
-            this.kubernetesClient = kubernetesClient;
+            _kubernetesClient = kubernetesClient;
         }
 
+        /// <summary>
+        /// Function to get the pog log.
+        /// </summary>
+        /// <param name="ns">The namespace of the pod</param>
+        /// <param name="pod">The name of the pod</param>
+        /// <param name="cancellationToken">a cancelation token</param>
+        /// <returns></returns>
         public async IAsyncEnumerable<string> GetPodLog(string ns, string pod, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var stream = await this.kubernetesClient.ReadNamespacedPodLogAsync(pod, ns, follow: true, sinceSeconds: 1500, cancellationToken: cancellationToken);
+            var stream = await _kubernetesClient.ReadNamespacedPodLogAsync(pod, ns, follow: true, sinceSeconds: 1500, cancellationToken: cancellationToken);
 
             var buffer = new byte[8192];
 
-            var count = 0;
+            int count;
 
             do
             {
-                count = stream.Read(buffer, 0, buffer.Length);
+                count = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken);
+
                 if (count != 0)
                 {
                     var tmpString = Encoding.Default.GetString(buffer, 0, count);
