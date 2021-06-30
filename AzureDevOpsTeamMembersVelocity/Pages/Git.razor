@@ -98,9 +98,9 @@
 
     public GitRepository? Repository { get; set; }
 
-    public IEnumerable<Model.PullRequest>? PullRequests { get; set; }
+    public IEnumerable<GitPullRequest>? PullRequests { get; set; }
 
-    public Model.PullRequest? PullRequest { get; set; }
+    public GitPullRequest? PullRequest { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -111,7 +111,7 @@
 
         var (repositories, error) = (await GitService.GetRepositories());
 
-        Repositories = repositories?.Value;
+        Repositories = repositories?.Value?.OrderBy(r => r.Name);
         Error = error;
 
         await GetPullRequests();
