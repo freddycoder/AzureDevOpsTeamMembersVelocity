@@ -43,26 +43,12 @@
     <script src="_framework/blazor.server.js"></script>
     <script src="_content/Blazored.Modal/blazored.modal.js"></script>
     <script>
-        function registerForStreamNotifications(namespace, pod) {
-            console.log("registerToLog " + namespace + pod);
-            if (document.getElementById(namespace + pod).checked) {
-                console.log("checkbox checked " + namespace + pod);
-                signalRSubscription = signalRConnection.stream("GetPodLog", namespace, pod).subscribe({
-                    next: (content) => {
-                        var container = $('<div class="logs-element"></div>');
+        window.scrollToBottom = () => {
+            window.scrollTo(0, document.body.scrollHeight);
+        }
 
-                        var line = $('<span class="log-line">' + applyHighlights(content) + '</span>');
-                        container.append(line);
-
-                        $("#log-container").append(container);
-
-                        $('#log-container').scrollTop($('#log-container')[0].scrollHeight);
-                    }
-                });
-            }
-            else {
-                console.log("Checkbox uncheck");
-            }
+        window.GetHostname = () => {
+            return window.location.hostname;
         }
     </script>
 </body>

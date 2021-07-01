@@ -1,5 +1,6 @@
 using AzureDevOpsTeamMembersVelocity.Data;
 using AzureDevOpsTeamMembersVelocity.Extensions;
+using AzureDevOpsTeamMembersVelocity.Hubs;
 using AzureDevOpsTeamMembersVelocity.Proxy;
 using AzureDevOpsTeamMembersVelocity.Repository;
 using AzureDevOpsTeamMembersVelocity.Services;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +20,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web.UI;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using static System.Environment;
@@ -98,6 +101,12 @@ namespace AzureDevOpsTeamMembersVelocity
 
                 return new Kubernetes(KubernetesClientConfiguration.BuildConfigFromConfigFile());
             });
+
+            services.AddResponseCompression(opts =>
+            {
+                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                    new[] { "application/octet-stream" });
+            });
         }
 
         /// <summary>
@@ -121,6 +130,8 @@ namespace AzureDevOpsTeamMembersVelocity
                     throw;
                 }
             }
+
+            app.UseResponseCompression();
 
             if (env.IsDevelopment())
             {
@@ -160,6 +171,7 @@ namespace AzureDevOpsTeamMembersVelocity
             {
                 endpoints.MapControllers();
                 endpoints.MapBlazorHub();
+                endpoints.MapHub<LogStreamHub>("/GetPodLog");
                 endpoints.MapFallbackToPage("/_Host");
             });
         }

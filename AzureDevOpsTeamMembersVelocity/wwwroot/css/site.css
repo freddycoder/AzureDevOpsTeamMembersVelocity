@@ -57,3 +57,15 @@ a, .btn-link {
 .text {
     white-space: pre-wrap;
 }
+
+.log_line {
+    display: block;
+}
+
+    .log_line:nth-child(odd) {
+        background: #EFEFEFEF;
+    }
+
+    .log_line:nth-child(even) {
+        background: #DCDCDC;
+    }

@@ -1,6 +1,11 @@
 ﻿@page "/Kubernetes"
+@using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Http 
 @inject k8s.Kubernetes Client
+@inject NavigationManager NavigationManager
 @inject ILogger<KubernetesDashboard> Logger
+@inject IJSRuntime JS
+@inject IHttpContextAccessor HttpContextAccessor 
 
 @if (Error != null)
 {
@@ -54,16 +59,17 @@
             {
                 @foreach (var pod in Pods.Items)
                 {
-                    var p = pod;
+                    var podNamespace = pod.Namespace();
+                    var podName = pod.Name();
 
                     <tr>
                         <td>@pod.Metadata.Name</td>
                         <td>@pod.Metadata.CreationTimestamp</td>
                         <td>
-                            <input id="@string.Concat(p.Namespace(), p.Name())" 
-                                   type="checkbox" 
-                                   class="form-check oi-check" 
-                                   onchange="registerForStreamNotifications('@p.Namespace()', '@p.Name()')" />
+                            <input id="@string.Concat(podNamespace, podName)"
+                                   type="checkbox"
+                                   class="form-check oi-check"
+                                   @onchange="async (changeEventArg) => await OnPodLogClick(changeEventArg, podNamespace, podName)" />
                         </td>
                     </tr>
                 }
@@ -73,9 +79,21 @@
 
     <h4>Logs</h4>
 
-    <div id="log-container">
+    <button class="btn btn-outline-info" @onclick="ChangeScrollToBottom">Auto scroll to bottom : @ScrollToBottom</button>
+    <button class="btn btn-outline-danger" @onclick="ClearLogs">Clear logs </button>
 
+    <div id="log-container">
+        @foreach (var message in PodLogs)
+        {
+            <span class="log_line text">@message</span>
+        }
     </div>
+
+    if (PodLogs.Count > 0)
+    {
+        <button class="btn btn-outline-info" @onclick="ChangeScrollToBottom">Auto scroll to bottom : @ScrollToBottom</button>
+        <button class="btn btn-outline-danger" @onclick="ClearLogs">Clear logs </button>
+    }
 }
 
 @code {
@@ -87,7 +105,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try {
+        try
+        {
             NamespaceList = await Client.ListNamespaceAsync();
 
             StateHasChanged();
@@ -107,10 +126,89 @@
 
                 StateHasChanged();
             }
+
+            var cookies = HttpContextAccessor.HttpContext?.Request.Cookies;
+
+            var cookiesCollection = new System.Net.CookieContainer();
+
+            if (cookies != null)
+            {
+                foreach (var c in cookies)
+                {
+                    cookiesCollection.Add(new System.Net.Cookie(c.Key, c.Value) { Domain = await JS.InvokeAsync<string>("window.GetHostname") });
+                }
+            }
+
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl(NavigationManager.ToAbsoluteUri("/GetPodLog"), options =>
+                {
+                    options.Cookies = cookiesCollection;
+                })
+                .Build();
+
+            await hubConnection.StartAsync();
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             Error = e.Message;
             Logger.LogError(e, e.Message);
+        }
+    }
+
+    private HubConnection? hubConnection;
+    private System.Collections.Concurrent.BlockingCollection<string> PodLogs { get; set; } = new();
+    private Dictionary<string, System.Threading.CancellationTokenSource> TokensBag { get; set; } = new();
+
+    private async Task OnPodLogClick(ChangeEventArgs args, string podNamespace, string podName)
+    {
+        var taskKey = $"{podNamespace}{podName}";
+
+        if (TokensBag.TryGetValue(taskKey, out var tokenSourceCancellation))
+        {
+            tokenSourceCancellation.Cancel();
+
+            TokensBag.Remove(taskKey);
+        }
+        else
+        {
+            var tokenSource = new System.Threading.CancellationTokenSource();
+
+            var channel = await hubConnection.StreamAsChannelAsync<string>("GetPodLog", podNamespace, podName, tokenSource.Token);
+
+            TokensBag.Add(taskKey, tokenSource);
+
+            while (await channel.WaitToReadAsync(tokenSource.Token))
+            {
+                while (channel.TryRead(out var log))
+                {
+                    PodLogs.Add(log);
+                    StateHasChanged();
+                    if (ScrollToBottom)
+                    {
+                        await JS.InvokeVoidAsync("window.scrollToBottom");
+                    }
+                }
+            }
+        }
+    }
+
+    private void ClearLogs()
+    {
+        while (PodLogs.TryTake(out _)) { }
+    }
+
+    private bool ScrollToBottom { get; set; }
+
+    public void ChangeScrollToBottom()
+    {
+        ScrollToBottom = !ScrollToBottom;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
         }
     }
 }

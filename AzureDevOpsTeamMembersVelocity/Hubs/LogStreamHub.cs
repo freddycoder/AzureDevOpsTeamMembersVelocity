@@ -6,6 +6,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System;
+using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace AzureDevOpsTeamMembersVelocity.Hubs
 {
@@ -21,14 +23,17 @@ namespace AzureDevOpsTeamMembersVelocity.Hubs
     public class LogStreamHub : Hub
     {
         private readonly Kubernetes _kubernetesClient;
+        private readonly ILogger<LogStreamHub> _logger;
 
         /// <summary>
         /// Constructor with dependencies
         /// </summary>
         /// <param name="kubernetesClient"></param>
-        public LogStreamHub(Kubernetes kubernetesClient)
+        /// <param name="logger">Logger</param>
+        public LogStreamHub(Kubernetes kubernetesClient, ILogger<LogStreamHub> logger)
         {
             _kubernetesClient = kubernetesClient;
+            _logger = logger;
         }
 
         /// <summary>
@@ -42,11 +47,13 @@ namespace AzureDevOpsTeamMembersVelocity.Hubs
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var stream = await _kubernetesClient.ReadNamespacedPodLogAsync(pod, ns, follow: true, sinceSeconds: 1500, cancellationToken: cancellationToken);
+            var stream = await _kubernetesClient.ReadNamespacedPodLogAsync(pod, ns, follow: true, sinceSeconds: 2000, cancellationToken: cancellationToken);
 
             var buffer = new byte[8192];
 
             int count;
+
+            bool runLoop = true;
 
             do
             {
@@ -64,7 +71,37 @@ namespace AzureDevOpsTeamMembersVelocity.Hubs
                             .Replace("\u001b[41m\u001b[30mfail\u001b[39m\u001b[22m\u001b[49m", "fail")
                             .Replace("\u001b[41m\u001b[1m\u001b[37mcrit\u001b[39m\u001b[22m\u001b[49m", "crit");
                 }
-            } while (count > 0);
+
+                try
+                {
+                    await Task.Delay(1998, cancellationToken);
+                }
+                catch
+                {
+                    _logger.LogInformation($"Stream {ns} {pod} as ended");
+
+                    runLoop = false;
+                }
+
+            } while (runLoop && StreamIsOn(ns, pod, cancellationToken));
+
+            _logger.LogInformation($"GetPodLog {ns} {pod} completed");
+        }
+
+        private bool StreamIsOn(string ns, string pod, CancellationToken cancellationToken)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+            catch
+            {
+                _logger.LogInformation($"Stream {ns} {pod} as ended");
+
+                return false;
+            }
+
+            return true;
         }
     }
 }
