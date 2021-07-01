@@ -163,6 +163,7 @@
             var (fullPR, error) = (await GitService.GetPullRequest(selectedPR.Url));
 
             PullRequest = fullPR;
+            GitSettings.PullRequest = fullPR?.PullRequestId;
             Error = error;
 
             StateHasChanged();

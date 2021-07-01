@@ -26,7 +26,7 @@ namespace AzureDevOpsTeamMembersVelocity
             get => _organization;
             set
             {
-                _asChanged = _organization == value;
+                _asChanged |= _organization != value;
                 _organization = value;
             }
         }
@@ -45,7 +45,7 @@ namespace AzureDevOpsTeamMembersVelocity
             get => _teamProject;
             set
             {
-                _asChanged = _teamProject == value;
+                _asChanged |= _teamProject != value;
                 _teamProject = value;
             }
         }
@@ -61,7 +61,7 @@ namespace AzureDevOpsTeamMembersVelocity
             get => _team;
             set
             {
-                _asChanged = _team == value;
+                _asChanged |= _team != value;
                 _team = value;
             }
         }
@@ -84,7 +84,7 @@ namespace AzureDevOpsTeamMembersVelocity
             }
             set
             {
-                _asChanged = _apiKey == value;
+                _asChanged |= _apiKey != value;
                 _apiKey = value;
                 _authKeyChanged = true;
             }
