@@ -1,9 +1,11 @@
 ﻿@page "/Kubernetes"
 @using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Http 
 @inject k8s.Kubernetes Client
 @inject NavigationManager NavigationManager
 @inject ILogger<KubernetesDashboard> Logger
 @inject IJSRuntime JS
+@inject IHttpContextAccessor HttpContextAccessor 
 
 @if (Error != null)
 {
@@ -87,8 +89,11 @@
         }
     </div>
 
-    <button class="btn btn-outline-info" @onclick="ChangeScrollToBottom">Auto scroll to bottom : @ScrollToBottom</button>
-    <button class="btn btn-outline-danger" @onclick="ClearLogs">Clear logs </button>
+    if (PodLogs.Count > 0)
+    {
+        <button class="btn btn-outline-info" @onclick="ChangeScrollToBottom">Auto scroll to bottom : @ScrollToBottom</button>
+        <button class="btn btn-outline-danger" @onclick="ClearLogs">Clear logs </button>
+    }
 }
 
 @code {
@@ -122,10 +127,22 @@
                 StateHasChanged();
             }
 
+            var cookies = HttpContextAccessor.HttpContext?.Request.Cookies;
+
+            var cookiesCollection = new System.Net.CookieContainer();
+
+            if (cookies != null)
+            {
+                foreach (var c in cookies)
+                {
+                    cookiesCollection.Add(new System.Net.Cookie(c.Key, c.Value) { Domain = await JS.InvokeAsync<string>("window.GetHostname") });
+                }
+            }
+
             hubConnection = new HubConnectionBuilder()
                 .WithUrl(NavigationManager.ToAbsoluteUri("/GetPodLog"), options =>
                 {
-                    options.UseDefaultCredentials = true;
+                    options.Cookies = cookiesCollection;
                 })
                 .Build();
 

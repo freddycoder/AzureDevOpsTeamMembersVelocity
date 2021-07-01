@@ -19,7 +19,7 @@ namespace AzureDevOpsTeamMembersVelocity.Hubs
     /// https://donotpanic.azurewebsites.net/2020/01/20/streaming-kubernetes-logs-using-signalr/
     /// with some code fix suggested by the rolsyn analyser and visual studio async plugin
     /// </remarks>
-    //[Authorize]
+    [Authorize]
     public class LogStreamHub : Hub
     {
         private readonly Kubernetes _kubernetesClient;
