@@ -255,7 +255,7 @@ Welcome to the team members velocity app.
 
     public async Task GetTeams()
     {
-        if (Organisation != null && TeamProjects != null)
+        if (Organisation != null && TeamProjects != null && TeamProjects.Count > 0)
         {
             await UserSettings.SetAsync(AppSettings);
 

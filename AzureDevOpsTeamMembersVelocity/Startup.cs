@@ -77,9 +77,9 @@ namespace AzureDevOpsTeamMembersVelocity
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             });
 
-            services.AddSession();
-
             services.AddDistributedCaching();
+
+            services.AddSession();
 
             services.AddScoped<DevOpsProxy>();
             services.AddScoped<IDevOpsProxy, DevOpsProxyCache>();

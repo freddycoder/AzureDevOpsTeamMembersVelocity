@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -16,6 +17,7 @@ namespace AzureDevOpsTeamMembersVelocity.Repository
     {
         private readonly ILogger<UserPreferenceFromFileSystemRepository> _logger;
         private readonly IDataProtector _dataProtection;
+        private readonly IFile _file;
         private readonly Dictionary<Type, AbstractSettings> _memory;
 
         /// <summary>
@@ -23,10 +25,14 @@ namespace AzureDevOpsTeamMembersVelocity.Repository
         /// </summary>
         /// <param name="dataProtectionProvider"></param>
         /// <param name="logger"></param>
-        public UserPreferenceFromFileSystemRepository(IDataProtectionProvider dataProtectionProvider, ILogger<UserPreferenceFromFileSystemRepository> logger)
+        /// <param name="file">IFile abstraction to ease the unit testing</param>
+        public UserPreferenceFromFileSystemRepository(IDataProtectionProvider dataProtectionProvider, 
+                                                      ILogger<UserPreferenceFromFileSystemRepository> logger,
+                                                      IFile file)
         {
             _logger = logger;
             _dataProtection = dataProtectionProvider.CreateProtector(nameof(AzureDevOpsTeamMembersVelocity));
+            _file = file;
             _memory = new ();
         }
 
@@ -46,11 +52,11 @@ namespace AzureDevOpsTeamMembersVelocity.Repository
 
             _logger.LogInformation($"Load settings from file : {fileName}");
 
-            if (File.Exists(fileName))
+            if (_file.Exists(fileName))
             {
                 try
                 {
-                    var jsonString = _dataProtection.Unprotect(await File.ReadAllTextAsync(fileName));
+                    var jsonString = _dataProtection.Unprotect(await _file.ReadAllTextAsync(fileName));
 
                     var settingsDeserialized = JsonSerializer.Deserialize<T>(jsonString, Program.SerializerOptions);
 
@@ -99,7 +105,7 @@ namespace AzureDevOpsTeamMembersVelocity.Repository
 
                 var encryptedText = _dataProtection.Protect(settingsSerialized);
 
-                await File.WriteAllTextAsync(fileName, encryptedText);
+                await _file.WriteAllTextAsync(fileName, encryptedText);
             }
             catch (Exception e)
             {

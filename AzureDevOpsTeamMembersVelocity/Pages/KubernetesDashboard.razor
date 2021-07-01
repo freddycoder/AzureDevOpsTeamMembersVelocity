@@ -1,5 +1,13 @@
 ﻿@page "/Kubernetes"
 @inject k8s.Kubernetes Client
+@inject ILogger<KubernetesDashboard> Logger
+
+@if (Error != null)
+{
+    <ul class="list-group mb-3">
+        <li class="list-group-item list-group-item-danger">@Error</li>
+    </ul>
+}
 
 <h3>Kubernetes</h3>
 
@@ -52,7 +60,10 @@
                         <td>@pod.Metadata.Name</td>
                         <td>@pod.Metadata.CreationTimestamp</td>
                         <td>
-                            <input id="@string.Concat(p.Namespace(), p.Name())" type="checkbox" class="form-check oi-check" onchange="registerForStreamNotifications('@p.Namespace()', '@p.Name()')" />
+                            <input id="@string.Concat(p.Namespace(), p.Name())" 
+                                   type="checkbox" 
+                                   class="form-check oi-check" 
+                                   onchange="registerForStreamNotifications('@p.Namespace()', '@p.Name()')" />
                         </td>
                     </tr>
                 }
@@ -72,24 +83,34 @@
 
     public V1PodList? Pods { get; set; }
 
+    public string? Error { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        NamespaceList = await Client.ListNamespaceAsync();
+        try {
+            NamespaceList = await Client.ListNamespaceAsync();
 
-        StateHasChanged();
+            StateHasChanged();
 
-        Pods = new V1PodList();
+            Pods = new V1PodList();
 
-        Pods.Items = new List<V1Pod>();
+            Pods.Items = new List<V1Pod>();
 
-        foreach (var ns in NamespaceList.Items)
-        {
-            var podList = await Client.ListNamespacedPodAsync(ns.Metadata.Name);
-
-            foreach (var pod in podList.Items)
+            foreach (var ns in NamespaceList.Items)
             {
-                Pods.Items.Add(pod);
+                var podList = await Client.ListNamespacedPodAsync(ns.Metadata.Name);
+
+                foreach (var pod in podList.Items)
+                {
+                    Pods.Items.Add(pod);
+                }
+
+                StateHasChanged();
             }
+        }
+        catch (Exception e) {
+            Error = e.Message;
+            Logger.LogError(e, e.Message);
         }
     }
 }

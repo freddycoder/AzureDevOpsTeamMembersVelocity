@@ -10,7 +10,7 @@ namespace AzureDevOpsTeamMembersVelocity.Settings
             get => _organization;
             set
             {
-                _asChanged = _organization == value;
+                _asChanged |= _organization != value;
                 _organization = value;
             }
         }
@@ -23,7 +23,7 @@ namespace AzureDevOpsTeamMembersVelocity.Settings
             get => _teamProject;
             set
             {
-                _asChanged = _teamProject == value;
+                _asChanged |= _teamProject != value;
                 _teamProject = value;
             }
         }
@@ -36,7 +36,7 @@ namespace AzureDevOpsTeamMembersVelocity.Settings
             get => _feed;
             set
             {
-                _asChanged = _feed == value;
+                _asChanged |= _feed != value;
                 _feed = value;
             }
         }
@@ -49,7 +49,7 @@ namespace AzureDevOpsTeamMembersVelocity.Settings
             get => _searchTerm;
             set
             {
-                _asChanged = _searchTerm == value;
+                _asChanged |= _searchTerm != value;
                 _searchTerm = value;
             }
         }
@@ -61,7 +61,7 @@ namespace AzureDevOpsTeamMembersVelocity.Settings
             get => _onlyAlpha;
             set
             {
-                _asChanged = _onlyAlpha == value;
+                _asChanged |= _onlyAlpha != value;
                 _onlyAlpha = value;
             }
         }

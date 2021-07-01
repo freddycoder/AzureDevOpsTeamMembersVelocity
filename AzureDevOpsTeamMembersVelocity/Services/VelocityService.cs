@@ -48,20 +48,22 @@ namespace AzureDevOpsTeamMembersVelocity.Services
                     yield return memberVelocity;
                 }
             }
-
-            var items = (await _devOpsService.WorkItems(sprintUrl)).Item1?.WorkItemRelations;
-
-            if (items != null)
+            else
             {
-                var personDictionary = new Dictionary<string, MemberVelocity>();
+                var workItems = (await _devOpsService.WorkItems(sprintUrl)).Item1?.WorkItemRelations;
 
-                await foreach (var (workItem, workItemUpdates) in GetWorksAndHistory(items))
+                if (workItems != null)
                 {
-                    GroupByPerson(personDictionary, workItem, workItemUpdates);
+                    var personDictionary = new Dictionary<string, MemberVelocity>();
 
-                    foreach (var value in personDictionary.Values)
+                    await foreach (var (workItem, workItemUpdates) in GetWorksAndHistory(workItems))
                     {
-                        yield return EnhanceMemberVolocityInfo(value, capacities, sprint, teamDaysOff, teamSettings);
+                        GroupByPerson(personDictionary, workItem, workItemUpdates, sprint);
+
+                        foreach (var value in personDictionary.Values)
+                        {
+                            yield return EnhanceMemberVolocityInfo(value, capacities, sprint, teamDaysOff, teamSettings);
+                        }
                     }
                 }
             }
@@ -121,18 +123,18 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         {
             foreach (var item in items)
             {
-                var result = await GetWorkItem(item);
+                var workItem = await GetWorkItem(item);
 
-                if (result != null)
+                if (workItem != null)
                 {
                     List<WorkItemUpdate>? workItemUpdate = default;
 
-                    if (result.Links?.WorkItemUpdates?.Href != null)
+                    if (workItem.Links?.WorkItemUpdates?.Href != null)
                     {
-                        workItemUpdate = (await _devOpsService.Updates(result.Links.WorkItemUpdates.Href)).Item1?.Value;
+                        workItemUpdate = (await _devOpsService.Updates(workItem.Links.WorkItemUpdates.Href)).Item1?.Value;
                     }
 
-                    yield return (result, workItemUpdate);
+                    yield return (workItem, workItemUpdate);
                 }
             }
         }
@@ -153,11 +155,14 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// <param name="groupByPerson">Dictionary used to to the group by, can be pre-populated</param>
         /// <param name="workItem">Work item</param>
         /// <param name="workItemUpdates">List of updates to group</param>
-        public static void GroupByPerson(Dictionary<string, MemberVelocity> groupByPerson, WorkItem workItem, List<WorkItemUpdate>? workItemUpdates)
+        /// <param name="sprint">The sprint fi available to not consider change history that append in others sprints</param>
+        public static void GroupByPerson(Dictionary<string, MemberVelocity> groupByPerson, WorkItem workItem, List<WorkItemUpdate>? workItemUpdates, Sprint? sprint = null)
         {
             if (workItemUpdates == null) return;
 
-            foreach (var update in workItemUpdates)
+            foreach (var update in workItemUpdates.Where(w => sprint?.Attributes?.StartDate == null ||       // Filter to get only changes
+                                                              sprint.Attributes.StartDate <= w.RevisedDate)) // where the change append after
+                                                                                                             // the begining of the sprint
             {
                 var person = update.RevisedBy?.DisplayName ?? string.Empty;
 

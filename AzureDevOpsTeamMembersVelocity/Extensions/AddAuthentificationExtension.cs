@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Web;
 using System;
+using System.IO.Abstractions;
 using static System.Environment;
 
 namespace AzureDevOpsTeamMembersVelocity.Extensions
@@ -41,6 +42,8 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
                 services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                         .AddCookie();
 
+                services.AddSingleton<FileSystem>();
+                services.AddSingleton<IFile>(sp => sp.GetRequiredService<FileSystem>().File);
                 services.AddSingleton<IUserPreferenceRepository, UserPreferenceFromFileSystemRepository>();
             }
             else if (IsIdentityAuth())
@@ -91,6 +94,8 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
             {
                 services.AddSingleton(new AuthUrlPagesProvider(""));
 
+                services.AddSingleton<FileSystem>();
+                services.AddSingleton<IFile>(sp => sp.GetRequiredService<FileSystem>().File);
                 services.AddSingleton<IUserPreferenceRepository, UserPreferenceFromFileSystemRepository>();
 
                 services.AddSingleton<IHostEnvironmentAuthenticationStateProvider, AllowAnonymousStateProvider>();
