@@ -71,17 +71,18 @@ namespace AzureDevOpsTeamMembersVelocity.Hubs
                             .Replace("\u001b[41m\u001b[30mfail\u001b[39m\u001b[22m\u001b[49m", "fail")
                             .Replace("\u001b[41m\u001b[1m\u001b[37mcrit\u001b[39m\u001b[22m\u001b[49m", "crit");
                 }
+				else {
+					try
+					{
+						await Task.Delay(1998, cancellationToken);
+					}
+					catch
+					{
+						_logger.LogInformation($"Stream {ns} {pod} as ended");
 
-                try
-                {
-                    await Task.Delay(1998, cancellationToken);
-                }
-                catch
-                {
-                    _logger.LogInformation($"Stream {ns} {pod} as ended");
-
-                    runLoop = false;
-                }
+						runLoop = false;
+					}
+				}
 
             } while (runLoop && StreamIsOn(ns, pod, cancellationToken));
 
