@@ -6,6 +6,7 @@
 @inject ILogger<KubernetesDashboard> Logger
 @inject IJSRuntime JS
 @inject IHttpContextAccessor HttpContextAccessor 
+@attribute [Authorize]
 
 @if (Error != null)
 {
