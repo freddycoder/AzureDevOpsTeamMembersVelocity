@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
@@ -13,6 +13,9 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
 {
+    /// <summary>
+    /// The forgot password page model
+    /// </summary>
     [AllowAnonymous]
     public class ForgotPasswordModel : PageModel
     {

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
 {
+    /// <summary>
+    /// The confirm email change page model
+    /// </summary>
     [AllowAnonymous]
     public class ConfirmEmailChangeModel : PageModel
     {

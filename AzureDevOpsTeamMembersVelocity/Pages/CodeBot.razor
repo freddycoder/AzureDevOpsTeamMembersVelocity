@@ -1,29 +1,45 @@
 ﻿@page "/CodeBot"
 @using AutoCode
 @inject ILogger<CodeBot> Logger
+@attribute [Authorize]
+
 <h3>CodeBot</h3>
 
-<div class="row">
-    <label>Choose a file</label>
-    <InputFile OnChange="LoadFiles"></InputFile>
+<div class="row border mb-5">
+    <div class="input-group col-4">
+        <label class="col-form-label">Choose a file : </label>
+        <InputFile OnChange="LoadFiles"></InputFile>
+    </div>
+    <div class="input-group col-8">
+        <label class="col-form-label">Comment template : </label>
+        <textarea class="input-group-text textarea-small" @bind="Template"></textarea>
+    </div>
 </div>
 
 <div class="row">
-    <textarea class="input-group-text" @bind="Code"></textarea>
+    <textarea class="input-group-text textarea-big" @bind="Code"></textarea>
 </div>
 
 @code { 
     public string? Code { get; set; }
 
+    public string Template
+    {
+        get => Comment.CommentTemplate;
+        set
+        {
+            Comment.CommentTemplate = value;
+        }
+    }
+
+    private Comment Comment { get; set; } = new Comment();
 
     private List<IBrowserFile> loadedFiles = new();
     private long maxFileSize = 1024 * 15;
     private int maxAllowedFiles = 1;
-    private bool isLoading;
 
     private async Task LoadFiles(InputFileChangeEventArgs e)
     {
-        isLoading = true;
         loadedFiles.Clear();
 
         foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
@@ -38,7 +54,7 @@
 
                 try
                 {
-                    Code = Automaticly.Add.Comment.To.Code(code);
+                    Code = Comment.Apply(code);
                 }
                 catch (Exception exception)
                 {
@@ -50,7 +66,5 @@
                 Logger.LogError("File: {Filename} Error: {Error}", file.Name, ex.Message);
             }
         }
-
-        isLoading = false;
     }
 }

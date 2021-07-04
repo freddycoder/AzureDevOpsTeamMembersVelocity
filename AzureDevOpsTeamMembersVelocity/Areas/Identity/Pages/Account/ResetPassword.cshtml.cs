@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -12,6 +12,9 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
 {
+    /// <summary>
+    /// The reset password page model
+    /// </summary>
     [AllowAnonymous]
     public class ResetPasswordModel : PageModel
     {
