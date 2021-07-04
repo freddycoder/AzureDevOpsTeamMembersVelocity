@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
 {
+    /// <summary>
+    /// The login with recovery code page model
+    /// </summary>
     [AllowAnonymous]
     public class LoginWithRecoveryCodeModel : PageModel
     {

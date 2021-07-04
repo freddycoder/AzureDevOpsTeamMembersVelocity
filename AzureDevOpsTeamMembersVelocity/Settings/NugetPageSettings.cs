@@ -2,8 +2,17 @@
 
 namespace AzureDevOpsTeamMembersVelocity.Settings
 {
+    /// <summary>
+    /// Class to represent settings that are kept for a user in the Nuget page.
+    /// </summary>
     public class NugetPageSettings : AbstractSettings
     {
+        /// <summary>
+        /// Name of the organization
+        /// </summary>
+        /// <remarks>
+        /// https://dev.azure.com/{Organization}
+        /// </remarks>
         [StringLength(256, ErrorMessage = "Organisation is too long.")]
         public string? Organisation 
         {
@@ -17,6 +26,9 @@ namespace AzureDevOpsTeamMembersVelocity.Settings
 
         private string? _organization;
 
+        /// <summary>
+        /// The team project to query for feed. If empty the organisation will be queried
+        /// </summary>
         [StringLength(64, ErrorMessage = "TeamProject is too long.")]
         public string? TeamProject 
         {
@@ -30,6 +42,9 @@ namespace AzureDevOpsTeamMembersVelocity.Settings
 
         private string? _teamProject;
 
+        /// <summary>
+        /// The name of the feed
+        /// </summary>
         [StringLength(256, ErrorMessage = "Feed is too long.")]
         public string? Feed 
         {
@@ -43,6 +58,9 @@ namespace AzureDevOpsTeamMembersVelocity.Settings
 
         private string? _feed;
 
+        /// <summary>
+        /// The search term sent to the Azure DevOps REST API
+        /// </summary>
         [StringLength(256, ErrorMessage = "SearchTerm is too long.")]
         public string? SearchTerm 
         {
@@ -56,6 +74,9 @@ namespace AzureDevOpsTeamMembersVelocity.Settings
 
         private string? _searchTerm;
 
+        /// <summary>
+        /// Indicator to display only the alpha version
+        /// </summary>
         public bool OnlyAlpha 
         {
             get => _onlyAlpha;

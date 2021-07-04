@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
 {
+    /// <summary>
+    /// The change password page model
+    /// </summary>
     public class ChangePasswordModel : PageModel
     {
         private readonly UserManager<IdentityUser> _userManager;

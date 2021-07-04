@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,6 +11,9 @@ using Microsoft.Extensions.Logging;
 
 namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
 {
+    /// <summary>
+    /// The login with2fa page model
+    /// </summary>
     [AllowAnonymous]
     public class LoginWith2faModel : PageModel
     {
