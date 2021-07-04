@@ -8,6 +8,7 @@ using System.Threading;
 using System;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace AzureDevOpsTeamMembersVelocity.Hubs
 {
@@ -24,17 +25,30 @@ namespace AzureDevOpsTeamMembersVelocity.Hubs
     {
         private readonly Kubernetes _kubernetesClient;
         private readonly ILogger<LogStreamHub> _logger;
+        private readonly IConfiguration _config;
 
         /// <summary>
         /// Constructor with dependencies
         /// </summary>
         /// <param name="kubernetesClient"></param>
         /// <param name="logger">Logger</param>
-        public LogStreamHub(Kubernetes kubernetesClient, ILogger<LogStreamHub> logger)
+        /// <param name="configuration">Interface to access configuration</param>
+        public LogStreamHub(Kubernetes kubernetesClient, 
+                            ILogger<LogStreamHub> logger,
+                            IConfiguration configuration)
         {
             _kubernetesClient = kubernetesClient;
             _logger = logger;
+            _config = configuration;
         }
+
+        /// <summary>
+        /// The default delay of the log stream when the kubernetes log stream is empty.
+        /// </summary>
+        /// <remarks>
+        /// This is miliseconds
+        /// </remarks>
+        public const int DefaultLogStreamDelay = 1998;
 
         /// <summary>
         /// Function to get the pog log.
@@ -51,13 +65,11 @@ namespace AzureDevOpsTeamMembersVelocity.Hubs
 
             var buffer = new byte[8192];
 
-            int count;
-
             bool runLoop = true;
 
             do
             {
-                count = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken);
+                int count = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken);
 
                 if (count != 0)
                 {
@@ -71,18 +83,21 @@ namespace AzureDevOpsTeamMembersVelocity.Hubs
                             .Replace("\u001b[41m\u001b[30mfail\u001b[39m\u001b[22m\u001b[49m", "fail")
                             .Replace("\u001b[41m\u001b[1m\u001b[37mcrit\u001b[39m\u001b[22m\u001b[49m", "crit");
                 }
-				else {
-					try
-					{
-						await Task.Delay(1998, cancellationToken);
-					}
-					catch
-					{
-						_logger.LogInformation($"Stream {ns} {pod} as ended");
+                else
+                {
+                    try
+                    {
+                        var miliseconds = _config.GetValue<int?>("DelayLogStreamEmpty") ?? DefaultLogStreamDelay;
 
-						runLoop = false;
-					}
-				}
+                        await Task.Delay(miliseconds, cancellationToken);
+                    }
+                    catch
+                    {
+                        _logger.LogInformation($"Stream {ns} {pod} as ended");
+
+                        runLoop = false;
+                    }
+                }
 
             } while (runLoop && StreamIsOn(ns, pod, cancellationToken));
 
