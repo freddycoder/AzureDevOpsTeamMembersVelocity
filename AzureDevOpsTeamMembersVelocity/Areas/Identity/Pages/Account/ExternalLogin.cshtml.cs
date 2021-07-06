@@ -27,6 +27,9 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
 
+        /// <summary>
+        /// Constructor with dependencies
+        /// </summary>
         public ExternalLoginModel(
             SignInManager<IdentityUser> signInManager,
             UserManager<IdentityUser> userManager,

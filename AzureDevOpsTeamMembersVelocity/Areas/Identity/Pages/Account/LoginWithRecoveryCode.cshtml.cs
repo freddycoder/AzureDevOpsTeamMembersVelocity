@@ -18,6 +18,9 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LoginWithRecoveryCodeModel> _logger;
 
+        /// <summary>
+        /// Constructor with dependencies
+        /// </summary>
         public LoginWithRecoveryCodeModel(SignInManager<IdentityUser> signInManager, ILogger<LoginWithRecoveryCodeModel> logger)
         {
             _signInManager = signInManager;

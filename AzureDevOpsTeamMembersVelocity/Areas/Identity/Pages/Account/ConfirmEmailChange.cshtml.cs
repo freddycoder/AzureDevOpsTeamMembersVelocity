@@ -17,6 +17,9 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
 
+        /// <summary>
+        /// Constructor with dependencies
+        /// </summary>
         public ConfirmEmailChangeModel(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
             _userManager = userManager;

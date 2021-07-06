@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +15,9 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<Disable2faModel> _logger;
 
+        /// <summary>
+        /// Constructor with dependencies
+        /// </summary>
         public Disable2faModel(
             UserManager<IdentityUser> userManager,
             ILogger<Disable2faModel> logger)

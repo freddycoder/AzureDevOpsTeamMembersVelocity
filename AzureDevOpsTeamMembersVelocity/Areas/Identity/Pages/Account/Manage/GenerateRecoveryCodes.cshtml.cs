@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -16,6 +16,9 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<GenerateRecoveryCodesModel> _logger;
 
+        /// <summary>
+        /// Constructor with dependencies
+        /// </summary>
         public GenerateRecoveryCodesModel(
             UserManager<IdentityUser> userManager,
             ILogger<GenerateRecoveryCodesModel> logger)

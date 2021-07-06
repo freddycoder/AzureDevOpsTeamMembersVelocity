@@ -20,6 +20,9 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LoginWith2faModel> _logger;
 
+        /// <summary>
+        /// Constructor with dependencies
+        /// </summary>
         public LoginWith2faModel(SignInManager<IdentityUser> signInManager, ILogger<LoginWith2faModel> logger)
         {
             _signInManager = signInManager;

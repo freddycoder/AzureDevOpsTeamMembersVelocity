@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Linq;
@@ -10,6 +10,9 @@ using Microsoft.Extensions.Logging;
 
 namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
 {
+    /// <summary>
+    /// The enable authenticator page model
+    /// </summary>
     public class EnableAuthenticatorModel : PageModel
     {
         private readonly UserManager<IdentityUser> _userManager;
@@ -18,6 +21,9 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
 
         private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
+        /// <summary>
+        /// Constructor with dependencies
+        /// </summary>
         public EnableAuthenticatorModel(
             UserManager<IdentityUser> userManager,
             ILogger<EnableAuthenticatorModel> logger,
