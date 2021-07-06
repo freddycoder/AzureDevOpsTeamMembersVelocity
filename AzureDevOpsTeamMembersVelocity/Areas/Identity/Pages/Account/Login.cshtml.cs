@@ -23,6 +23,9 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
 
+        /// <summary>
+        /// Constructor with dependencies
+        /// </summary>
         public LoginModel(SignInManager<IdentityUser> signInManager, 
             ILogger<LoginModel> logger)
         {

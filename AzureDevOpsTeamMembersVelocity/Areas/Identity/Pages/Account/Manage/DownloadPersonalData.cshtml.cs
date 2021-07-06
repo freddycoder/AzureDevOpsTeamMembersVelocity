@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -10,11 +10,17 @@ using Microsoft.Extensions.Logging;
 
 namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
 {
+    /// <summary>
+    /// The download personal data page model
+    /// </summary>
     public class DownloadPersonalDataModel : PageModel
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<DownloadPersonalDataModel> _logger;
 
+        /// <summary>
+        /// Constructor with dependencies
+        /// </summary>
         public DownloadPersonalDataModel(
             UserManager<IdentityUser> userManager,
             ILogger<DownloadPersonalDataModel> logger)

@@ -20,6 +20,9 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
     {
         private readonly UserManager<IdentityUser> _userManager;
 
+        /// <summary>
+        /// Constructor with dependencies
+        /// </summary>
         public ResetPasswordModel(UserManager<IdentityUser> userManager)
         {
             _userManager = userManager;

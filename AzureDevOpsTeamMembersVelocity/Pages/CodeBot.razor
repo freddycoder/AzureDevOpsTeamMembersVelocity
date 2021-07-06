@@ -3,6 +3,13 @@
 @inject ILogger<CodeBot> Logger
 @attribute [Authorize]
 
+@if (Error != null)
+{
+    <ul class="list-group mb-3">
+        <li class="list-group-item list-group-item-danger">@Error</li>
+    </ul>
+}
+
 <h3>CodeBot</h3>
 
 <div class="row border mb-5">
@@ -20,7 +27,7 @@
     <textarea class="input-group-text textarea-big" @bind="Code"></textarea>
 </div>
 
-@code { 
+@code {
     public string? Code { get; set; }
 
     public string Template
@@ -32,10 +39,12 @@
         }
     }
 
+    public string? Error { get; set; }
+
     private Comment Comment { get; set; } = new Comment();
 
     private List<IBrowserFile> loadedFiles = new();
-    private long maxFileSize = 1024 * 15;
+    private long maxFileSize = 1024 * 30;
     private int maxAllowedFiles = 1;
 
     private async Task LoadFiles(InputFileChangeEventArgs e)
@@ -60,9 +69,13 @@
                 {
                     Code = exception.Message;
                 }
+
+                Error = default;
             }
             catch (Exception ex)
             {
+                Error = ex.Message;
+
                 Logger.LogError("File: {Filename} Error: {Error}", file.Name, ex.Message);
             }
         }
