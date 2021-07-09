@@ -1,11 +1,11 @@
 ﻿@page "/Kubernetes"
 @using Microsoft.JSInterop
-@using Microsoft.AspNetCore.Http 
+@using Microsoft.AspNetCore.Http
 @inject k8s.Kubernetes Client
 @inject NavigationManager NavigationManager
 @inject ILogger<KubernetesDashboard> Logger
 @inject IJSRuntime JS
-@inject IHttpContextAccessor HttpContextAccessor 
+@inject IHttpContextAccessor HttpContextAccessor
 @attribute [Authorize]
 
 @if (Error != null)
@@ -17,73 +17,148 @@
 
 <h3>Kubernetes</h3>
 
-<h4>Namespaces</h4>
+<div class="row">
+    <button class="btn btn-primary"
+            type="button"
+            @onclick='() => Collapsing("collapseNamespace")'>
+        Namespaces
+    </button>
+</div>
 
 @if (NamespaceList != null)
 {
-    <table class="table table-hover table-responsive">
-        <caption>Table of kubernetes namespace</caption>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Creation time</th>
-                <th>Phase</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-
-            @foreach (var ns in NamespaceList.Items)
-            {
+    <div class="@NamespaceCollapseClass" id="collapseNamespace">
+        <table class="table table-hover table-responsive">
+            <caption>Table of kubernetes namespace</caption>
+            <thead>
                 <tr>
-                    <td>@ns.Metadata.Name</td>
-                    <td>@ns.Metadata.CreationTimestamp</td>
-                    <td>@ns.Status.Phase</td>
-                    <td>
-                    </td>
+                    <th>Name</th>
+                    <th>Creation time</th>
+                    <th>Phase</th>
+                    <th></th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
 
-    <h4>Pods</h4>
-
-    <table class="table table-hover table-responsive">
-        <caption>Table of kubernetes pods</caption>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Creation time</th>
-                <th>Phase</th>
-                <th>Reason</th>
-                <th>Select</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Pods != null && Pods.Items != null)
-            {
-                @foreach (var pod in Pods.Items)
+                @foreach (var ns in NamespaceList.Items)
                 {
-                    var podNamespace = pod.Namespace();
-                    var podName = pod.Name();
-
                     <tr>
-                        <td>@pod.Metadata.Name</td>
-                        <td>@pod.Metadata.CreationTimestamp</td>
-                        <td>@pod.Status.Phase</td>
-                        <td>@pod.Status.Reason</td>
+                        <td>@ns.Metadata.Name</td>
+                        <td>@ns.Metadata.CreationTimestamp</td>
+                        <td>@ns.Status.Phase</td>
                         <td>
-                            <input id="@string.Concat(podNamespace, podName)"
-                                   type="checkbox"
-                                   class="form-check"
-                                   title="button-pod-@pod.Metadata.Name"
-                                   @onchange="async (changeEventArg) => await OnPodLogClick(changeEventArg, podNamespace, podName)" />
+                            <button id="@string.Concat("ns-", ns.Metadata.Name)"
+                                    title="btn-delete-ns-@ns.Metadata.Name"
+                                    class="btn btn-danger"
+                                    @onclick="async (mea) => await DeleteNamespace(ns)">
+                                Delete
+                            </button>
                         </td>
                     </tr>
                 }
-            }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <button class="btn btn-primary"
+                type="button"
+                @onclick='() => Collapsing("collapseDeployment")'>
+            Deployments
+        </button>
+    </div>
+
+    <div class="@DeploymentCollapseClass" id="collapseDeployment">
+        <table class="table table-hover table-responsive">
+            <caption>Table of kubernetes deployments</caption>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Creation time</th>
+                    <th>Ready</th>
+                    <th>Unavailable</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Deployments != null && Deployments.Items != null)
+                {
+                    @foreach (var deployment in Deployments.Items)
+                    {
+                        var deploymentNamespace = deployment.Namespace();
+                        var deploymentName = deployment.Name();
+
+                        <tr>
+                            <td>@deployment.Metadata.Name</td>
+                            <td>@deployment.Metadata.CreationTimestamp</td>
+                            <td>@deployment.Status.ReadyReplicas</td>
+                            <td>@deployment.Status.UnavailableReplicas</td>
+                            <td>
+                                <input id="@string.Concat(deploymentNamespace, deploymentName)"
+                                       title="button-pod-@deployment.Metadata.Name"
+                                       type="checkbox"
+                                       class="form-check"
+                                       @onchange="async (changeEventArg) => await OnDeploymentLogClick(changeEventArg, deploymentNamespace, deploymentName)" />
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <button class="btn btn-primary"
+                type="button"
+                @onclick='() => Collapsing("collapsePods")'>
+            Pods
+        </button>
+    </div>
+
+    <div class="@PodsCollapseClass" id="collapsePods">
+        <table class="table table-hover table-responsive">
+            <caption>Table of kubernetes pods</caption>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Creation time</th>
+                    <th>Phase</th>
+                    <th>Reason</th>
+                    <th>Select</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Pods != null && Pods.Items != null)
+                {
+                    @foreach (var pod in Pods.Items)
+                    {
+                        var podNamespace = pod.Namespace();
+                        var podName = pod.Name();
+
+                        <tr>
+                            <td>@pod.Metadata.Name</td>
+                            <td>@pod.Metadata.CreationTimestamp</td>
+                            <td>@pod.Status.Phase</td>
+                            <td>@pod.Status.Reason</td>
+                            <td>
+                                <input id="@string.Concat(podNamespace, podName)"
+                                       title="button-pod-@pod.Metadata.Name"
+                                       type="checkbox"
+                                       class="form-check"
+                                       @onchange="async (changeEventArg) => await OnPodLogClick(changeEventArg, podNamespace, podName)" />
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <hr />
 
     <h4>Logs</h4>
 
@@ -107,6 +182,8 @@
 @code {
     public V1NamespaceList? NamespaceList { get; set; }
 
+    public V1DeploymentList? Deployments { get; set; }
+
     public V1PodList? Pods { get; set; }
 
     public string? Error { get; set; }
@@ -118,6 +195,8 @@
             NamespaceList = await Client.ListNamespaceAsync();
 
             StateHasChanged();
+
+            Deployments = await Client.ListDeploymentForAllNamespacesAsync();
 
             Pods = new V1PodList();
 
@@ -200,6 +279,60 @@
         }
     }
 
+    private async Task OnDeploymentLogClick(ChangeEventArgs args, string deploymentNamespace, string deploymentName)
+    {
+        if (Pods != null && Pods.Items != null)
+        {
+            var taskList = new List<Task>();
+
+            foreach (var pod in Pods.Items)
+            {
+                if (pod.Name().StartsWith(deploymentName))
+                {
+                    taskList.Add(OnPodLogClick(args, deploymentNamespace, pod.Name()));
+                }
+            }
+
+            foreach (var task in taskList)
+            {
+                await task;
+            }
+        }
+    }
+
+    private async Task DeleteNamespace(V1Namespace ns)
+    {
+        await Client.DeleteNamespaceAsync(ns.Metadata.Name, new V1DeleteOptions());
+
+        if (Pods == null)
+        {
+            Pods = new V1PodList();
+        }
+
+        NamespaceList = await Client.ListNamespaceAsync();
+
+        Pods.Items = Pods.Items.Where(p =>
+        {
+            if (p.Namespace() != ns.Metadata.Name)
+            {
+                return true;
+            }
+
+            var taskKey = $"{ns.Metadata.Name}{p.Metadata.Name}";
+
+            if (TokensBag.TryGetValue(taskKey, out var tokenSourceCancellation))
+            {
+                tokenSourceCancellation.Cancel();
+
+                TokensBag.Remove(taskKey);
+            }
+
+            return false;
+        }).ToList();
+
+        StateHasChanged();
+    }
+
     private void ClearLogs()
     {
         while (PodLogs.TryTake(out _)) { }
@@ -217,6 +350,28 @@
         if (hubConnection is not null)
         {
             await hubConnection.DisposeAsync();
+        }
+    }
+
+    public string? NamespaceCollapseClass { get; set; }
+
+    public string? DeploymentCollapseClass { get; set; }
+
+    public string? PodsCollapseClass { get; set; }
+
+    public void Collapsing(string collapseId)
+    {
+        if (collapseId == "collapseNamespace")
+        {
+            NamespaceCollapseClass = string.IsNullOrEmpty(NamespaceCollapseClass) ? "collapse" : "";
+        }
+        else if (collapseId == "collapseDeployment")
+        {
+            DeploymentCollapseClass = string.IsNullOrEmpty(DeploymentCollapseClass) ? "collapse" : "";
+        }
+        else if (collapseId == "collapsePods")
+        {
+            PodsCollapseClass = string.IsNullOrEmpty(PodsCollapseClass) ? "collapse" : "";
         }
     }
 }
