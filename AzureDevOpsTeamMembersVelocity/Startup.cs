@@ -92,7 +92,7 @@ namespace AzureDevOpsTeamMembersVelocity
             services.AddScoped<NugetService>();
             services.AddSingleton<IVelocityRepository, VelocityRepository>();
 
-            services.AddSingleton(sp =>
+            services.AddSingleton<IKubernetes>(sp =>
             {
                 if (KubernetesClientConfiguration.IsInCluster())
                 {

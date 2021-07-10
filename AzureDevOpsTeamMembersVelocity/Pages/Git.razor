@@ -109,12 +109,15 @@
 
         EditContext = new EditContext(GitSettings);
 
-        var (repositories, error) = (await GitService.GetRepositories());
+        if (Settings.Organisation != null && Settings.TeamProject != null)
+        {
+            var (repositories, error) = (await GitService.GetRepositories(Settings.Organisation, Settings.TeamProject));
 
-        Repositories = repositories?.Value?.OrderBy(r => r.Name);
-        Error = error;
+            Repositories = repositories?.Value?.OrderBy(r => r.Name);
+            Error = error;
 
-        await GetPullRequests();
+            await GetPullRequests();
+        }
     }
 
     public async Task UpdateRepositoryAndGetPullRequests(string repositoryName)

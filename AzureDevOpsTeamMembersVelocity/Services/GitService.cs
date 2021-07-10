@@ -1,6 +1,5 @@
 ﻿using AzureDevOpsTeamMembersVelocity.Model;
 using AzureDevOpsTeamMembersVelocity.Proxy;
-using AzureDevOpsTeamMembersVelocity.Repository;
 using System.Threading.Tasks;
 
 namespace AzureDevOpsTeamMembersVelocity.Services
@@ -11,30 +10,24 @@ namespace AzureDevOpsTeamMembersVelocity.Services
     public class GitService
     {
         private readonly IDevOpsProxy _proxy;
-        private readonly IUserPreferenceRepository _settings;
 
         /// <summary>
         /// Constructor with dependencies
         /// </summary>
         /// <param name="proxy">The proxy to call the azure devops API</param>
-        /// <param name="settings">Settings of the app to access Organization name and TeamProject name</param>
-        public GitService(IDevOpsProxy proxy, IUserPreferenceRepository settings)
+        public GitService(IDevOpsProxy proxy)
         {
             _proxy = proxy;
-            _settings = settings;
         }
 
         /// <summary>
         /// List all repository of the current selected Organisation and TeamProject
         /// </summary>
         /// <returns>A task that list Repositories</returns>
-        public async Task<(ListResponse<GitRepository>?, string?)> GetRepositories()
+        public Task<(ListResponse<GitRepository>?, string?)> GetRepositories(string organization, string teamProject)
         {
-            var settings = await _settings.GetAsync<TeamMembersVelocitySettings>();
-
-            var url = $"https://dev.azure.com/{settings.Organisation}/{settings.TeamProject}/_apis/git/repositories?api-version=6.0";
-
-            return await _proxy.GetAsync<ListResponse<GitRepository>>(url);
+            return _proxy.GetAsync<ListResponse<GitRepository>>(
+    $"https://dev.azure.com/{organization}/{teamProject}/_apis/git/repositories?api-version=6.0");
         }
 
         /// <summary>
