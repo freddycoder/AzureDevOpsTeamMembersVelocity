@@ -21,7 +21,6 @@ using Microsoft.Identity.Web.UI;
 using System;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using static System.Environment;
 
@@ -89,6 +88,7 @@ namespace AzureDevOpsTeamMembersVelocity
             services.AddScoped<DevOpsService>();
             services.AddScoped<VelocityService>();
             services.AddScoped<GitService>();
+            services.AddScoped<ReleasesService>();
             services.AddScoped<NugetService>();
             services.AddSingleton<IVelocityRepository, VelocityRepository>();
 

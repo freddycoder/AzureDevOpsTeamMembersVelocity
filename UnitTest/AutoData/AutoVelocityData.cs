@@ -1,8 +1,12 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using AutoFixture.Xunit2;
+using AzureDevOpsTeamMembersVelocity.Proxy;
+using AzureDevOpsTeamMembersVelocity.Repository;
+using NSubstitute;
 using System;
 using System.IO.Abstractions;
+using UnitTest.AutoData.Customization;
 
 namespace UnitTest.AutoData
 {
@@ -17,7 +21,10 @@ namespace UnitTest.AutoData
         {
             var fixture = fixtureFactory();
 
-            fixture.Customize(new AutoNSubstituteCustomization());
+            fixture.Customize(new AutoNSubstituteCustomization())
+                   .Customize(new ProxyCustomization());
+
+            fixture.Register<IUserPreferenceRepository>(() => new MockUserPreferenceRepository());
 
             fixture.Freeze<IFile>();
 

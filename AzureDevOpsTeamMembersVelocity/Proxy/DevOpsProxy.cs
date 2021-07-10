@@ -87,9 +87,10 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
         private async Task<HttpResponseMessage> GetResponseAsync(string fullUrl)
         {
             if ((fullUrl.StartsWith("https://dev.azure.com/", StringComparison.OrdinalIgnoreCase) || 
-                 fullUrl.StartsWith("https://feeds.dev.azure.com/", StringComparison.OrdinalIgnoreCase)) == false)
+                 fullUrl.StartsWith("https://feeds.dev.azure.com/", StringComparison.OrdinalIgnoreCase) ||
+                 fullUrl.StartsWith("https://vsrm.dev.azure.com/", StringComparison.OrdinalIgnoreCase)) == false) 
             {
-                throw new InvalidOperationException("DevOpsProxy fullUrl must start with 'https://dev.azure.com' or 'https://feeds.dev.azure.com/'");
+                throw new InvalidOperationException("DevOpsProxy fullUrl must start with 'https://dev.azure.com' or 'https://feeds.dev.azure.com/' or 'https://vsrm.dev.azure.com/'");
             }
             if (fullUrl.Contains('\n'))
             {

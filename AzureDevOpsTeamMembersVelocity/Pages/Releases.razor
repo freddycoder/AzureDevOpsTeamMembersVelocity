@@ -1,7 +1,33 @@
 ﻿@page "/Releases" 
+@inject ReleasesService ReleasesService
+@inject IUserPreferenceRepository UserPreference
 
 <h3>Releases</h3>
 
-@code {
+<ul>
+    @if (ReleasesList != null)
+    {
+        foreach (var release in ReleasesList)
+        {
+            <li>@release.Name</li>
+        }
 
+        if (ReleasesList.Count == 0)
+        {
+            <li>You don't have any release yet</li>
+        }
+    }
+</ul>
+
+
+@code {
+    List<Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.Release>? ReleasesList { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var settings = await UserPreference.GetAsync<TeamMembersVelocitySettings>();
+
+        if (settings.Organisation != null && settings.TeamProject != null)
+            ReleasesList = (await ReleasesService.ListReleases(settings.Organisation, settings.TeamProject)).Item1?.Value;
+    }
 }

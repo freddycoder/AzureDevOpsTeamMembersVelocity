@@ -109,9 +109,9 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// </remarks>
         /// <param name="capacityUrl">The full URL of the capacity information.</param>
         /// <returns>The list of capacities</returns>
-        public Task<(ListResponse<Capacity>?, string?)> Capacities(string capacityUrl)
+        public Task<(ListResponse<Microsoft.TeamFoundation.Work.WebApi.TeamMemberCapacityIdentityRef>?, string?)> Capacities(string capacityUrl)
         {
-            return _proxy.GetAsync<ListResponse<Capacity>>(
+            return _proxy.GetAsync<ListResponse<Microsoft.TeamFoundation.Work.WebApi.TeamMemberCapacityIdentityRef>>(
                 $"{capacityUrl}?api-version=6.0");
         }
 

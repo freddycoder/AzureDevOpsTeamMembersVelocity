@@ -5,9 +5,6 @@ namespace AzureDevOpsTeamMembersVelocity.Model
     /// <inheritdoc cref="Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItemUpdate"/>
     public class WorkItemUpdate : Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItemUpdate, IComparable<WorkItemUpdate>
     {
-        /// <inheritdoc cref="Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItemUpdate.RevisedBy"/>
-        public new IdentityReference? RevisedBy { get; set; }
-
         /// <summary>
         /// The title of the associate WorkItem. 
         /// </summary>

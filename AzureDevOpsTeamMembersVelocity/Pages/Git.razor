@@ -98,9 +98,9 @@
 
     public GitRepository? Repository { get; set; }
 
-    public IEnumerable<GitPullRequest>? PullRequests { get; set; }
+    public IEnumerable<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest>? PullRequests { get; set; }
 
-    public GitPullRequest? PullRequest { get; set; }
+    public Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest? PullRequest { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
