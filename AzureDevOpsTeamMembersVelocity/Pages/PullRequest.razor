@@ -1,6 +1,7 @@
 ﻿@page "/PullRequest"
 @inject NavigationManager NavManager
 @inject GitService GitService
+@inject IUserPreferenceRepository UserSettings;
 
 @if (Error != null)
 {
@@ -15,19 +16,33 @@
     </div>
 </div>
 
-@if (PullRequestModel != null)
+@if (PullRequestModel != null && Comments != null)
 {
-    <div class="row border">
-        <pre class="text">
-            @AzureDevOpsTeamMembersVelocity.Extensions.JsonExtension.FormatJson(JsonSerializer.Serialize(PullRequestModel, Program.SerializerOptions))
-        </pre>
-    </div>
+    foreach (var item in Comments)
+    {
+        <MudCard>
+            <MudCardContent>
+                @foreach (var comment in item.Comments)
+                {
+                    <MudText>@comment.Author.DisplayName</MudText>
+                    <MudText>@comment.Content</MudText>
+                }
+            </MudCardContent>
+        </MudCard>
+    }
+
+    if (Comments.Count == 0)
+    {
+        <p>There is no comments in this PR yet.</p>
+    }
 }
 
 @code {
+    public string? Error { get; set; }
+
     public Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest? PullRequestModel { get; set; }
 
-    public string? Error { get; set; }
+    public List<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequestCommentThread>? Comments { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -38,6 +53,25 @@
             var (pr, error) = await GitService.GetPullRequest(pullRequestUrl);
 
             PullRequestModel = pr;
+            Error = error;
+
+            if (pr != null)
+            {
+                await GetComments(pr);
+            }
+        }
+    }
+
+    private async Task GetComments(Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest pr)
+    {
+        var settings = await UserSettings.GetAsync<TeamMembersVelocitySettings>();
+
+        if (settings.Organisation != null)
+        {
+            var (comments, error) = await GitService.GetComments(
+                                settings.Organisation, pr.Repository.Id, pr.PullRequestId);
+
+            Comments = comments?.Value;
             Error = error;
         }
     }

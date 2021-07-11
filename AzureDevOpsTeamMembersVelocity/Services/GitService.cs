@@ -1,5 +1,6 @@
 ﻿using AzureDevOpsTeamMembersVelocity.Model;
 using AzureDevOpsTeamMembersVelocity.Proxy;
+using System;
 using System.Threading.Tasks;
 
 namespace AzureDevOpsTeamMembersVelocity.Services
@@ -58,6 +59,19 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         public Task<(Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest?, string?)> GetPullRequest(string pullRequestUrl)
         {
             return _proxy.GetAsync<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest?>($"{pullRequestUrl}?api-version=6.0");
+        }
+
+        /// <summary>
+        /// Fetch all comments of a pull request
+        /// </summary>
+        /// <param name="organization"></param>
+        /// <param name="repositoryId"></param>
+        /// <param name="pullRequestId"></param>
+        /// <returns></returns>
+        public Task<(ListResponse<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequestCommentThread>?, string?)> GetComments(string organization, Guid repositoryId, int? pullRequestId)
+        {
+            return _proxy.GetAsync<ListResponse<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequestCommentThread>>(
+$"https://dev.azure.com/{organization}/_apis/git/repositories/{repositoryId}/pullRequests/{pullRequestId}/threads?api-version=6.0");
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using UnitTest.AutoData;
 using Xunit;
+using static UnitTest.Constante;
 
 namespace UnitTest
 {
@@ -10,9 +11,6 @@ namespace UnitTest
         [Theory, AutoVelocityData]
         public async Task ListReleases(ReleasesService sut)
         {
-            const string organization = "fabrikam";
-            const string teamProject = "MyFirstProject";
-
             var (releasesList, errorMessage) = await sut.ListReleases(organization, teamProject);
 
             Assert.Null(errorMessage);

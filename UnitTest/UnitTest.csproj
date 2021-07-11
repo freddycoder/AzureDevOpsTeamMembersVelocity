@@ -27,6 +27,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="JsonExample\pullrequest22.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="JsonExample\pullrequestthreadcomment.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="JsonExample\releaseslist1.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

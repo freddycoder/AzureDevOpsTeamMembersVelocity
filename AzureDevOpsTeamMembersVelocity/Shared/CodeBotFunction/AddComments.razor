@@ -1,0 +1,72 @@
+﻿@using AutoCode
+@inject ILogger<AddComments> Logger
+
+<div class="row border mb-5">
+    <div class="input-group col-4">
+        <label class="col-form-label">Choose a file : </label>
+        <InputFile OnChange="LoadFiles"></InputFile>
+    </div>
+    <div class="input-group col-8">
+        <label class="col-form-label">Comment template : </label>
+        <textarea class="input-group-text textarea-small" @bind="Template"></textarea>
+    </div>
+</div>
+
+<div class="row">
+    <textarea class="input-group-text textarea-big" @bind="Code"></textarea>
+</div>
+
+@code {
+    public string? Code { get; set; }
+
+    public string Template
+    {
+        get => Comment.CommentTemplate;
+        set
+        {
+            Comment.CommentTemplate = value;
+        }
+    }
+
+    public string? Error { get; set; }
+
+    private Comment Comment { get; set; } = new Comment();
+
+    private List<IBrowserFile> loadedFiles = new();
+    private long maxFileSize = 1024 * 30;
+    private int maxAllowedFiles = 1;
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        loadedFiles.Clear();
+
+        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        {
+            try
+            {
+                loadedFiles.Add(file);
+
+                using var sr = new StreamReader(file.OpenReadStream(maxFileSize));
+
+                var code = await sr.ReadToEndAsync();
+
+                try
+                {
+                    Code = Comment.Apply(code);
+                }
+                catch (Exception exception)
+                {
+                    Code = exception.Message;
+                }
+
+                Error = default;
+            }
+            catch (Exception ex)
+            {
+                Error = ex.Message;
+
+                Logger.LogError("File: {Filename} Error: {Error}", file.Name, ex.Message);
+            }
+        }
+    }
+}

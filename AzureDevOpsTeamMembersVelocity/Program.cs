@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AzureDevOpsTeamMembersVelocity.Serialization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
@@ -46,6 +47,8 @@ namespace AzureDevOpsTeamMembersVelocity
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 WriteIndented = true
             };
+
+            settings.Converters.Add(new PropertyCollectionConverter());
 
             settings.Converters.Add(new JsonSubjectDescriptorConverter());
 

@@ -69,41 +69,46 @@ else
         </div>
 
         <div class="col-md-6">
-            <button class="btn btn-secondary float-md-right mr-3" @onclick="RefreshVelocity">Refresh</button>
+            <MudButton class="float-md-right mr-3"
+                       Variant="Variant.Filled"
+                       Color="Color.Tertiary"
+                       @onclick="RefreshVelocity">Refresh</MudButton>
         </div>
     </div>
 
-    <table class="table table-striped table-hover table-responsive-md">
-            <thead>
-                <tr>
-                    <th>Person</th>
-                    <th>Hours of work done</th>
-                    <th>Hours added</th>
-                    <th>Hours removed</th>
-                    <th>Estimated Capacity</th>
-                    <th>Real capacity</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var velocity in MembersVelocities.OrderByDescending(v => v.HoursOfWorkDone))
-                {
-                    var updates = velocity.Updates;
+    <MudSimpleTable Style="overflow-x: auto;">
+        <thead>
+            <tr>
+                <th>Person</th>
+                <th>Hours of work done</th>
+                <th>Hours added</th>
+                <th>Hours removed</th>
+                <th>Estimated Capacity</th>
+                <th>Real capacity</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var velocity in MembersVelocities.OrderByDescending(v => v.HoursOfWorkDone))
+            {
+                var updates = velocity.Updates;
 
-                    <tr>
-                        <td>@velocity.DisplayName</td>
-                        <td>@velocity.HoursOfWorkDone.ToString("F2")</td>
-                        <td>@velocity.HoursAdded.ToString("F2")</td>
-                        <td>@velocity.HoursRemoved.ToString("F2")</td>
-                        <td>@velocity.CapacitySaved.ToString("F2")</td>
-                        <td>@velocity.RealCapacity.ToString("F2")</td>
-                        <td>
-                            <button class="btn btn-primary" @onclick="() => ShowUpdates(updates)">Show history</button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                <tr>
+                    <td>@velocity.DisplayName</td>
+                    <td>@velocity.HoursOfWorkDone.ToString("F2")</td>
+                    <td>@velocity.HoursAdded.ToString("F2")</td>
+                    <td>@velocity.HoursRemoved.ToString("F2")</td>
+                    <td>@velocity.CapacitySaved.ToString("F2")</td>
+                    <td>@velocity.RealCapacity.ToString("F2")</td>
+                    <td>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   @onclick="() => ShowUpdates(updates)">Show history</MudButton>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </MudSimpleTable>
 }
 else
 {
