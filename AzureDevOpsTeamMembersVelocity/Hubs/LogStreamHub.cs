@@ -23,7 +23,7 @@ namespace AzureDevOpsTeamMembersVelocity.Hubs
     [Authorize]
     public class LogStreamHub : Hub
     {
-        private readonly Kubernetes _kubernetesClient;
+        private readonly IKubernetes _kubernetesClient;
         private readonly ILogger<LogStreamHub> _logger;
         private readonly IConfiguration _config;
 
@@ -33,7 +33,7 @@ namespace AzureDevOpsTeamMembersVelocity.Hubs
         /// <param name="kubernetesClient"></param>
         /// <param name="logger">Logger</param>
         /// <param name="configuration">Interface to access configuration</param>
-        public LogStreamHub(Kubernetes kubernetesClient, 
+        public LogStreamHub(IKubernetes kubernetesClient, 
                             ILogger<LogStreamHub> logger,
                             IConfiguration configuration)
         {

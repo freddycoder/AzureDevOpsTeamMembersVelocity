@@ -74,36 +74,36 @@ else
     </div>
 
     <table class="table table-striped table-hover table-responsive-md">
-        <thead>
-            <tr>
-                <th>Person</th>
-                <th>Hours of work done</th>
-                <th>Hours added</th>
-                <th>Hours removed</th>
-                <th>Estimated Capacity</th>
-                <th>Real capacity</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var velocity in MembersVelocities.OrderByDescending(v => v.HoursOfWorkDone))
-            {
-                var updates = velocity.Updates;
-
+            <thead>
                 <tr>
-                    <td>@velocity.DisplayName</td>
-                    <td>@velocity.HoursOfWorkDone.ToString("F2")</td>
-                    <td>@velocity.HoursAdded.ToString("F2")</td>
-                    <td>@velocity.HoursRemoved.ToString("F2")</td>
-                    <td>@velocity.CapacitySaved.ToString("F2")</td>
-                    <td>@velocity.RealCapacity.ToString("F2")</td>
-                    <td>
-                        <button class="btn btn-primary" @onclick="() => ShowUpdates(updates)">Show history</button>
-                    </td>
+                    <th>Person</th>
+                    <th>Hours of work done</th>
+                    <th>Hours added</th>
+                    <th>Hours removed</th>
+                    <th>Estimated Capacity</th>
+                    <th>Real capacity</th>
+                    <th></th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var velocity in MembersVelocities.OrderByDescending(v => v.HoursOfWorkDone))
+                {
+                    var updates = velocity.Updates;
+
+                    <tr>
+                        <td>@velocity.DisplayName</td>
+                        <td>@velocity.HoursOfWorkDone.ToString("F2")</td>
+                        <td>@velocity.HoursAdded.ToString("F2")</td>
+                        <td>@velocity.HoursRemoved.ToString("F2")</td>
+                        <td>@velocity.CapacitySaved.ToString("F2")</td>
+                        <td>@velocity.RealCapacity.ToString("F2")</td>
+                        <td>
+                            <button class="btn btn-primary" @onclick="() => ShowUpdates(updates)">Show history</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
 }
 else
 {

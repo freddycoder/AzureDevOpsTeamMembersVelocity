@@ -22,6 +22,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
+using MudBlazor.Services;
 using static System.Environment;
 
 namespace AzureDevOpsTeamMembersVelocity
@@ -67,6 +68,7 @@ namespace AzureDevOpsTeamMembersVelocity
             }
             services.AddServerSideBlazor();
             services.AddBlazoredModal();
+            services.AddMudServices();
 
             services.AddTeamMemberVelocityAutorisation(Configuration);
 

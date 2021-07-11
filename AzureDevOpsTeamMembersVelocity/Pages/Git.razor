@@ -25,65 +25,37 @@
             <ValidationSummary />
             <div class="form-group">
                 <div class="form-row">
-                    <div class="form-group col-md-4">
-                        <label for="inputTeamProject">Repository</label>
-                        <InputSelect ValueExpression="() => GitSettings.Repository"
-                                     ValueChanged="async (string repositoryName) => await UpdateRepositoryAndGetPullRequests(repositoryName)"
-                                     class="form-control">
-                            <option value="">Select repository...</option>
-                            @if (Repositories != null)
-                            {
-                                @foreach (var repo in Repositories)
-                                {
-                                    if (repo.Name == GitSettings.Repository)
-                                    {
-                                        <option value="@repo.Name" selected="selected">@repo.Name</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@repo.Name">@repo.Name</option>
-                                    }
-                                }
-                            }
-                        </InputSelect>
-                    </div>
-
-                    @if (string.IsNullOrWhiteSpace(GitSettings.Repository) == false)
-                    {
-                        <div class="form-group col-md-4">
-                            <label for="inputTeamProject">Pull Request</label>
-                            <InputSelect ValueExpression="() => GitSettings.PullRequest"
-                                         ValueChanged="async (int? prId) => await GetPullRequest(prId)"
-                                         class="form-control">
-                                <option value="">Select a PR...</option>
-                                @if (PullRequests != null)
-                                {
-                                    @foreach (var pr in PullRequests)
-                                    {
-                                        if (pr.PullRequestId == GitSettings.PullRequest)
-                                        {
-                                            <option value="@pr.PullRequestId" selected="selected">@pr.Title</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@pr.PullRequestId">@pr.Title</option>
-                                        }
-                                    }
-                                }
-                            </InputSelect>
-                        </div>
-                    }
-                </div>
-                <div class="form-row">
-                    <input name="__RequestVerificationToken" type="hidden" value="@TokenProvider.XsrfToken">
-                    <button class="btn btn-secondary mb-3">Search</button>
+                    <MultiSelectList Label="Repository"
+                                     HelperText="Select one or many repositories"
+                                     Values="Repositories"
+                                     SelectedValues="SelectedRepositories"
+                                     PropertySelectedName="Name"
+                                     PropertySelectedTitle="Name"
+                                     OnSelectedValueChanged="async (set) => await UpdateRepositoryAndGetPullRequests(set)" />
                 </div>
             </div>
         </EditForm>
     }
 </div>
 
-<PullRequest PullRequestModel="PullRequest" />
+<MudTable Items="@PullRequests" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>Title</MudTh>
+        <MudTh>Author</MudTh>
+        <MudTh>Creation date</MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Nr">@context.PullRequestId</MudTd>
+        <MudTd DataLabel="Sign">@context.Title</MudTd>
+        <MudTd DataLabel="Name">@context.CreatedBy.DisplayName</MudTd>
+        <MudTd DataLabel="Creation date">@context.CreationDate</MudTd>
+        <MudTh>
+            <a class="btn btn-primary" href="/PullRequest?pullrequest=@context.Url">PR</a>
+        </MudTh>
+    </RowTemplate>
+</MudTable>
 
 @code {
     public string? Error { get; set; }
@@ -92,20 +64,35 @@
 
     public GitPageSettings GitSettings { get; set; } = new GitPageSettings();
 
+    public HashSet<string>? SelectedRepositories { get; set; }
+
     public EditContext? EditContext { get; set; }
 
     public IEnumerable<GitRepository>? Repositories { get; set; }
 
     public GitRepository? Repository { get; set; }
 
-    public IEnumerable<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest>? PullRequests { get; set; }
+    public List<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest>? PullRequests { get; set; }
 
     public Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest? PullRequest { get; set; }
+
+    private bool _loading;
 
     protected override async Task OnInitializedAsync()
     {
         Settings = await UserPreference.GetAsync<TeamMembersVelocitySettings>();
         GitSettings = await UserPreference.GetAsync<GitPageSettings>();
+
+        SelectedRepositories = GitSettings.SelectedRepositories?.ToHashSet() ?? new HashSet<string>();
+
+        // This property is obselete and must not be used anymore. It is used here 
+        // to allow better transition to te new mechanisme. User will keep there
+        // previous setting and after the first use there settings file are going
+        // to use the collection of repostiory intead of the single repository.
+        if (GitSettings.Repository != null && GitSettings.SelectedRepositories == null)
+        {
+            SelectedRepositories.Add(GitSettings.Repository);
+        }
 
         EditContext = new EditContext(GitSettings);
 
@@ -116,23 +103,35 @@
             Repositories = repositories?.Value?.OrderBy(r => r.Name);
             Error = error;
 
-            await GetPullRequests();
+            await UpdateRepositoryAndGetPullRequests(
+                GitSettings?.SelectedRepositories?.ToHashSet() ?? new HashSet<string>());
         }
     }
 
-    public async Task UpdateRepositoryAndGetPullRequests(string repositoryName)
+    public async Task UpdateRepositoryAndGetPullRequests(HashSet<string> repositoriesNames)
     {
-        GitSettings.Repository = repositoryName;
+        SelectedRepositories = repositoriesNames;
 
-        await GetPullRequests();
+        GitSettings.SelectedRepositories = repositoriesNames;
+
+        PullRequests?.Clear();
+
+        if (PullRequests == null)
+        {
+            PullRequests = new List<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest>();
+        }
+
+        foreach (var repo in GitSettings.SelectedRepositories)
+        {
+            await GetPullRequests(repo);
+        }
     }
 
-    public async Task GetPullRequests()
+    public async Task GetPullRequests(string repoName)
     {
-        var selectedRepository = Repositories?.FirstOrDefault(r => r.Name == GitSettings.Repository);
+        var selectedRepository = Repositories?.FirstOrDefault(r => r.Name == repoName);
 
-        if (selectedRepository != null &&
-            string.IsNullOrWhiteSpace(GitSettings.Repository) == false)
+        if (selectedRepository != null)
         {
             // Fetch full information of the repository
             var (repository, error) = (await GitService.GetRepository(selectedRepository.Url));
@@ -144,30 +143,18 @@
             {
                 var (pullRequests, errorPr) = (await GitService.GetPullRequests(Repository.Links.PullRequests.Href));
 
-                PullRequests = pullRequests?.Value;
-                Error = errorPr;
-
-                if (GitSettings.PullRequest != null)
+                if (pullRequests?.Value?.Any() == true)
                 {
-                    await GetPullRequest(GitSettings.PullRequest);
+                    if (PullRequests == null)
+                    {
+                        PullRequests = new List<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest>();
+                    }
+
+                    PullRequests.AddRange(pullRequests.Value);
                 }
+
+                Error = errorPr;
             }
-
-            StateHasChanged();
-        }
-    }
-
-    public async Task GetPullRequest(int? idPR)
-    {
-        var selectedPR = PullRequests?.FirstOrDefault(pr => pr.PullRequestId == idPR);
-
-        if (selectedPR != null && idPR != default)
-        {
-            var (fullPR, error) = (await GitService.GetPullRequest(selectedPR.Url));
-
-            PullRequest = fullPR;
-            GitSettings.PullRequest = fullPR?.PullRequestId;
-            Error = error;
 
             StateHasChanged();
         }

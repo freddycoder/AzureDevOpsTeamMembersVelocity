@@ -4,30 +4,59 @@
 
 <h3>Releases</h3>
 
-<ul>
-    @if (ReleasesList != null)
-    {
-        foreach (var release in ReleasesList)
-        {
-            <li>@release.Name</li>
-        }
+<div class="row">
+    <div class="col-3">
+        <h4>Releases definition</h4>
+        <ul class="list-group">
+            @if (DefinitionList != null)
+            {
+                foreach (var defintion in DefinitionList)
+                {
+                    <li class="list-group-item">@defintion.Name</li>
+                }
 
-        if (ReleasesList.Count == 0)
-        {
-            <li>You don't have any release yet</li>
-        }
-    }
-</ul>
+                if (DefinitionList.Count == 0)
+                {
+                    <li class="list-group-item list-group-item-info">You don't have any definition yet</li>
+                }
+            }
+        </ul>
+    </div>
+
+    <div class="col-3">
+        <h4>Releases list</h4>
+        <ul class="list-group">
+            @if (ReleasesList != null)
+            {
+                foreach (var release in ReleasesList)
+                {
+                    <li class="list-group-item">@release.Name</li>
+                }
+
+                if (ReleasesList.Count == 0)
+                {
+                    <li class="list-group-item list-group-item-info">You don't have any release yet</li>
+                }
+            }
+        </ul>
+    </div>
+</div>
 
 
 @code {
     List<Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.Release>? ReleasesList { get; set; }
+
+    List<Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.ReleaseDefinition>? DefinitionList { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         var settings = await UserPreference.GetAsync<TeamMembersVelocitySettings>();
 
         if (settings.Organisation != null && settings.TeamProject != null)
+        {
+            DefinitionList = (await ReleasesService.ListDefinition(settings.Organisation, settings.TeamProject)).Item1?.Value;
+
             ReleasesList = (await ReleasesService.ListReleases(settings.Organisation, settings.TeamProject)).Item1?.Value;
+        }
     }
 }

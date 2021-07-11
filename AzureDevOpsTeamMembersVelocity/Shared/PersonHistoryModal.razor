@@ -1,34 +1,23 @@
 ﻿@if (Updates != null)
 {
-    <div class="container">
-        <div class="row">
-            <table class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th>Task title</th>
-                        <th>Field update</th>
-                        <th>Remaning work</th>
-                        <th>Revised date</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var update in Updates.OrderBy(u => u))
-                    {
-                        <tr>
-                            <td>@update.RelatedTaskTitle</td>
-                            <td>@Print(update.Fields?.MaybeGet("System.State"))</td>
-                            <td>@Print(update.Fields?.MaybeGet("Microsoft.VSTS.Scheduling.RemainingWork"))</td>
-                            <td>@update.RevisedDate</td>
-                            <td>
-                                <button @onclick="() => ShowJson(update.Url)">json</button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <MudTable Items="@Updates" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
+        <HeaderContent>
+            <MudTh>Task title</MudTh>
+            <MudTh>Field update</MudTh>
+            <MudTh>Remaining work</MudTh>
+            <MudTh>Revised date</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.RelatedTaskTitle</MudTd>
+            <MudTd>@Print(context.Fields?.MaybeGet("System.State"))</MudTd>
+            <MudTd>@Print(context.Fields?.MaybeGet("Microsoft.VSTS.Scheduling.RemainingWork"))</MudTd>
+            <MudTd>@context.RevisedDate</MudTd>
+            <MudTh>
+                <button @onclick="() => ShowJson(context.Url)">json</button>
+            </MudTh>
+        </RowTemplate>
+    </MudTable>
 }
 
 @code {
@@ -36,10 +25,24 @@
     public IModalService? Modal { get; set; }
 
     [CascadingParameter]
-    BlazoredModalInstance? ModalInstance { get; set; }
+    public BlazoredModalInstance? ModalInstance { get; set; }
+
+    private IEnumerable<WorkItemUpdate>? _updates;
 
     [Parameter]
-    public List<WorkItemUpdate>? Updates { get; set; }
+    public IEnumerable<WorkItemUpdate>? Updates
+    {
+        get
+        {
+            return _updates?.OrderBy(u => u);
+        }
+        set
+        {
+            _updates = value;
+        }
+    }
+
+    private bool _loading;
 
     public string? Print(object? obj)
     {

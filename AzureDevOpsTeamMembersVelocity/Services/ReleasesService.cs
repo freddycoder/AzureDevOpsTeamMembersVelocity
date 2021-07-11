@@ -1,4 +1,5 @@
 ﻿using AzureDevOpsTeamMembersVelocity.Proxy;
+using Microsoft.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace AzureDevOpsTeamMembersVelocity.Services
@@ -32,6 +33,12 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         {
             return _proxy.GetAsync<ListResponse<Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.Release>>(
 $"https://vsrm.dev.azure.com/{organization}/{teamProject}/_apis/release/releases?api-version=6.0");
+        }
+
+        public Task<(ListResponse<Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.ReleaseDefinition>?, string?)> ListDefinition(string organization, string teamProject)
+        {
+            return _proxy.GetAsync<ListResponse<Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.ReleaseDefinition>>(
+$"https://vsrm.dev.azure.com/{organization}/{teamProject}/_apis/release/definitions?api-version=6.0");
         }
     }
 }

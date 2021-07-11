@@ -1,0 +1,82 @@
+﻿@typeparam TValue
+
+<MudGrid>
+    <MudItem xs="12" md="12">
+        <MudSelect T="string" 
+                   Label="@Label" 
+                   HelperText="@HelperText" 
+                   MultiSelection="true" 
+                   @bind-Value="value" 
+                   SelectedValues="SelectedValues"
+                   SelectedValuesChanged="OnSelectedValueChanged">
+            @foreach (var value in Values ?? Array.Empty<TValue>())
+            {
+                <MudSelectItem T="string" Value="@(PropertyNameInfo?.GetValue(value) as string)">@PropertyTitleInfo?.GetValue(value)</MudSelectItem>
+            }
+        </MudSelect>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private string? value { get; set; }
+
+    [Parameter]
+    public HashSet<string?>? SelectedValues { get; set; }
+
+    [Parameter]
+    public IEnumerable<TValue>? Values { get; set; }
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public string? HelperText { get; set; }
+
+    [Parameter]
+    public string? PropertySelectedName
+    {
+        get
+        {
+            return PropertyNameInfo?.Name;
+        }
+        set
+        {
+            if (value != null)
+            {
+                PropertyNameInfo = typeof(TValue).GetProperty(value);
+            }
+            else
+            {
+                PropertyNameInfo = null;
+            }
+        }
+    }
+
+    private System.Reflection.PropertyInfo? PropertyNameInfo { get; set; }
+
+    [Parameter]
+    public string? PropertySelectedTitle
+    {
+        get
+        {
+            return PropertyTitleInfo?.Name;
+        }
+        set
+        {
+            if (value != null)
+            {
+                PropertyTitleInfo = typeof(TValue).GetProperty(value);
+            }
+            else
+            {
+                PropertyTitleInfo = null;
+            }
+        }
+    }
+
+    private System.Reflection.PropertyInfo? PropertyTitleInfo { get; set; }
+
+    [Parameter]
+    public Action<HashSet<string?>> OnSelectedValueChanged { get; set; } = (set) => { };
+}
+

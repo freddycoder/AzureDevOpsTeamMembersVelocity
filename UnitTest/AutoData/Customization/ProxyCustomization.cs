@@ -29,7 +29,7 @@ namespace UnitTest.AutoData.Customization
             fixture.Register<IDevOpsProxy>(() => fixture.Create<DevOpsProxy>());
         }
 
-        private static HttpClient mockHttpClient = GetMockHttpMessageHandler_WithExampleMapped();
+        private static readonly HttpClient mockHttpClient = GetMockHttpMessageHandler_WithExampleMapped();
 
         private static HttpClient GetMockHttpMessageHandler_WithExampleMapped()
         {
