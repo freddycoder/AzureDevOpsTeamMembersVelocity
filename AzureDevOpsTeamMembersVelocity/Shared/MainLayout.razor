@@ -2,32 +2,32 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject AuthUrlPagesProvider AuthUrlProvider
 
-<div class="page">
-    <div class="sidebar">
+<MudLayout>
+    <MudAppBar Dense="true">
+        <AuthorizeView>
+            <Authorized>
+                @if (AuthUrlProvider.IsIdentity)
+                {
+                    <a href="/identity/account/manage">Welcome @context?.User?.Identity?.Name</a>
+                }
+                else
+                {
+                    <span>Welcome @context?.User?.Identity?.Name</span>
+                }
+            </Authorized>
+        </AuthorizeView>
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="@_drawerOpen">
         <NavMenu />
-    </div>
+    </MudDrawer>
 
-    <div class="main">
-        <div class="top-row px-4">
-            <AuthorizeView>
-                <Authorized>
-                    @if (AuthUrlProvider.IsIdentity)
-                    {
-                        <a href="/identity/account/manage">Welcome @context?.User?.Identity?.Name</a>
-                    }
-                    else
-                    {
-                        <span>Welcome @context?.User?.Identity?.Name</span>
-                    }
-                </Authorized>
-            </AuthorizeView>
-        </div>
-
-        <div class="content px-4">
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large">
             @Body
-        </div>
-    </div>
-</div>
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
 
 @code {
     public ClaimsPrincipal? ClaimsPrincipal { get; set; }
@@ -37,5 +37,12 @@
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
 
         ClaimsPrincipal = authState.User;
+    }
+
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
     }
 }

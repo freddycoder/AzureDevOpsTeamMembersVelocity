@@ -49,7 +49,7 @@ a, .btn-link {
         top: 0.5rem;
     }
 
-.blazored-modal {
+.mud-dialog {
     overflow: auto !important;
     max-height: calc(100% - 3.5rem) !important;
 }

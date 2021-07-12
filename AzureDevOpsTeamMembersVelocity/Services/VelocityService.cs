@@ -39,7 +39,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// <param name="teamSettings">Team settings is use to enhance result and do the right calculation</param>
         /// <param name="useCache">Indicate if the value can be get from memory or the results is calculated</param>
         /// <returns></returns>
-        public async IAsyncEnumerable<MemberVelocity> MemberVelocities(string sprintUrl, List<Capacity>? capacities = null, Sprint? sprint = null, Microsoft.TeamFoundation.Work.WebApi.TeamSettingsDaysOff? teamDaysOff = null, Microsoft.TeamFoundation.Work.WebApi.TeamSetting? teamSettings = null, bool useCache = true)
+        public async IAsyncEnumerable<MemberVelocity> MemberVelocities(string sprintUrl, List<Microsoft.TeamFoundation.Work.WebApi.TeamMemberCapacityIdentityRef>? capacities = null, Sprint? sprint = null, Microsoft.TeamFoundation.Work.WebApi.TeamSettingsDaysOff? teamDaysOff = null, Microsoft.TeamFoundation.Work.WebApi.TeamSetting? teamSettings = null, bool useCache = true)
         {
             if (useCache && _repo.TryGet(sprintUrl, out IEnumerable<MemberVelocity>? memberVelocities) && memberVelocities != null)
             {
@@ -69,7 +69,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             }
         }
 
-        private static MemberVelocity EnhanceMemberVolocityInfo(MemberVelocity velocity, List<Capacity>? capacities = null, Sprint? sprint = null, Microsoft.TeamFoundation.Work.WebApi.TeamSettingsDaysOff? teamDaysOff = null, Microsoft.TeamFoundation.Work.WebApi.TeamSetting? teamSettings = null)
+        private static MemberVelocity EnhanceMemberVolocityInfo(MemberVelocity velocity, List<Microsoft.TeamFoundation.Work.WebApi.TeamMemberCapacityIdentityRef>? capacities = null, Sprint? sprint = null, Microsoft.TeamFoundation.Work.WebApi.TeamSettingsDaysOff? teamDaysOff = null, Microsoft.TeamFoundation.Work.WebApi.TeamSetting? teamSettings = null)
         {
             if (capacities != default)
             {

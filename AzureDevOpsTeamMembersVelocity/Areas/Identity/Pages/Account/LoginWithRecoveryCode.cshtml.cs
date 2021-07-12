@@ -27,11 +27,17 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
             _logger = logger;
         }
 
+        /// <summary>
+        /// The input model of the login with recovery code page
+        /// </summary>
         [BindProperty]
-        public InputModel? Input { get; set; }
+        public InputModel Input { get; set; } = new InputModel();
 
         public string? ReturnUrl { get; set; }
 
+        /// <summary>
+        ///  The input model class of the login with recovery code page
+        /// </summary>
         public class InputModel
         {
             [BindProperty]

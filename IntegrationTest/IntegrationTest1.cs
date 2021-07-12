@@ -1,26 +1,29 @@
-using Microsoft.AspNetCore.Mvc.Testing;
+using AzureDevOpsTeamMembersVelocity;
+using IntegrationTest.ApplicationFactory;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace IntegrationTest
 {
-    public class BasicTests
-    : IClassFixture<WebApplicationFactory<AzureDevOpsTeamMembersVelocity.Startup>>
+    public class BasicTests : IClassFixture<TeamVelocityWebAppFactory<Startup>>
     {
-        private readonly WebApplicationFactory<AzureDevOpsTeamMembersVelocity.Startup> _factory;
+        private readonly TeamVelocityWebAppFactory<Startup> _factory;
 
-        public BasicTests(WebApplicationFactory<AzureDevOpsTeamMembersVelocity.Startup> factory)
+        public BasicTests(TeamVelocityWebAppFactory<Startup> factory)
         {
             _factory = factory;
         }
 
         [Theory]
         [InlineData("/")]
-        [InlineData("/Git")]
         [InlineData("/SprintAnalysis")]
+        [InlineData("/Git")]
+        [InlineData("/PullRequest")]
         [InlineData("/CodeBot")]
+        [InlineData("/Releases")]
         [InlineData("/Nuget")]
         [InlineData("/Kubernetes")]
+        [InlineData("/NonExistingPage")]
         public async Task Get_EndpointsReturnSuccessAndCorrectContentType(string url)
         {
             // Arrange

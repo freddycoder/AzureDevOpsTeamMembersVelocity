@@ -1,7 +1,7 @@
 ﻿@page "/Kubernetes"
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Http
-@inject k8s.Kubernetes Client
+@inject k8s.IKubernetes Client
 @inject NavigationManager NavigationManager
 @inject ILogger<KubernetesDashboard> Logger
 @inject IJSRuntime JS

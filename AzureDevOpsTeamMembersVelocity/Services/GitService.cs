@@ -1,6 +1,6 @@
 ﻿using AzureDevOpsTeamMembersVelocity.Model;
 using AzureDevOpsTeamMembersVelocity.Proxy;
-using AzureDevOpsTeamMembersVelocity.Repository;
+using System;
 using System.Threading.Tasks;
 
 namespace AzureDevOpsTeamMembersVelocity.Services
@@ -11,30 +11,24 @@ namespace AzureDevOpsTeamMembersVelocity.Services
     public class GitService
     {
         private readonly IDevOpsProxy _proxy;
-        private readonly IUserPreferenceRepository _settings;
 
         /// <summary>
         /// Constructor with dependencies
         /// </summary>
         /// <param name="proxy">The proxy to call the azure devops API</param>
-        /// <param name="settings">Settings of the app to access Organization name and TeamProject name</param>
-        public GitService(IDevOpsProxy proxy, IUserPreferenceRepository settings)
+        public GitService(IDevOpsProxy proxy)
         {
             _proxy = proxy;
-            _settings = settings;
         }
 
         /// <summary>
         /// List all repository of the current selected Organisation and TeamProject
         /// </summary>
         /// <returns>A task that list Repositories</returns>
-        public async Task<(ListResponse<GitRepository>?, string?)> GetRepositories()
+        public Task<(ListResponse<GitRepository>?, string?)> GetRepositories(string organization, string teamProject)
         {
-            var settings = await _settings.GetAsync<TeamMembersVelocitySettings>();
-
-            var url = $"https://dev.azure.com/{settings.Organisation}/{settings.TeamProject}/_apis/git/repositories?api-version=6.0";
-
-            return await _proxy.GetAsync<ListResponse<GitRepository>>(url);
+            return _proxy.GetAsync<ListResponse<GitRepository>>(
+    $"https://dev.azure.com/{organization}/{teamProject}/_apis/git/repositories?api-version=6.0");
         }
 
         /// <summary>
@@ -52,9 +46,9 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// </summary>
         /// <param name="pullRequestUrl">The pull request url from a GitRepositoryUrl</param>
         /// <returns>A task that list pull requests</returns>
-        public Task<(ListResponse<GitPullRequest>?,string?)> GetPullRequests(string pullRequestUrl)
+        public Task<(ListResponse<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest>?,string?)> GetPullRequests(string pullRequestUrl)
         {
-            return _proxy.GetAsync<ListResponse<GitPullRequest>>($"{pullRequestUrl}?api-version=6.0");
+            return _proxy.GetAsync<ListResponse<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest>>($"{pullRequestUrl}?api-version=6.0");
         }
 
         /// <summary>
@@ -62,9 +56,22 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// </summary>
         /// <param name="pullRequestUrl">The pull request url</param>
         /// <returns>A PR and an error if any</returns>
-        public Task<(GitPullRequest?, string?)> GetPullRequest(string pullRequestUrl)
+        public Task<(Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest?, string?)> GetPullRequest(string pullRequestUrl)
         {
-            return _proxy.GetAsync<GitPullRequest?>($"{pullRequestUrl}?api-version=6.0");
+            return _proxy.GetAsync<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest?>($"{pullRequestUrl}?api-version=6.0");
+        }
+
+        /// <summary>
+        /// Fetch all comments of a pull request
+        /// </summary>
+        /// <param name="organization"></param>
+        /// <param name="repositoryId"></param>
+        /// <param name="pullRequestId"></param>
+        /// <returns></returns>
+        public Task<(ListResponse<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequestCommentThread>?, string?)> GetComments(string organization, Guid repositoryId, int? pullRequestId)
+        {
+            return _proxy.GetAsync<ListResponse<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequestCommentThread>>(
+$"https://dev.azure.com/{organization}/_apis/git/repositories/{repositoryId}/pullRequests/{pullRequestId}/threads?api-version=6.0");
         }
     }
 }

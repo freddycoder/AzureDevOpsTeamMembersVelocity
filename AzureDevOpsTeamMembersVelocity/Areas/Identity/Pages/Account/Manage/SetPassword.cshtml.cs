@@ -28,12 +28,18 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
         }
 
+        /// <summary>
+        /// The input model of the set password page
+        /// </summary>
         [BindProperty]
-        public InputModel? Input { get; set; }
+        public InputModel Input { get; set; } = new InputModel();
 
         [TempData]
         public string? StatusMessage { get; set; }
 
+        /// <summary>
+        /// The input model class of the set password page
+        /// </summary>
         public class InputModel
         {
             [Required]

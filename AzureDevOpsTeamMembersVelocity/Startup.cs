@@ -4,7 +4,6 @@ using AzureDevOpsTeamMembersVelocity.Hubs;
 using AzureDevOpsTeamMembersVelocity.Proxy;
 using AzureDevOpsTeamMembersVelocity.Repository;
 using AzureDevOpsTeamMembersVelocity.Services;
-using Blazored.Modal;
 using k8s;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -21,8 +20,8 @@ using Microsoft.Identity.Web.UI;
 using System;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Headers;
+using MudBlazor.Services;
 using static System.Environment;
 
 namespace AzureDevOpsTeamMembersVelocity
@@ -67,7 +66,7 @@ namespace AzureDevOpsTeamMembersVelocity
                 }).AddMicrosoftIdentityUI();
             }
             services.AddServerSideBlazor();
-            services.AddBlazoredModal();
+            services.AddMudServices();
 
             services.AddTeamMemberVelocityAutorisation(Configuration);
 
@@ -89,10 +88,11 @@ namespace AzureDevOpsTeamMembersVelocity
             services.AddScoped<DevOpsService>();
             services.AddScoped<VelocityService>();
             services.AddScoped<GitService>();
+            services.AddScoped<ReleasesService>();
             services.AddScoped<NugetService>();
             services.AddSingleton<IVelocityRepository, VelocityRepository>();
 
-            services.AddSingleton(sp =>
+            services.AddSingleton<IKubernetes>(sp =>
             {
                 if (KubernetesClientConfiguration.IsInCluster())
                 {
