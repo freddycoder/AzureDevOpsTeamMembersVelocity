@@ -28,9 +28,15 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
             _userManager = userManager;
         }
 
+        /// <summary>
+        /// The input model of the reset password page
+        /// </summary>
         [BindProperty]
-        public InputModel? Input { get; set; }
+        public InputModel Input { get; set; } = new InputModel();
 
+        /// <summary>
+        /// The input model class of the reset password page
+        /// </summary>
         public class InputModel
         {
             [Required]

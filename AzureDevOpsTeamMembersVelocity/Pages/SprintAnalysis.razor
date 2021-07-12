@@ -2,6 +2,7 @@
 @inject NavigationManager NavManager
 @inject VelocityService VelocityService
 @inject DevOpsService DevOpsService
+@inject IDialogService DialogService
 @attribute [Authorize]
 
 @if (Error != null)
@@ -120,9 +121,6 @@ else
 @code {
     public string? Error { get; set; }
 
-    [CascadingParameter]
-    public IModalService? Modal { get; set; }
-
     public Sprint? Sprint { get; set; }
 
     public List<Microsoft.TeamFoundation.Work.WebApi.TeamMemberCapacityIdentityRef>? Capacities { get; set; }
@@ -177,11 +175,14 @@ else
 
     private void ShowUpdates(List<WorkItemUpdate> updates)
     {
-        var parameters = new ModalParameters();
+        var parameters = new DialogParameters();
 
         parameters.Add("Updates", updates);
 
-        Modal?.Show<PersonHistoryModal>("Update history", parameters);
+        DialogService.Show<PersonHistoryModal>("Update history", parameters, new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium
+        });
     }
 
     private void SaveVelocity()

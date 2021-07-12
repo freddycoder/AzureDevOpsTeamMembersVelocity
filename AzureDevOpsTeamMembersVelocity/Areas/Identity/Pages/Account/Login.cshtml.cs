@@ -33,8 +33,11 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
             _logger = logger;
         }
 
+        /// <summary>
+        /// The input model of the login page
+        /// </summary>
         [BindProperty]
-        public InputModel? Input { get; set; }
+        public InputModel Input { get; set; } = new InputModel();
 
         public IList<AuthenticationScheme>? ExternalLogins { get; set; }
 
@@ -43,6 +46,9 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
         [TempData]
         public string? ErrorMessage { get; set; }
 
+        /// <summary>
+        /// The input model class of the login page
+        /// </summary>
         public class InputModel
         {
             [Required]

@@ -3,6 +3,7 @@
 @inject NugetService NugetService
 @inject IUserPreferenceRepository UserPreference
 @inject TokenProvider TokenProvider
+@inject IDialogService DialogService
 @attribute [Authorize]
 
 @if (Error != null)
@@ -212,15 +213,15 @@
         await UserPreference.SetAsync(NugetSettings);
     }
 
-    [CascadingParameter]
-    public IModalService? Modal { get; set; }
-
     public void ShowJson(Model.Nuget nuget)
     {
-        var parameters = new ModalParameters();
+        var parameters = new DialogParameters();
 
         parameters.Add("Json", JsonSerializer.Serialize(nuget, Program.SerializerOptions));
 
-        Modal?.Show<JsonModal>("Json view", parameters);
+        DialogService.Show<JsonModal>("Json view", parameters, new DialogOptions
+        {
+            MaxWidth = MaxWidth.ExtraLarge
+        });
     }
 }

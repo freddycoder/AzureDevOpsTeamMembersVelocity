@@ -11,7 +11,7 @@ namespace AzureDevOpsTeamMembersVelocity.Settings
         /// <summary>
         /// Name of the repository
         /// </summary>
-        [Obsolete]
+        [Obsolete("Use the SelectedRepositories property for future devloppement")]
         public string? Repository 
         {
             get => _repository;

@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <PackageReference Include="AutoCode" Version="1.0.1" />
-    <PackageReference Include="Blazored.Modal" Version="6.0.1" />
     <PackageReference Include="KubernetesClient" Version="5.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.7" />

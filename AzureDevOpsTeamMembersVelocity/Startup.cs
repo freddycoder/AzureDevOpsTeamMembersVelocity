@@ -4,7 +4,6 @@ using AzureDevOpsTeamMembersVelocity.Hubs;
 using AzureDevOpsTeamMembersVelocity.Proxy;
 using AzureDevOpsTeamMembersVelocity.Repository;
 using AzureDevOpsTeamMembersVelocity.Services;
-using Blazored.Modal;
 using k8s;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -67,7 +66,6 @@ namespace AzureDevOpsTeamMembersVelocity
                 }).AddMicrosoftIdentityUI();
             }
             services.AddServerSideBlazor();
-            services.AddBlazoredModal();
             services.AddMudServices();
 
             services.AddTeamMemberVelocityAutorisation(Configuration);

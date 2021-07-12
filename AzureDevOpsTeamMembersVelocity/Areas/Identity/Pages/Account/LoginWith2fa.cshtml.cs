@@ -29,13 +29,19 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
             _logger = logger;
         }
 
+        /// <summary>
+        /// The input model of the login with 2fa page
+        /// </summary>
         [BindProperty]
-        public InputModel? Input { get; set; }
+        public InputModel Input { get; set; } = new InputModel();
 
         public bool RememberMe { get; set; }
 
         public string? ReturnUrl { get; set; }
 
+        /// <summary>
+        /// The input model class of the login with 2fa page
+        /// </summary>
         public class InputModel
         {
             [Required]

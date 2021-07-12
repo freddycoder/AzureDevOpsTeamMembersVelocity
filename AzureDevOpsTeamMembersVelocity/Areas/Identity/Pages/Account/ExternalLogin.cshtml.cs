@@ -39,8 +39,11 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
             _emailSender = emailSender;
         }
 
+        /// <summary>
+        /// The input model of the external login page
+        /// </summary>
         [BindProperty]
-        public InputModel? Input { get; set; }
+        public InputModel Input { get; set; } = new InputModel();
 
         public string? ProviderDisplayName { get; set; }
 

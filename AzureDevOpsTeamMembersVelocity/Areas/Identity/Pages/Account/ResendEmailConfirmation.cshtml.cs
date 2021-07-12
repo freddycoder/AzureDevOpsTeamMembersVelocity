@@ -31,9 +31,15 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
             _emailSender = emailSender;
         }
 
+        /// <summary>
+        /// The input model of the resend email confirmation page
+        /// </summary>
         [BindProperty]
-        public InputModel? Input { get; set; }
+        public InputModel Input { get; set; } = new InputModel();
 
+        /// <summary>
+        /// The input model class of the resend email confirmation page
+        /// </summary>
         public class InputModel
         {
             [Required]

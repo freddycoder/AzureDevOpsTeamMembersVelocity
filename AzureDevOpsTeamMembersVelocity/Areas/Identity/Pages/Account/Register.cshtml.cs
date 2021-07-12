@@ -46,11 +46,20 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
             _emailSender = emailSender;
         }
 
+        /// <summary>
+        /// The input model of the register page
+        /// </summary>
         [BindProperty]
-        public InputModel? Input { get; set; }
+        public InputModel Input { get; set; } = new InputModel();
 
+        /// <summary>
+        /// The return url to redirect of register process
+        /// </summary>
         public string? ReturnUrl { get; set; }
 
+        /// <summary>
+        /// List of external login available
+        /// </summary>
         public IList<AuthenticationScheme>? ExternalLogins { get; set; }
 
         /// <summary>

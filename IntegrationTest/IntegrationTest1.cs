@@ -18,6 +18,7 @@ namespace IntegrationTest
         [InlineData("/")]
         [InlineData("/SprintAnalysis")]
         [InlineData("/Git")]
+        [InlineData("/PullRequest")]
         [InlineData("/CodeBot")]
         [InlineData("/Releases")]
         [InlineData("/Nuget")]

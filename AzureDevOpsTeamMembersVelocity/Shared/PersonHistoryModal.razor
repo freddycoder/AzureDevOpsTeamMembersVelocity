@@ -1,4 +1,6 @@
-﻿@if (Updates != null)
+﻿@inject IDialogService DialogService
+
+@if (Updates != null)
 {
     <MudTable Items="@Updates" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
         <HeaderContent>
@@ -21,12 +23,6 @@
 }
 
 @code {
-    [CascadingParameter]
-    public IModalService? Modal { get; set; }
-
-    [CascadingParameter]
-    public BlazoredModalInstance? ModalInstance { get; set; }
-
     private IEnumerable<WorkItemUpdate>? _updates;
 
     [Parameter]
@@ -56,10 +52,13 @@
 
     public void ShowJson(string url)
     {
-        var parameters = new ModalParameters();
+        var parameters = new DialogParameters();
 
         parameters.Add("Url", url);
 
-        Modal?.Show<JsonModal>("Json view", parameters);
+        DialogService.Show<JsonModal>("Json view", parameters, new DialogOptions
+        {
+            MaxWidth = MaxWidth.ExtraLarge
+        });
     }
 }
