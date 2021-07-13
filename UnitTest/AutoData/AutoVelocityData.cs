@@ -1,9 +1,7 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using AutoFixture.Xunit2;
-using AzureDevOpsTeamMembersVelocity.Proxy;
 using AzureDevOpsTeamMembersVelocity.Repository;
-using NSubstitute;
 using System;
 using System.IO.Abstractions;
 using UnitTest.AutoData.Customization;
