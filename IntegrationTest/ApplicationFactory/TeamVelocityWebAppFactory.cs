@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 using System.Linq;
 
 namespace IntegrationTest.ApplicationFactory
@@ -23,7 +24,7 @@ namespace IntegrationTest.ApplicationFactory
 
                 services.Remove(descriptor);
 
-                services.AddSingleton(NSubstitute.Substitute.For<IKubernetes>());
+                services.AddSingleton(Substitute.For<IKubernetes>());
             });
         }
     }

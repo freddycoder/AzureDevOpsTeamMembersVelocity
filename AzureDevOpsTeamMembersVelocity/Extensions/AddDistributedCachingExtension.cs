@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -16,10 +17,11 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
         /// implementation is register.
         /// </summary>
         /// <param name="services"></param>
+        /// <param name="configuration"></param>
         /// <returns></returns>
-        public static IServiceCollection AddDistributedCaching(this IServiceCollection services)
+        public static IServiceCollection AddDistributedCaching(this IServiceCollection services, IConfiguration configuration)
         {
-            var redisHostname = Environment.GetEnvironmentVariable("REDIS_HOSTNAME");
+            var redisHostname = configuration.GetValue<string>("REDIS_HOSTNAME");
 
             if (string.IsNullOrWhiteSpace(redisHostname))
             {

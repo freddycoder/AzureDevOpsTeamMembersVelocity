@@ -52,10 +52,10 @@ namespace AzureDevOpsTeamMembersVelocity
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTeamVelocityForwardedHeaders();
+            services.AddTeamVelocityForwardedHeaders(Configuration);
 
             var mvcBuilder = services.AddRazorPages();
-            if (AddAuthentificationExtension.IsAzureADAuth())
+            if (AddAuthentificationExtension.IsAzureADAuth(Configuration))
             {
                 mvcBuilder.AddMvcOptions(options =>
                 {
@@ -79,7 +79,7 @@ namespace AzureDevOpsTeamMembersVelocity
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             });
 
-            services.AddDistributedCaching();
+            services.AddDistributedCaching(Configuration);
 
             services.AddSession();
 
@@ -114,8 +114,8 @@ namespace AzureDevOpsTeamMembersVelocity
         /// </summary>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider, ILogger<Startup> logger)
         {
-            if ((! string.Equals(GetEnvironmentVariable("USE_STARTUP_MIGRATION"), bool.FalseString, StringComparison.OrdinalIgnoreCase)) &&
-                   string.Equals(GetEnvironmentVariable("USE_IDENTITY"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
+            if ((! string.Equals(("USE_STARTUP_MIGRATION"), bool.FalseString, StringComparison.OrdinalIgnoreCase)) &&
+                   string.Equals(("USE_IDENTITY"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
             {
                 try
                 {
@@ -137,13 +137,13 @@ namespace AzureDevOpsTeamMembersVelocity
             {
                 app.UseDeveloperExceptionPage();
 
-                app.UseTeamMembersVelocityForwardedHeadersRules(logger);
+                app.UseTeamMembersVelocityForwardedHeadersRules(logger, Configuration);
             }
             else
             {
                 app.UseExceptionHandler("/Error");
 
-                app.UseTeamMembersVelocityForwardedHeadersRules(logger);
+                app.UseTeamMembersVelocityForwardedHeadersRules(logger, Configuration);
 
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
@@ -151,8 +151,8 @@ namespace AzureDevOpsTeamMembersVelocity
 
             app.Use(async (context, next) =>
             {
-                context.Response.Headers.Add("X-Frame-Options", GetEnvironmentVariable("X-FRAME-OPTIONS") ?? "DENY");
-                context.Response.Headers.Add("X-Content-Type-Options", GetEnvironmentVariable("X-Content-Type-Options") ?? "nosniff");
+                context.Response.Headers.Add("X-Frame-Options", ("X-FRAME-OPTIONS") ?? "DENY");
+                context.Response.Headers.Add("X-Content-Type-Options", ("X-Content-Type-Options") ?? "nosniff");
                 await next();
             });
 

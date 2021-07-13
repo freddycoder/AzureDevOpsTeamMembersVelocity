@@ -7,25 +7,53 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
 
 namespace AzureDevOpsTeamMembersVelocity.Pages
 {
+    /// <summary>
+    /// The Login model page used when the app is in environment variable user mode
+    /// </summary>
     public class LoginModel : PageModel
     {
+        private readonly IConfiguration _configuration;
+        
+        /// <summary>
+        /// Constructor with dependencies
+        /// </summary>
+        /// <param name="configuration"></param>
+        public LoginModel(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        /// <summary>
+        /// The Email enter by the user in the form
+        /// </summary>
         [BindProperty]
         [Required]
         [EmailAddress]
         public string? Email { get; set; }
 
+        /// <summary>
+        /// The password enter by the user in the form
+        /// </summary>
         [BindProperty]
         [DataType(DataType.Password)]
         public string? Password { get; set; }
 
+        /// <summary>
+        /// Append on get
+        /// </summary>
         public void OnGet()
         {
 
         }
 
+        /// <summary>
+        /// Append on post
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> OnPostAsync()
         {
             if (Email == null)
@@ -35,8 +63,11 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
                 return Page();
             }
 
-            if (!(Email == Environment.GetEnvironmentVariable("COOKIEAUTH_USER") &&
-                  Password == Environment.GetEnvironmentVariable("COOKIEAUTH_PASSWORD")))
+            var user = _configuration.GetValue<string>("COOKIEAUTH_USER");
+            var password = _configuration.GetValue<string>("COOKIEAUTH_PASSWORD");
+
+            if (!(Email == user &&
+                  Password == password))
             {
                 ModelState.AddModelError("", "Wrong username or password");
 

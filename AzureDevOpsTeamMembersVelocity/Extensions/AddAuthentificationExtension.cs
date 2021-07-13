@@ -9,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Web;
 using System;
 using System.IO.Abstractions;
-using static System.Environment;
 
 namespace AzureDevOpsTeamMembersVelocity.Extensions
 {
@@ -30,12 +29,12 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
         /// <exception cref="InvalidProgramException" />
         public static IServiceCollection AddTeamMemberVelocityAutorisation(this IServiceCollection services, IConfiguration configuration)
         {
-            if (OnlyOneAuthMethodIsUsed() == false)
+            if (!OnlyOneAuthMethodIsUsed(configuration))
             {
                 throw new InvalidProgramException("You cannot use cookie user and identity at the same time. See the github wiki for more information.");
             }
 
-            if (IsCookieAuth())
+            if (IsCookieAuth(configuration))
             {
                 services.AddSingleton(new AuthUrlPagesProvider(CookieAuthenticationDefaults.AuthenticationScheme));
 
@@ -46,7 +45,7 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
                 services.AddSingleton<IFile>(sp => sp.GetRequiredService<FileSystem>().File);
                 services.AddSingleton<IUserPreferenceRepository, UserPreferenceFromFileSystemRepository>();
             }
-            else if (IsIdentityAuth())
+            else if (IsIdentityAuth(configuration))
             {
                 services.AddSingleton(new AuthUrlPagesProvider("Identity.Application"));
 
@@ -55,35 +54,39 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
 
                 services.AddScoped<IUserPreferenceRepository, UserPreferenceFromCacheRepository>();
             }
-            else if (IsAzureADAuth())
+            else if (IsAzureADAuth(configuration))
             {
                 services.AddSingleton(new AuthUrlPagesProvider("AzureAD"));
 
                 // Support for kubernetes
                 // Colon is not allow in environement variable name
-                if (string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD:ClientId")) && string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD__ClientId")) == false)
+                if (string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD:ClientId")) && 
+                    !string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD__ClientId")))
                 {
-                    configuration["AzureAD:ClientId"] = GetEnvironmentVariable("AzureAD__ClientId");
+                    configuration["AzureAD:ClientId"] = configuration.GetValue<string>("AzureAD__ClientId");
                 }
 
-                if (string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD:TenantId")) && string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD__TenantId")) == false)
+                if (string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD:TenantId")) && 
+                    !string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD__TenantId")))
                 {
-                    configuration["AzureAD:TenantId"] = GetEnvironmentVariable("AzureAD__TenantId");
+                    configuration["AzureAD:TenantId"] = configuration.GetValue<string>("AzureAD__TenantId");
                 }
 
-                if (string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD:CallbackPath")) && string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD__CallbackPath")) == false)
+                if (string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD:CallbackPath")) && 
+                    !string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD__CallbackPath")))
                 {
-                    configuration["AzureAD:CallbackPath"] = GetEnvironmentVariable("AzureAD__CallbackPath");
+                    configuration["AzureAD:CallbackPath"] = configuration.GetValue<string>("AzureAD__CallbackPath");
                 }
 
-                if (string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD:SignedOutCallbackPath")) && string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD__SignedOutCallbackPath")) == false)
+                if (string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD:SignedOutCallbackPath")) && !string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD__SignedOutCallbackPath")))
                 {
-                    configuration["AzureAD:SignedOutCallbackPath"] = GetEnvironmentVariable("AzureAD__SignedOutCallbackPath");
+                    configuration["AzureAD:SignedOutCallbackPath"] = configuration.GetValue<string>("AzureAD__SignedOutCallbackPath");
                 }
 
-                if (string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD:Instance")) && string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD__Instance")) == false)
+                if (string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD:Instance")) && 
+                    !string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD__Instance")))
                 {
-                    configuration["AzureAD:Instance"] = GetEnvironmentVariable("AzureAD__Instance");
+                    configuration["AzureAD:Instance"] = configuration.GetValue<string>("AzureAD__Instance");
                 }
 
                 services.AddMicrosoftIdentityWebAppAuthentication(configuration);
@@ -111,15 +114,15 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
         /// Method use to validate the configuration of the app. Only one method should be identify.
         /// </summary>
         /// <returns></returns>
-        public static bool OnlyOneAuthMethodIsUsed()
+        public static bool OnlyOneAuthMethodIsUsed(IConfiguration configuration)
         {
             int count = 0;
 
-            if (IsCookieAuth()) count++;
+            if (IsCookieAuth(configuration)) count++;
 
-            if (IsIdentityAuth()) count++;
+            if (IsIdentityAuth(configuration)) count++;
 
-            if (IsAzureADAuth()) count++;
+            if (IsAzureADAuth(configuration)) count++;
 
             return count <= 1;
         }
@@ -128,10 +131,10 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
         /// Indicate if the AzureAD authentication mecanism is configure
         /// </summary>
         /// <returns></returns>
-        public static bool IsAzureADAuth()
+        public static bool IsAzureADAuth(IConfiguration configuration)
         {
-            if (string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD:TenantId")) &&
-                string.IsNullOrWhiteSpace(GetEnvironmentVariable("AzureAD__TenantId")))
+            if (string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD:TenantId")) &&
+                string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD__TenantId")))
             {
                 return false;
             }
@@ -143,18 +146,18 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
         /// Indicate if the self-hosted Identity authentication mecanism is configure
         /// </summary>
         /// <returns></returns>
-        public static bool IsIdentityAuth()
+        public static bool IsIdentityAuth(IConfiguration configuration)
         {
-            return string.Equals(GetEnvironmentVariable("USE_IDENTITY"), bool.TrueString, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(configuration.GetValue<string>("USE_IDENTITY"), bool.TrueString, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
         /// Indicate if the environment user cookie authentication mecanism is configure
         /// </summary>
         /// <returns></returns>
-        public static bool IsCookieAuth()
+        public static bool IsCookieAuth(IConfiguration configuration)
         {
-            return string.IsNullOrWhiteSpace(GetEnvironmentVariable("COOKIEAUTH_USER")) == false;
+            return !string.IsNullOrWhiteSpace(configuration.GetValue<string>("COOKIEAUTH_USER"));
         }
     }
 }

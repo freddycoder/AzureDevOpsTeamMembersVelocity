@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
-using static System.Environment;
 
 namespace AzureDevOpsTeamMembersVelocity.Extensions
 {
@@ -13,15 +13,21 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
     /// </summary>
     public static class UseForwardedHeadersExtension
     {
-        public static IServiceCollection AddTeamVelocityForwardedHeaders(this IServiceCollection services)
+        /// <summary>
+        /// Add forwarded headers services necessary when using the app behind a reverse proxy
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddTeamVelocityForwardedHeaders(this IServiceCollection services, IConfiguration configuration)
         {
-            if (string.Equals(GetEnvironmentVariable("Forwarded_headers"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(configuration.GetValue<string>("Forwarded_headers"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
             {
                 services.Configure<ForwardedHeadersOptions>(options =>
                 {
                     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 
-                    foreach (var network in GetEnvironmentVariable("KNOW_NETWORKS")?.Split(';') ?? Array.Empty<string>())
+                    foreach (var network in configuration.GetValue<string>("KNOW_NETWORKS")?.Split(';') ?? Array.Empty<string>())
                     {
                         var ipInfo = network.Split("/");
 
@@ -33,15 +39,22 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
             return services;
         }
 
-        public static IApplicationBuilder UseTeamMembersVelocityForwardedHeadersRules(this IApplicationBuilder app, ILogger<Startup> logger)
+        /// <summary>
+        /// Add forwarded headers middleware necessary when using the app behind a reverse proxy
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="logger"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        public static IApplicationBuilder UseTeamMembersVelocityForwardedHeadersRules(this IApplicationBuilder app, ILogger<Startup> logger, IConfiguration configuration)
         {
-            if (string.Equals(GetEnvironmentVariable("Forwarded_headers"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(configuration.GetValue<string>("Forwarded_headers"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
             {
                 app.UseForwardedHeaders();
 
-                DebugHeaders(app, logger);
+                DebugHeaders(app, logger, configuration);
                 
-                if (string.Equals(GetEnvironmentVariable("USE_SCHEMA_FROM_PROXY"), bool.TrueString, StringComparison.CurrentCultureIgnoreCase))
+                if (string.Equals(configuration.GetValue<string>("USE_SCHEMA_FROM_PROXY"), bool.TrueString, StringComparison.CurrentCultureIgnoreCase))
                 {
                     app.Use(async (context, next) =>
                     {
@@ -58,9 +71,9 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
             return app;
         }
 
-        private static void DebugHeaders(IApplicationBuilder app, ILogger<Startup> logger)
+        private static void DebugHeaders(IApplicationBuilder app, ILogger<Startup> logger, IConfiguration configuration)
         {
-            if (string.Equals(GetEnvironmentVariable("Debug_headers"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(configuration.GetValue<string>("Debug_headers"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
             {
                 app.Use(async (context, next) =>
                 {
