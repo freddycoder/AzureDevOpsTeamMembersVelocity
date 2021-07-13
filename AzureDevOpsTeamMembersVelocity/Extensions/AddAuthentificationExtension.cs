@@ -29,7 +29,7 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
         /// <exception cref="InvalidProgramException" />
         public static IServiceCollection AddTeamMemberVelocityAutorisation(this IServiceCollection services, IConfiguration configuration)
         {
-            if (OnlyOneAuthMethodIsUsed(configuration) == false)
+            if (!OnlyOneAuthMethodIsUsed(configuration))
             {
                 throw new InvalidProgramException("You cannot use cookie user and identity at the same time. See the github wiki for more information.");
             }
@@ -60,27 +60,31 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
 
                 // Support for kubernetes
                 // Colon is not allow in environement variable name
-                if (string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD:ClientId")) && string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD__ClientId")) == false)
+                if (string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD:ClientId")) && 
+                    !string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD__ClientId")))
                 {
                     configuration["AzureAD:ClientId"] = configuration.GetValue<string>("AzureAD__ClientId");
                 }
 
-                if (string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD:TenantId")) && string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD__TenantId")) == false)
+                if (string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD:TenantId")) && 
+                    !string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD__TenantId")))
                 {
                     configuration["AzureAD:TenantId"] = configuration.GetValue<string>("AzureAD__TenantId");
                 }
 
-                if (string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD:CallbackPath")) && string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD__CallbackPath")) == false)
+                if (string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD:CallbackPath")) && 
+                    !string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD__CallbackPath")))
                 {
                     configuration["AzureAD:CallbackPath"] = configuration.GetValue<string>("AzureAD__CallbackPath");
                 }
 
-                if (string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD:SignedOutCallbackPath")) && string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD__SignedOutCallbackPath")) == false)
+                if (string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD:SignedOutCallbackPath")) && !string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD__SignedOutCallbackPath")))
                 {
                     configuration["AzureAD:SignedOutCallbackPath"] = configuration.GetValue<string>("AzureAD__SignedOutCallbackPath");
                 }
 
-                if (string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD:Instance")) && string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD__Instance")) == false)
+                if (string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD:Instance")) && 
+                    !string.IsNullOrWhiteSpace(configuration.GetValue<string>("AzureAD__Instance")))
                 {
                     configuration["AzureAD:Instance"] = configuration.GetValue<string>("AzureAD__Instance");
                 }
@@ -153,7 +157,7 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
         /// <returns></returns>
         public static bool IsCookieAuth(IConfiguration configuration)
         {
-            return string.IsNullOrWhiteSpace(configuration.GetValue<string>("COOKIEAUTH_USER")) == false;
+            return !string.IsNullOrWhiteSpace(configuration.GetValue<string>("COOKIEAUTH_USER"));
         }
     }
 }

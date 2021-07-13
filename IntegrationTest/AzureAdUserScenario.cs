@@ -30,9 +30,10 @@ namespace IntegrationTest
 
             var loginRedirect = await client.GetAsync("/");
 
-            Assert.Equal(HttpStatusCode.InternalServerError, loginRedirect.StatusCode);
+            // TODO, complete the arrangement in the AzureADTeamVelocityWebAppFactory
             //Assert.Equal(HttpStatusCode.Redirect, loginRedirect.StatusCode);
-            // https://joonasw.net/view/testing-azure-ad-protected-apis-part-3-automated-integration-tests
+
+            Assert.Equal(HttpStatusCode.InternalServerError, loginRedirect.StatusCode);
         }
     }
 }
