@@ -129,32 +129,25 @@
 
     public async Task GetPullRequests(string repoName)
     {
-        var selectedRepository = Repositories?.FirstOrDefault(r => r.Name == repoName);
+        Repository = Repositories?.FirstOrDefault(r => r.Name == repoName);
 
-        if (selectedRepository != null)
+        if (Repository?.Url != null && Settings.Organisation != null)
         {
-            // Fetch full information of the repository
-            var (repository, error) = (await GitService.GetRepository(selectedRepository.Url));
+            var (pullRequests, errorPr) = (await GitService.GetPullRequests(Settings.Organisation,
+                                                                            ExtractTeamProjectId(Repository.Url),
+                                                                            Repository.Id));
 
-            Repository = repository;
-            Error = error;
-
-            if (Repository?.Links?.PullRequests?.Href != null)
+            if (pullRequests?.Value?.Any() == true)
             {
-                var (pullRequests, errorPr) = (await GitService.GetPullRequests(Repository.Links.PullRequests.Href));
-
-                if (pullRequests?.Value?.Any() == true)
+                if (PullRequests == null)
                 {
-                    if (PullRequests == null)
-                    {
-                        PullRequests = new List<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest>();
-                    }
-
-                    PullRequests.AddRange(pullRequests.Value);
+                    PullRequests = new List<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest>();
                 }
 
-                Error = errorPr;
+                PullRequests.AddRange(pullRequests.Value);
             }
+
+            Error = errorPr;
 
             StateHasChanged();
         }
@@ -164,5 +157,13 @@
     {
         await base.OnAfterRenderAsync(firstRender);
         await UserPreference.SetAsync(GitSettings);
+    }
+
+    private Guid ExtractTeamProjectId(string gitPullRequestUrl)
+    {
+        const int guidLength = 36;
+        string baseUrl = $"https://dev.azure.com/{Settings.Organisation}/";
+
+        return Guid.Parse(gitPullRequestUrl.Substring(baseUrl.Length, guidLength));
     }
 }
