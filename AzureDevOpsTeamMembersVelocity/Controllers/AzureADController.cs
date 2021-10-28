@@ -1,6 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace AzureDevOpsTeamMembersVelocity.Controllers
 {
@@ -22,7 +30,9 @@ namespace AzureDevOpsTeamMembersVelocity.Controllers
                 RedirectUri = returnUrl
             };
 
-            return await Task.Run(() => Challenge(props));
+            var result = await Task.Run(() => Challenge(props));
+
+            return result;
         }
     }
 }

@@ -6,7 +6,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
 
-        "COOKIEAUTH_USER": "admin@teamvelocity.com",
+        //"COOKIEAUTH_USER": "admin@teamvelocity.com",
         //"COOKIEAUTH_PASSWORD": "admin",
 
         //"USE_IDENTITY": "true",
@@ -16,10 +16,10 @@
         // - "organizations" to sign in users in any work or school account
         // - "common" to sign in users with any work or school account or Microsoft personal account
         // - "consumers" to sign in users with a Microsoft personal account only
-        //"AzureAD:TenantId": "<your-tenantid>",
+        "AzureAD:TenantId": "c383c74f-8edf-4f51-9bf3-c2bc352996bd",
 
         // Client ID (application ID) obtained from the Azure portal
-        //"AzureAD:ClientId": "<your-clientId>",
+        "AzureAD:ClientId": "90d698ca-c372-46c2-b8e7-dd40187fa403",
 
         // Cache response of the Azure DevOps REST API for reuse
         // If the value is not set, a default cache a 1 seconds is apply

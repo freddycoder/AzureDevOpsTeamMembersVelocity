@@ -22,7 +22,8 @@ using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
 using MudBlazor.Services;
-using static System.Environment;
+using AzureDevOpsTeamMembersVelocity.Authorization;
+using Microsoft.Identity.Web;
 
 namespace AzureDevOpsTeamMembersVelocity
 {
@@ -65,7 +66,11 @@ namespace AzureDevOpsTeamMembersVelocity
                     options.Filters.Add(new AuthorizeFilter(policy));
                 }).AddMicrosoftIdentityUI();
             }
-            services.AddServerSideBlazor();
+            var circuitOptions = services.AddServerSideBlazor();
+            if (AddAuthentificationExtension.IsAzureADAuth(Configuration))
+            {
+                circuitOptions.AddMicrosoftIdentityConsentHandler();
+            }
             services.AddMudServices();
 
             services.AddTeamMemberVelocityAutorisation(Configuration);
@@ -114,8 +119,8 @@ namespace AzureDevOpsTeamMembersVelocity
         /// </summary>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider, ILogger<Startup> logger)
         {
-            if ((! string.Equals(("USE_STARTUP_MIGRATION"), bool.FalseString, StringComparison.OrdinalIgnoreCase)) &&
-                   string.Equals(("USE_IDENTITY"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
+            if ((! string.Equals(Configuration.GetValue<string>("USE_STARTUP_MIGRATION"), bool.FalseString, StringComparison.OrdinalIgnoreCase)) &&
+                   string.Equals(Configuration.GetValue<string>("USE_IDENTITY"), bool.TrueString, StringComparison.OrdinalIgnoreCase))
             {
                 try
                 {

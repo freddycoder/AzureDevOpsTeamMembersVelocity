@@ -6,6 +6,28 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using ComposableAsync;
 using AzureDevOpsTeamMembersVelocity.Repository;
+using Microsoft.Identity.Client;
+using System.Linq;
+using AzureDevOpsTeamMembersVelocity.Authorization;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http.Headers;
+using System.Text;
+using Microsoft.AspNetCore.Components.Authorization;
+
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Identity.Web;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using static System.Net.WebRequestMethods;
+using Org.BouncyCastle.Asn1.Crmf;
+using System.Runtime;
+using static System.Net.Mime.MediaTypeNames;
+using System.Text.Encodings.Web;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace AzureDevOpsTeamMembersVelocity.Proxy
 {
@@ -18,6 +40,8 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
         private static readonly TimeLimiter TimeConstrainte = TimeLimiter.GetFromMaxCountByInterval(29, TimeSpan.FromSeconds(1));
         private readonly IUserPreferenceRepository _appSettings;
         private readonly ILogger<DevOpsProxy> _logger;
+        private readonly IConfiguration _config;
+        private readonly IServiceProvider _serviceProvider;
         private readonly HttpClient _client;
 
         /// <summary>
@@ -26,10 +50,16 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
         /// <param name="client">HttpClient to used</param>
         /// <param name="appSettings">App settings, to acces AuthenticationHeader</param>
         /// <param name="logger">Logger to log information and critical error</param>
-        public DevOpsProxy(IHttpClientFactory client, IUserPreferenceRepository appSettings, ILogger<DevOpsProxy> logger)
+        public DevOpsProxy(IHttpClientFactory client, 
+            IUserPreferenceRepository appSettings, 
+            IConfiguration config,
+            IServiceProvider serviceProvider,
+            ILogger<DevOpsProxy> logger)
         {
             _appSettings = appSettings;
             _logger = logger;
+            _config = config;
+            _serviceProvider = serviceProvider;
             _client = client.CreateClient(nameof(DevOpsProxy));
         }
 
@@ -97,15 +127,68 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
                 throw new InvalidOperationException("DevOpsProxy fullUrl must not contains any '\\n'");
             }
 
-            var settings = await _appSettings.GetAsync<TeamMembersVelocitySettings>();
+            if (!AddAuthentificationExtension.IsAzureADAuth(_config))
+            {
+                TeamMembersVelocitySettings settings = await _appSettings.GetAsync<TeamMembersVelocitySettings>();
 
-            _client.DefaultRequestHeaders.Authorization = settings.AuthenticationHeader;
+                _client.DefaultRequestHeaders.Authorization = settings.AuthenticationHeader;
+            }
+            else
+            {
+                var cache = _serviceProvider.GetRequiredService<IDistributedCache>();
+                var userInfo = _serviceProvider.GetRequiredService<AuthenticationStateProvider>();
+
+                var authState = await userInfo.GetAuthenticationStateAsync();
+
+                var userId = authState.User.Claims.First(c => c.Type == "http://schemas.microsoft.com/identity/claims/objectidentifier" || 
+                                                              c.Type == "uid");
+
+                var key = $"{userId.Value}.{_config["AzureAD:TenantId"]}";
+
+                var token = await cache.GetStringAsync(key);
+
+                var tokenProvider = _serviceProvider.GetRequiredService<ITokenAcquisition>();
+
+                try 
+                {
+                    var tokens = await tokenProvider.GetAccessTokenForUserAsync(new[]
+                    {
+                        "https://app.vssps.visualstudio.com/user_impersonation",
+                        "https://app.vssps.visualstudio.com/vso.work"
+                    });
+
+                    _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokens);
+                }
+                catch (Exception e)
+                {
+                    var handler = _serviceProvider.GetRequiredService<MicrosoftIdentityConsentAndConditionalAccessHandler>();
+
+                    handler.HandleException(e);
+
+                    var tokens = await tokenProvider.GetAccessTokenForUserAsync(new[]
+                    {
+                        "https://app.vssps.visualstudio.com/user_impersonation",
+                        "https://app.vssps.visualstudio.com/vso.work"
+                    });
+
+                    _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokens);
+                }
+            }
 
             await TimeConstrainte;
 
             var response = await _client.GetAsync(fullUrl);
 
             response.EnsureSuccessStatusCode();
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NonAuthoritativeInformation)
+            {
+                var exception = new UnauthorizedAccessException("203: Authentication failed when calling the Azure DevOps REST API");
+
+                exception.Data.Add("HttpResponse", await response.Content.ReadAsStringAsync());
+
+                throw exception;
+            }
 
             return response;
         }

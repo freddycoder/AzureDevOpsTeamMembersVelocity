@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Identity.Client;
 using Microsoft.Identity.Web;
 using System;
+using System.Collections.Generic;
 using System.IO.Abstractions;
 
-namespace AzureDevOpsTeamMembersVelocity.Extensions
+namespace AzureDevOpsTeamMembersVelocity.Authorization
 {
     /// <summary>
     /// Class that handle the authorization configuration of the app.
@@ -89,8 +91,16 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
                     configuration["AzureAD:Instance"] = configuration.GetValue<string>("AzureAD__Instance");
                 }
 
-                services.AddMicrosoftIdentityWebAppAuthentication(configuration);
-
+                services.AddMicrosoftIdentityWebAppAuthentication(configuration)
+                        .EnableTokenAcquisitionToCallDownstreamApi(options =>
+                        {
+                            
+                        }, new [] 
+                        { 
+                            "https://app.vssps.visualstudio.com/user_impersonation"
+                        })
+                        .AddDistributedTokenCaches();
+                
                 services.AddScoped<IUserPreferenceRepository, UserPreferenceFromCacheRepository>();
             }
             else
