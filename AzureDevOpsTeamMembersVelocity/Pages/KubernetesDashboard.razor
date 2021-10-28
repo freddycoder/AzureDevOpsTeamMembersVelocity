@@ -6,6 +6,7 @@
 @inject ILogger<KubernetesDashboard> Logger
 @inject IJSRuntime JS
 @inject IHttpContextAccessor HttpContextAccessor
+@inject IUserPreferenceRepository UserPreference
 @attribute [Authorize]
 
 @if (Error != null)
@@ -27,7 +28,7 @@
 
 @if (NamespaceList != null)
 {
-    <div class="@NamespaceCollapseClass" id="collapseNamespace">
+    <div class="@Settings.NamespaceCollapseClass" id="collapseNamespace">
         <table class="table table-hover table-responsive">
             <caption>Table of kubernetes namespace</caption>
             <thead>
@@ -70,7 +71,7 @@
         </button>
     </div>
 
-    <div class="@DeploymentCollapseClass" id="collapseDeployment">
+    <div class="@Settings.DeploymentCollapseClass" id="collapseDeployment">
         <table class="table table-hover table-responsive">
             <caption>Table of kubernetes deployments</caption>
             <thead>
@@ -119,7 +120,7 @@
         </button>
     </div>
 
-    <div class="@PodsCollapseClass" id="collapsePods">
+    <div class="@Settings.PodsCollapseClass" id="collapsePods">
         <table class="table table-hover table-responsive">
             <caption>Table of kubernetes pods</caption>
             <thead>
@@ -188,10 +189,14 @@
 
     public string? Error { get; set; }
 
+    public KubernetesPageSettings Settings { get; set; } = new KubernetesPageSettings();
+
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            Settings = await UserPreference.GetAsync<KubernetesPageSettings>();
+
             NamespaceList = await Client.ListNamespaceAsync();
 
             StateHasChanged();
@@ -353,25 +358,21 @@
         }
     }
 
-    public string? NamespaceCollapseClass { get; set; }
-
-    public string? DeploymentCollapseClass { get; set; }
-
-    public string? PodsCollapseClass { get; set; }
-
     public void Collapsing(string collapseId)
     {
         if (collapseId == "collapseNamespace")
         {
-            NamespaceCollapseClass = string.IsNullOrEmpty(NamespaceCollapseClass) ? "collapse" : "";
+            Settings.NamespaceCollapseClass = string.IsNullOrEmpty(Settings.NamespaceCollapseClass) ? "collapse" : "";
         }
         else if (collapseId == "collapseDeployment")
         {
-            DeploymentCollapseClass = string.IsNullOrEmpty(DeploymentCollapseClass) ? "collapse" : "";
+            Settings.DeploymentCollapseClass = string.IsNullOrEmpty(Settings.DeploymentCollapseClass) ? "collapse" : "";
         }
         else if (collapseId == "collapsePods")
         {
-            PodsCollapseClass = string.IsNullOrEmpty(PodsCollapseClass) ? "collapse" : "";
+            Settings.PodsCollapseClass = string.IsNullOrEmpty(Settings.PodsCollapseClass) ? "collapse" : "";
         }
+
+        UserPreference.SetAsync(Settings);
     }
 }

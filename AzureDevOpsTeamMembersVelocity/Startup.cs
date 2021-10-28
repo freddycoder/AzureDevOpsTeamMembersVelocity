@@ -109,8 +109,7 @@ namespace AzureDevOpsTeamMembersVelocity
 
             services.AddResponseCompression(opts =>
             {
-                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-                    new[] { "application/octet-stream" });
+                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
             });
         }
 
@@ -126,7 +125,10 @@ namespace AzureDevOpsTeamMembersVelocity
                 {
                     var database = serviceProvider.GetRequiredService<IdentityContext>();
 
-                    database.Database.Migrate();
+                    if (database.Database.IsRelational())
+                    {
+                        database.Database.Migrate();
+                    }                    
                 }
                 catch (Exception e)
                 {

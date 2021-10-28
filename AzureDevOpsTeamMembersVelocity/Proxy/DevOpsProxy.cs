@@ -6,27 +6,13 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using ComposableAsync;
 using AzureDevOpsTeamMembersVelocity.Repository;
-using Microsoft.Identity.Client;
 using System.Linq;
 using AzureDevOpsTeamMembersVelocity.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http.Headers;
-using System.Text;
 using Microsoft.AspNetCore.Components.Authorization;
-
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Identity.Web;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using static System.Net.WebRequestMethods;
-using Org.BouncyCastle.Asn1.Crmf;
-using System.Runtime;
-using static System.Net.Mime.MediaTypeNames;
-using System.Text.Encodings.Web;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace AzureDevOpsTeamMembersVelocity.Proxy
@@ -49,6 +35,8 @@ namespace AzureDevOpsTeamMembersVelocity.Proxy
         /// </summary>
         /// <param name="client">HttpClient to used</param>
         /// <param name="appSettings">App settings, to acces AuthenticationHeader</param>
+        /// <param name="config"></param>
+        /// <param name="serviceProvider"></param>
         /// <param name="logger">Logger to log information and critical error</param>
         public DevOpsProxy(IHttpClientFactory client, 
             IUserPreferenceRepository appSettings, 
