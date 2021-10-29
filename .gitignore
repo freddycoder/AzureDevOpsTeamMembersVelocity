@@ -353,6 +353,7 @@ MigrationBackup/
 AzureDevOpsTeamMemberVelocity.json
 NugetPageSettings.json
 GitPageSettings.json
+KubernetesPageSettings.json
 
 key-*.xml
 Documentation.xml
