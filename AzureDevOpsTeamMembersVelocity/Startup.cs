@@ -23,6 +23,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using MudBlazor.Services;
 using static System.Environment;
+using AzureDevOpsTeamMembersVelocity.Mock;
 
 namespace AzureDevOpsTeamMembersVelocity
 {
@@ -94,6 +95,11 @@ namespace AzureDevOpsTeamMembersVelocity
 
             services.AddSingleton<IKubernetes>(sp =>
             {
+                if (string.Equals(Configuration["MockKubernetes"], bool.TrueString, StringComparison.OrdinalIgnoreCase))
+                {
+                    return new MockKubernetes();
+                }
+
                 if (KubernetesClientConfiguration.IsInCluster())
                 {
                     return new Kubernetes(KubernetesClientConfiguration.InClusterConfig());

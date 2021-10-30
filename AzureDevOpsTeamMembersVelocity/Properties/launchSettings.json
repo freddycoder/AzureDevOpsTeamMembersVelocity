@@ -33,6 +33,9 @@
 
         // Delay of the next check of log in the LogStreamHub
         //"DelayLogStreamEmpty": "1998"
+
+        // For developper with poor machine and low budget
+        //"MockKubernetes": "true"
       },
       "dotnetRunMessages": "true",
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
