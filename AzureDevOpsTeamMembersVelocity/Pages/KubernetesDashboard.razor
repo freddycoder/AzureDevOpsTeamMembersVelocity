@@ -40,7 +40,6 @@
                 </tr>
             </thead>
             <tbody>
-
                 @foreach (var ns in NamespaceList.Items)
                 {
                     <tr>
@@ -197,11 +196,11 @@
         {
             Settings = await UserPreference.GetAsync<KubernetesPageSettings>();
 
-            NamespaceList = await Client.ListNamespaceAsync(watch: true);
+            NamespaceList = await Client.ListNamespaceAsync();
 
             StateHasChanged();
 
-            Deployments = await Client.ListDeploymentForAllNamespacesAsync(watch: true);
+            Deployments = await Client.ListDeploymentForAllNamespacesAsync();
 
             Pods = new V1PodList();
 
@@ -209,7 +208,7 @@
 
             foreach (var ns in NamespaceList.Items)
             {
-                var podList = await Client.ListNamespacedPodAsync(ns.Metadata.Name, watch: true);
+                var podList = await Client.ListNamespacedPodAsync(ns.Metadata.Name);
 
                 foreach (var pod in podList.Items)
                 {
