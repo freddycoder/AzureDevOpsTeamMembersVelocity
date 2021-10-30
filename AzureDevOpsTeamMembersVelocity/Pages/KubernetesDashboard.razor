@@ -197,11 +197,11 @@
         {
             Settings = await UserPreference.GetAsync<KubernetesPageSettings>();
 
-            NamespaceList = await Client.ListNamespaceAsync();
+            NamespaceList = await Client.ListNamespaceAsync(watch: true);
 
             StateHasChanged();
 
-            Deployments = await Client.ListDeploymentForAllNamespacesAsync();
+            Deployments = await Client.ListDeploymentForAllNamespacesAsync(watch: true);
 
             Pods = new V1PodList();
 
@@ -209,7 +209,7 @@
 
             foreach (var ns in NamespaceList.Items)
             {
-                var podList = await Client.ListNamespacedPodAsync(ns.Metadata.Name);
+                var podList = await Client.ListNamespacedPodAsync(ns.Metadata.Name, watch: true);
 
                 foreach (var pod in podList.Items)
                 {
@@ -307,7 +307,15 @@
 
     private async Task DeleteNamespace(V1Namespace ns)
     {
-        await Client.DeleteNamespaceAsync(ns.Metadata.Name, new V1DeleteOptions());
+        try
+        {
+            await Client.DeleteNamespaceAsync(ns.Metadata.Name, new V1DeleteOptions());
+        }
+        catch (Exception e)
+        {
+            Error = e.Message;
+            Logger.LogError(e, e.Message);
+        }
 
         if (Pods == null)
         {
