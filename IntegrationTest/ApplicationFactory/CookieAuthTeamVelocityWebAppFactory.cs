@@ -1,10 +1,5 @@
-﻿using k8s;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using NSubstitute;
-using System.Linq;
 
 namespace IntegrationTest.ApplicationFactory
 {

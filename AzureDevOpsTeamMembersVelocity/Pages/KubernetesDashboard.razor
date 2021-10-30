@@ -40,7 +40,6 @@
                 </tr>
             </thead>
             <tbody>
-
                 @foreach (var ns in NamespaceList.Items)
                 {
                     <tr>
@@ -307,7 +306,15 @@
 
     private async Task DeleteNamespace(V1Namespace ns)
     {
-        await Client.DeleteNamespaceAsync(ns.Metadata.Name, new V1DeleteOptions());
+        try
+        {
+            await Client.DeleteNamespaceAsync(ns.Metadata.Name, new V1DeleteOptions());
+        }
+        catch (Exception e)
+        {
+            Error = e.Message;
+            Logger.LogError(e, e.Message);
+        }
 
         if (Pods == null)
         {
