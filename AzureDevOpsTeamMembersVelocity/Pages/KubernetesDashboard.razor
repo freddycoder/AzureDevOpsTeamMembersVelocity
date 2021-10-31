@@ -387,7 +387,8 @@
                                 case WatchEventType.Added:
                                     if (Pods.TryAdd(key, pod.Item2))
                                     {
-                                        if (DeployementCheckedForLogs.Any(d => pod.Item2.Metadata.Name.StartsWith(d)))
+                                        if (pod.Item2.Status.Phase == "Running" && 
+                                            DeployementCheckedForLogs.Any(d => pod.Item2.Metadata.Name.StartsWith(d)))
                                         {
                                             taskList.Add(ListenTopPodLogs(PodLogsTaskKey(@namespace, podName), @namespace, podName));
                                         }
@@ -433,9 +434,45 @@
 
                                         if (TokensBag.TryGetValue(taskKey, out var token))
                                         {
-                                            Logger.LogWarning("May need to do something, for now this scenario is not fully implemented");
-                                            Logger.LogWarning(WatchEventType.Modified.ToString());
-                                            Logger.LogWarning(JsonSerializer.Serialize(pod.Item2));
+                                            if (pod.Item2.Status.Phase == "Pending" ||
+                                                pod.Item2.Status.Phase == "Succeded" ||
+                                                pod.Item2.Status.Phase == "Failed")
+                                            {
+                                                token.Cancel();
+
+                                                TokensBag.Remove(taskKey);
+                                            }
+                                            else if (pod.Item2.Status.Phase == "Running")
+                                            {
+                                                Logger.LogInformation("Get metadata update on a pod that listen to logs");
+                                            }
+                                            else
+                                            {
+                                                Logger.LogWarning("Unknow state recieved from the hub");
+                                                Logger.LogWarning(WatchEventType.Modified.ToString());
+                                                Logger.LogWarning(JsonSerializer.Serialize(pod.Item2));
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            if (pod.Item2.Status.Phase == "Pending" ||
+                                                pod.Item2.Status.Phase == "Succeded" ||
+                                                pod.Item2.Status.Phase == "Failed")
+                                            {
+                                                Logger.LogInformation("Get metadata update on a pod that listen to logs, but the pod is not ready for listening to logs");
+                                            }
+                                            else if (pod.Item2.Status.Phase == "Running" && 
+                                                     DeployementCheckedForLogs.Any(d => pod.Item2.Metadata.Name.StartsWith(d)))
+                                            {
+                                                taskList.Add(ListenTopPodLogs(PodLogsTaskKey(@namespace, podName), @namespace, podName));
+                                            }
+                                            else
+                                            {
+                                                Logger.LogWarning("Unknow state recieved from the hub");
+                                                Logger.LogWarning(WatchEventType.Modified.ToString());
+                                                Logger.LogWarning(JsonSerializer.Serialize(pod.Item2));
+                                            }
                                         }
                                     }
                                     else
