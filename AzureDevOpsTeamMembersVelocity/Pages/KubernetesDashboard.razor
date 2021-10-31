@@ -39,7 +39,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var ns in NamespaceList)
+            @foreach (var ns in NamespaceList.Values)
             {
                 <tr>
                     <td>@ns.Metadata.Name</td>
@@ -82,7 +82,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var deployment in Deployments)
+            @foreach (var deployment in Deployments.Values)
             {
                 var deploymentNamespace = deployment.Namespace();
                 var deploymentName = deployment.Name();
@@ -128,7 +128,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var pod in Pods)
+            @foreach (var pod in Pods.Values)
             {
                 var podNamespace = pod.Namespace();
                 var podName = pod.Name();
@@ -172,11 +172,11 @@
 }
 
 @code {
-    public BlockingCollection<V1Namespace> NamespaceList { get; set; } = new();
+    public ConcurrentDictionary<string, V1Namespace> NamespaceList { get; set; } = new();
 
-    public BlockingCollection<V1Deployment> Deployments { get; set; } = new();
+    public ConcurrentDictionary<string, V1Deployment> Deployments { get; set; } = new();
 
-    public BlockingCollection<V1Pod> Pods { get; set; } = new();
+    public ConcurrentDictionary<string, V1Pod> Pods { get; set; } = new();
 
     public string? Error { get; set; }
 
@@ -258,16 +258,38 @@
                             {
                                 case null:
                                 case WatchEventType.Added:
-                                    NamespaceList.Add(@namespace.Item2);
+                                    if (!NamespaceList.TryAdd(@namespace.Item2.Metadata.Name, @namespace.Item2))
+                                    {
+                                        var message = $"Failed to add namespace {@namespace.Item2.Metadata.Name}";
+                                        Logger.LogError(message);
+                                        Error = message;
+                                    }
                                     break;
                                 case WatchEventType.Bookmark:
-                                    throw new NotImplementedException(WatchEventType.Bookmark.ToString());
+                                    Logger.LogInformation(WatchEventType.Bookmark.ToString());
+                                    Logger.LogInformation(JsonSerializer.Serialize(@namespace.Item2));
+                                    break;
                                 case WatchEventType.Deleted:
-                                    throw new NotImplementedException(WatchEventType.Deleted.ToString());
+                                    if (!NamespaceList.Remove(@namespace.Item2.Metadata.Name, out var _))
+                                    {
+                                        var message = $"Failed to remove namespace {@namespace.Item2.Metadata.Name}";
+                                        Logger.LogError(message);
+                                        Error = message;
+                                    }
+                                    break;
                                 case WatchEventType.Error:
-                                    throw new NotImplementedException(WatchEventType.Error.ToString());
+                                    Logger.LogError(WatchEventType.Error.ToString());
+                                    Logger.LogError(JsonSerializer.Serialize(@namespace.Item2));
+                                    break;
                                 case WatchEventType.Modified:
-                                    throw new NotImplementedException(WatchEventType.Modified.ToString());
+                                    var key = @namespace.Item2.Metadata.Name;
+                                    if ((NamespaceList.TryGetValue(key, out var oldValue) && NamespaceList.TryUpdate(key, @namespace.Item2, oldValue)) == false)
+                                    {
+                                        var message = $"Failed to update namespace {@namespace.Item2.Metadata.Name}";
+                                        Logger.LogError(message);
+                                        Error = message;
+                                    }
+                                    break;
                                 default:
                                     throw new InvalidOperationException($"Unknow {nameof(WatchEventType)} with value {@namespace.Item1}");
                             }
@@ -292,20 +314,43 @@
                                 continue;
                             }
 
+                            var key = $"{deployment.Item2.Metadata.NamespaceProperty}-{deployment.Item2.Metadata.Name}";
+
                             switch (deployment.Item1)
                             {
                                 case null:
                                 case WatchEventType.Added:
-                                    Deployments.Add(deployment.Item2);
+                                    if (!Deployments.TryAdd(key, deployment.Item2))
+                                    {
+                                        var message = $"Failed to add deployment {deployment.Item2.Metadata.Name}";
+                                        Logger.LogError(message);
+                                        Error = message;
+                                    }
                                     break;
                                 case WatchEventType.Bookmark:
-                                    throw new NotImplementedException(WatchEventType.Bookmark.ToString());
+                                    Logger.LogInformation(WatchEventType.Bookmark.ToString());
+                                    Logger.LogInformation(JsonSerializer.Serialize(deployment.Item2));
+                                    break;
                                 case WatchEventType.Deleted:
-                                    throw new NotImplementedException(WatchEventType.Deleted.ToString());
+                                    if (!Deployments.Remove(key, out var removedDeployment))
+                                    {
+                                        var message = $"Failed to remove deployment {deployment.Item2.Metadata.Name}";
+                                        Logger.LogError(message);
+                                        Error = message;
+                                    }
+                                    break;
                                 case WatchEventType.Error:
-                                    throw new NotImplementedException(WatchEventType.Error.ToString());
+                                    Logger.LogError(WatchEventType.Error.ToString());
+                                    Logger.LogError(JsonSerializer.Serialize(deployment.Item2));
+                                    break;
                                 case WatchEventType.Modified:
-                                    throw new NotImplementedException(WatchEventType.Modified.ToString());
+                                    if ((Deployments.TryGetValue(key, out var oldValue) && Deployments.TryUpdate(key, deployment.Item2, oldValue)) == false)
+                                    {
+                                        var message = $"Failed to update deployment {deployment.Item2.Metadata.Name}";
+                                        Logger.LogError(message);
+                                        Error = message;
+                                    }
+                                    break;
                                 default:
                                     throw new InvalidOperationException($"Unknow {nameof(WatchEventType)} with value {deployment.Item1}");
                             }
@@ -321,6 +366,8 @@
                 {
                     var podChannel = await k8sHubConnection.StreamAsChannelAsync<Pair<WatchEventType?, V1Pod>>("Pods", _dashboardToken.Token);
 
+                    List<Task> taskList = new();
+
                     while (await podChannel.WaitToReadAsync(_dashboardToken.Token))
                     {
                         while (podChannel.TryRead(out var pod))
@@ -330,20 +377,74 @@
                                 continue;
                             }
 
+                            var @namespace = pod.Item2.Metadata.NamespaceProperty;
+                            var podName = pod.Item2.Metadata.Name;
+                            var key = $"{@namespace}-{pod.Item2.Metadata.Name}";
+
                             switch (pod.Item1)
                             {
                                 case null:
                                 case WatchEventType.Added:
-                                    Pods.Add(pod.Item2);
+                                    if (Pods.TryAdd(key, pod.Item2))
+                                    {
+                                        if (DeployementCheckedForLogs.Any(d => pod.Item2.Metadata.Name.StartsWith(d)))
+                                        {
+                                            taskList.Add(ListenTopPodLogs(PodLogsTaskKey(@namespace, podName), @namespace, podName));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var message = $"Failed to add pod {pod.Item2.Metadata.Name}";
+                                        Logger.LogError(message);
+                                        Error = message;
+                                    }
                                     break;
                                 case WatchEventType.Bookmark:
-                                    throw new NotImplementedException(WatchEventType.Bookmark.ToString());
+                                    Logger.LogInformation(WatchEventType.Bookmark.ToString());
+                                    Logger.LogInformation(JsonSerializer.Serialize(pod.Item2));
+                                    break;
                                 case WatchEventType.Deleted:
-                                    throw new NotImplementedException(WatchEventType.Deleted.ToString());
+                                    if (Pods.Remove(key, out var podDeleted))
+                                    {
+                                        var taskKey = PodLogsTaskKey(podDeleted.Metadata.NamespaceProperty, podDeleted.Metadata.Name);
+
+                                        if (TokensBag.TryGetValue(taskKey, out var tokenSourceCancellation))
+                                        {
+                                            tokenSourceCancellation.Cancel();
+
+                                            TokensBag.Remove(taskKey);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var message = $"Failed to remove pod {pod.Item2.Metadata.Name}";
+                                        Logger.LogError(message);
+                                        Error = message;
+                                    }
+                                    break;
                                 case WatchEventType.Error:
-                                    throw new NotImplementedException(WatchEventType.Error.ToString());
+                                    Logger.LogError(WatchEventType.Error.ToString());
+                                    Logger.LogError(JsonSerializer.Serialize(pod.Item2));
+                                    break;
                                 case WatchEventType.Modified:
-                                    throw new NotImplementedException(WatchEventType.Modified.ToString());
+                                    if ((Pods.TryGetValue(key, out var oldValue) && Pods.TryUpdate(key, pod.Item2, oldValue)))
+                                    {
+                                        var taskKey = PodLogsTaskKey(pod.Item2.Metadata.NamespaceProperty, pod.Item2.Metadata.Name);
+
+                                        if (TokensBag.TryGetValue(taskKey, out var token))
+                                        {
+                                            Logger.LogWarning("May need to do something, for now this scenario is not fully implemented");
+                                            Logger.LogWarning(WatchEventType.Modified.ToString());
+                                            Logger.LogWarning(JsonSerializer.Serialize(pod.Item2));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var message = $"Failed to update pod {pod.Item2.Metadata.Name}";
+                                        Logger.LogError(message);
+                                        Error = message;
+                                    }
+                                    break;
                                 default:
                                     throw new InvalidOperationException($"Unknow {nameof(WatchEventType)} with value {pod.Item1}");
                             }
@@ -354,19 +455,21 @@
                             });
                         }
                     }
+
+                    await Task.WhenAll(taskList);
                 })
             });
         }
         catch (Exception e)
         {
             Logger.LogError(e.Message, e);
-            Error = e.Message;
+            Error = $"RunK8sDashboarde: {e.Message}{Environment.NewLine}You may want to reload the page to fully restore the live refresh";
         }
     }
 
     private async Task OnPodLogClick(ChangeEventArgs args, string podNamespace, string podName)
     {
-        var taskKey = $"{podNamespace}{podName}";
+        var taskKey = PodLogsTaskKey(podNamespace, podName);
 
         if (TokensBag.TryGetValue(taskKey, out var tokenSourceCancellation))
         {
@@ -376,35 +479,45 @@
         }
         else
         {
-            var tokenSource = new System.Threading.CancellationTokenSource();
+            await ListenTopPodLogs(taskKey, podNamespace, podName);
+        }
+    }
 
-            var channel = await logHubConnection.StreamAsChannelAsync<string>("GetPodLog", podNamespace, podName, tokenSource.Token);
+    public async Task ListenTopPodLogs(string taskKey, string podNamespace, string podName)
+    {
+        var tokenSource = new System.Threading.CancellationTokenSource();
 
-            TokensBag.Add(taskKey, tokenSource);
+        var channel = await logHubConnection.StreamAsChannelAsync<string>("GetPodLog", podNamespace, podName, tokenSource.Token);
 
-            while (await channel.WaitToReadAsync(tokenSource.Token))
+        TokensBag.Add(taskKey, tokenSource);
+
+        while (await channel.WaitToReadAsync(tokenSource.Token))
+        {
+            while (channel.TryRead(out var log))
             {
-                while (channel.TryRead(out var log))
+                PodLogs.Add(log);
+                StateHasChanged();
+                if (ScrollToBottom)
                 {
-                    PodLogs.Add(log);
-                    StateHasChanged();
-                    if (ScrollToBottom)
-                    {
-                        await JS.InvokeVoidAsync("window.scrollToBottom");
-                    }
+                    await JS.InvokeVoidAsync("window.scrollToBottom");
                 }
             }
         }
     }
 
+    public string PodLogsTaskKey(string podNamespace, string podName) => $"{podNamespace}{podName}";
+
+    public HashSet<string> DeployementCheckedForLogs { get; } = new();
+
     private async Task OnDeploymentLogClick(ChangeEventArgs args, string deploymentNamespace, string deploymentName)
     {
         try
         {
-            var taskList = new List<Task>
-                ();
+            DeployementCheckedForLogs.Add(deploymentName);
 
-            foreach (var pod in Pods)
+            List<Task> taskList = new();
+
+            foreach (var pod in Pods.Values)
             {
                 if (pod.Name().StartsWith(deploymentName))
                 {
@@ -419,6 +532,12 @@
         }
         catch (Exception e)
         {
+            try
+            {
+                DeployementCheckedForLogs.Remove($"{deploymentNamespace}-{deploymentName}");
+            }
+            catch { }
+
             Error = e.Message;
             Logger.LogError(e, e.Message);
         }
@@ -435,29 +554,6 @@
             Error = e.Message;
             Logger.LogError(e, e.Message);
         }
-
-        //NamespaceList = await Client.ListNamespaceAsync();
-
-        //Pods.Items = Pods.Items.Where(p =>
-        //{
-        //    if (p.Namespace() != ns.Metadata.Name)
-        //    {
-        //        return true;
-        //    }
-
-        //    var taskKey = $"{ns.Metadata.Name}{p.Metadata.Name}";
-
-        //    if (TokensBag.TryGetValue(taskKey, out var tokenSourceCancellation))
-        //    {
-        //        tokenSourceCancellation.Cancel();
-
-        //        TokensBag.Remove(taskKey);
-        //    }
-
-        //    return false;
-        //}).ToList();
-
-        //StateHasChanged();
     }
 
     private void ClearLogs()
@@ -499,7 +595,7 @@
             Console.Error.WriteLine(e.StackTrace);
         }
 
-        _dashboardTask.Dispose();
+        _dashboardTask?.Dispose();
         _dashboardToken.Dispose();
     }
 

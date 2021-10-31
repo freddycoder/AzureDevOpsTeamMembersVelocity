@@ -37,14 +37,14 @@ namespace AzureDevOpsTeamMembersVelocity.Hubs
         /// <returns></returns>
         public async IAsyncEnumerable<Pair<WatchEventType?, V1Namespace>> Namespaces([EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            var watcher = _kubernetesClient.ListNamespaceWithHttpMessagesAsync(watch: true, cancellationToken: cancellationToken);
+            var watcher = _kubernetesClient.ListNamespaceWithHttpMessagesAsync(allowWatchBookmarks: false, watch: true, cancellationToken: cancellationToken);
 
             await foreach (var (type, item) in watcher.WatchAsync<V1Namespace, V1NamespaceList>())
             {
                 yield return new(type, item);
             }
 
-            _logger.LogInformation($"Method {nameof(Namespaces)} is done");
+            _logger.LogInformation($"{nameof(Namespaces)} hub completed without error");
         }
 
         /// <summary>
@@ -54,14 +54,14 @@ namespace AzureDevOpsTeamMembersVelocity.Hubs
         /// <returns></returns>
         public async IAsyncEnumerable<Pair<WatchEventType?, V1Deployment>> Deployments([EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            var watcher = _kubernetesClient.ListDeploymentForAllNamespacesWithHttpMessagesAsync(watch: true, cancellationToken: cancellationToken);
+            var watcher = _kubernetesClient.ListDeploymentForAllNamespacesWithHttpMessagesAsync(allowWatchBookmarks: false, watch: true, cancellationToken: cancellationToken);
 
             await foreach (var (type, item) in watcher.WatchAsync<V1Deployment, V1DeploymentList>())
             {
                 yield return new(type, item);
             }
 
-            _logger.LogInformation($"Method {nameof(Deployments)} is done");
+            _logger.LogInformation($"{nameof(Deployments)} hub completed without error");
         }
 
         /// <summary>
@@ -71,14 +71,14 @@ namespace AzureDevOpsTeamMembersVelocity.Hubs
         /// <returns></returns>
         public async IAsyncEnumerable<Pair<WatchEventType?, V1Pod>> Pods([EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            var watcher = _kubernetesClient.ListPodForAllNamespacesWithHttpMessagesAsync(watch: true, cancellationToken: cancellationToken);
+            var watcher = _kubernetesClient.ListPodForAllNamespacesWithHttpMessagesAsync(allowWatchBookmarks: false, watch: true, cancellationToken: cancellationToken);
 
             await foreach (var (type, item) in watcher.WatchAsync<V1Pod, V1PodList>())
             {
                 yield return new(type, item);
             }
 
-            _logger.LogInformation($"Method {nameof(Pods)} is done");
+            _logger.LogInformation($"{nameof(Pods)} hub completed without error");
         }
     }
 }
