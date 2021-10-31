@@ -26,165 +26,157 @@
     </button>
 </div>
 
-@if (NamespaceList != null)
-{
-    <div class="@Settings.NamespaceCollapseClass" id="collapseNamespace">
-        <table class="table table-hover table-responsive">
-            <caption>Table of kubernetes namespace</caption>
-            <thead>
+
+<div class="@Settings.NamespaceCollapseClass" id="collapseNamespace">
+    <table class="table table-hover table-responsive">
+        <caption>Table of kubernetes namespace</caption>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Creation time</th>
+                <th>Phase</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ns in NamespaceList.Values)
+            {
                 <tr>
-                    <th>Name</th>
-                    <th>Creation time</th>
-                    <th>Phase</th>
-                    <th></th>
+                    <td>@ns.Metadata.Name</td>
+                    <td>@ns.Metadata.CreationTimestamp</td>
+                    <td>@ns.Status.Phase</td>
+                    <td>
+                        <button id="@string.Concat("ns-", ns.Metadata.Name)"
+                                title="btn-delete-ns-@ns.Metadata.Name"
+                                class="btn btn-danger"
+                                @onclick="async (mea) => await DeleteNamespace(ns)">
+                            Delete
+                        </button>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach (var ns in NamespaceList.Items)
-                {
-                    <tr>
-                        <td>@ns.Metadata.Name</td>
-                        <td>@ns.Metadata.CreationTimestamp</td>
-                        <td>@ns.Status.Phase</td>
-                        <td>
-                            <button id="@string.Concat("ns-", ns.Metadata.Name)"
-                                    title="btn-delete-ns-@ns.Metadata.Name"
-                                    class="btn btn-danger"
-                                    @onclick="async (mea) => await DeleteNamespace(ns)">
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+            }
+        </tbody>
+    </table>
+</div>
 
-    <hr />
+<hr />
 
-    <div class="row">
-        <button class="btn btn-primary"
-                type="button"
-                @onclick='() => Collapsing("collapseDeployment")'>
-            Deployments
-        </button>
-    </div>
+<div class="row">
+    <button class="btn btn-primary"
+            type="button"
+            @onclick='() => Collapsing("collapseDeployment")'>
+        Deployments
+    </button>
+</div>
 
-    <div class="@Settings.DeploymentCollapseClass" id="collapseDeployment">
-        <table class="table table-hover table-responsive">
-            <caption>Table of kubernetes deployments</caption>
-            <thead>
+<div class="@Settings.DeploymentCollapseClass" id="collapseDeployment">
+    <table class="table table-hover table-responsive">
+        <caption>Table of kubernetes deployments</caption>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Creation time</th>
+                <th>Ready</th>
+                <th>Unavailable</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var deployment in Deployments.Values)
+            {
+                var deploymentNamespace = deployment.Namespace();
+                var deploymentName = deployment.Name();
+
                 <tr>
-                    <th>Name</th>
-                    <th>Creation time</th>
-                    <th>Ready</th>
-                    <th>Unavailable</th>
-                    <th></th>
+                    <td>@deployment.Metadata.Name</td>
+                    <td>@deployment.Metadata.CreationTimestamp</td>
+                    <td>@deployment.Status.ReadyReplicas</td>
+                    <td>@deployment.Status.UnavailableReplicas</td>
+                    <td>
+                        <input id="@string.Concat(deploymentNamespace, deploymentName)"
+                               title="button-pod-@deployment.Metadata.Name"
+                               type="checkbox"
+                               class="form-check"
+                               @onchange="async (changeEventArg) => await OnDeploymentLogClick(changeEventArg, deploymentNamespace, deploymentName)" />
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @if (Deployments != null && Deployments.Items != null)
-                {
-                    @foreach (var deployment in Deployments.Items)
-                    {
-                        var deploymentNamespace = deployment.Namespace();
-                        var deploymentName = deployment.Name();
+            }
+        </tbody>
+    </table>
+</div>
 
-                        <tr>
-                            <td>@deployment.Metadata.Name</td>
-                            <td>@deployment.Metadata.CreationTimestamp</td>
-                            <td>@deployment.Status.ReadyReplicas</td>
-                            <td>@deployment.Status.UnavailableReplicas</td>
-                            <td>
-                                <input id="@string.Concat(deploymentNamespace, deploymentName)"
-                                       title="button-pod-@deployment.Metadata.Name"
-                                       type="checkbox"
-                                       class="form-check"
-                                       @onchange="async (changeEventArg) => await OnDeploymentLogClick(changeEventArg, deploymentNamespace, deploymentName)" />
-                            </td>
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
-    </div>
+<hr />
 
-    <hr />
+<div class="row">
+    <button class="btn btn-primary"
+            type="button"
+            @onclick='() => Collapsing("collapsePods")'>
+        Pods
+    </button>
+</div>
 
-    <div class="row">
-        <button class="btn btn-primary"
-                type="button"
-                @onclick='() => Collapsing("collapsePods")'>
-            Pods
-        </button>
-    </div>
+<div class="@Settings.PodsCollapseClass" id="collapsePods">
+    <table class="table table-hover table-responsive">
+        <caption>Table of kubernetes pods</caption>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Creation time</th>
+                <th>Phase</th>
+                <th>Reason</th>
+                <th>Select</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pod in Pods.Values)
+            {
+                var podNamespace = pod.Namespace();
+                var podName = pod.Name();
 
-    <div class="@Settings.PodsCollapseClass" id="collapsePods">
-        <table class="table table-hover table-responsive">
-            <caption>Table of kubernetes pods</caption>
-            <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Creation time</th>
-                    <th>Phase</th>
-                    <th>Reason</th>
-                    <th>Select</th>
+                    <td>@pod.Metadata.Name</td>
+                    <td>@pod.Metadata.CreationTimestamp</td>
+                    <td>@pod.Status.Phase</td>
+                    <td>@pod.Status.Reason</td>
+                    <td>
+                        <input id="@string.Concat(podNamespace, podName)"
+                               title="button-pod-@pod.Metadata.Name"
+                               type="checkbox"
+                               class="form-check"
+                               @onchange="async (changeEventArg) => await OnPodLogClick(changeEventArg, podNamespace, podName)" />
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @if (Pods != null && Pods.Items != null)
-                {
-                    @foreach (var pod in Pods.Items)
-                    {
-                        var podNamespace = pod.Namespace();
-                        var podName = pod.Name();
+            }
+        </tbody>
+    </table>
+</div>
 
-                        <tr>
-                            <td>@pod.Metadata.Name</td>
-                            <td>@pod.Metadata.CreationTimestamp</td>
-                            <td>@pod.Status.Phase</td>
-                            <td>@pod.Status.Reason</td>
-                            <td>
-                                <input id="@string.Concat(podNamespace, podName)"
-                                       title="button-pod-@pod.Metadata.Name"
-                                       type="checkbox"
-                                       class="form-check"
-                                       @onchange="async (changeEventArg) => await OnPodLogClick(changeEventArg, podNamespace, podName)" />
-                            </td>
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
-    </div>
+<hr />
 
-    <hr />
+<h4>Logs</h4>
 
-    <h4>Logs</h4>
+<button title="btn-log-autoscroll-top" class="btn btn-outline-info" @onclick="ChangeScrollToBottom">Auto scroll to bottom : @ScrollToBottom</button>
+<button title="btn-log-clearlog-top" class="btn btn-outline-danger" @onclick="ClearLogs">Clear logs </button>
 
-    <button title="btn-log-autoscroll-top" class="btn btn-outline-info" @onclick="ChangeScrollToBottom">Auto scroll to bottom : @ScrollToBottom</button>
-    <button title="btn-log-clearlog-top" class="btn btn-outline-danger" @onclick="ClearLogs">Clear logs </button>
-
-    <div id="log-container">
-        @foreach (var message in PodLogs)
-        {
-            <span class="log_line text">@message</span>
-        }
-    </div>
-
-    if (PodLogs.Count > 0)
+<div id="log-container">
+    @foreach (var message in PodLogs)
     {
-        <button title="btn-log-autoscroll-bottom" class="btn btn-outline-info" @onclick="ChangeScrollToBottom">Auto scroll to bottom : @ScrollToBottom</button>
-        <button title="btn-log-clearlog-bottom" class="btn btn-outline-danger" @onclick="ClearLogs">Clear logs </button>
+        <span class="log_line text">@message</span>
     }
+</div>
+
+@if (PodLogs.Count > 0)
+{
+    <button title="btn-log-autoscroll-bottom" class="btn btn-outline-info" @onclick="ChangeScrollToBottom">Auto scroll to bottom : @ScrollToBottom</button>
+    <button title="btn-log-clearlog-bottom" class="btn btn-outline-danger" @onclick="ClearLogs">Clear logs </button>
 }
 
 @code {
-    public V1NamespaceList? NamespaceList { get; set; }
+    public ConcurrentDictionary<string, V1Namespace> NamespaceList { get; set; } = new();
 
-    public V1DeploymentList? Deployments { get; set; }
+    public ConcurrentDictionary<string, V1Deployment> Deployments { get; set; } = new();
 
-    public V1PodList? Pods { get; set; }
+    public ConcurrentDictionary<string, V1Pod> Pods { get; set; } = new();
 
     public string? Error { get; set; }
 
@@ -195,28 +187,6 @@
         try
         {
             Settings = await UserPreference.GetAsync<KubernetesPageSettings>();
-
-            NamespaceList = await Client.ListNamespaceAsync();
-
-            StateHasChanged();
-
-            Deployments = await Client.ListDeploymentForAllNamespacesAsync();
-
-            Pods = new V1PodList();
-
-            Pods.Items = new List<V1Pod>();
-
-            foreach (var ns in NamespaceList.Items)
-            {
-                var podList = await Client.ListNamespacedPodAsync(ns.Metadata.Name);
-
-                foreach (var pod in podList.Items)
-                {
-                    Pods.Items.Add(pod);
-                }
-
-                StateHasChanged();
-            }
 
             var cookies = HttpContextAccessor.HttpContext?.Request.Cookies;
 
@@ -230,14 +200,25 @@
                 }
             }
 
-            hubConnection = new HubConnectionBuilder()
+            k8sHubConnection = new HubConnectionBuilder()
+                .WithUrl(NavigationManager.ToAbsoluteUri("/K8sHub"), options =>
+                {
+                    options.Cookies = cookiesCollection;
+                })
+                .Build();
+
+            await k8sHubConnection.StartAsync();
+
+            _dashboardTask = RunK8sDashboard();
+
+            logHubConnection = new HubConnectionBuilder()
                 .WithUrl(NavigationManager.ToAbsoluteUri("/GetPodLog"), options =>
                 {
                     options.Cookies = cookiesCollection;
                 })
                 .Build();
 
-            await hubConnection.StartAsync();
+            await logHubConnection.StartAsync();
         }
         catch (Exception e)
         {
@@ -246,13 +227,286 @@
         }
     }
 
-    private HubConnection? hubConnection;
-    private System.Collections.Concurrent.BlockingCollection<string> PodLogs { get; set; } = new();
+    private HubConnection? k8sHubConnection;
+    private CancellationTokenSource _dashboardToken = new();
+    private Task? _dashboardTask;
+
+    private HubConnection? logHubConnection;
+    private BlockingCollection<string> PodLogs { get; set; } = new();
     private Dictionary<string, System.Threading.CancellationTokenSource> TokensBag { get; set; } = new();
+
+    private async Task RunK8sDashboard()
+    {
+        try
+        {
+            await Task.WhenAll(new Task[]
+            {
+                Task.Run(async () =>
+                {
+                    var namespaceChannel = await k8sHubConnection.StreamAsChannelAsync<Pair<WatchEventType?, V1Namespace>>("Namespaces", _dashboardToken.Token);
+
+                    while (await namespaceChannel.WaitToReadAsync(_dashboardToken.Token))
+                    {
+                        while (namespaceChannel.TryRead(out var @namespace))
+                        {
+                            if (@namespace.Item2 is null)
+                            {
+                                continue;
+                            }
+
+                            switch (@namespace.Item1)
+                            {
+                                case null:
+                                case WatchEventType.Added:
+                                    if (!NamespaceList.TryAdd(@namespace.Item2.Metadata.Name, @namespace.Item2))
+                                    {
+                                        var message = $"Failed to add namespace {@namespace.Item2.Metadata.Name}";
+                                        Logger.LogError(message);
+                                        Error = message;
+                                    }
+                                    break;
+                                case WatchEventType.Bookmark:
+                                    Logger.LogInformation(WatchEventType.Bookmark.ToString());
+                                    Logger.LogInformation(JsonSerializer.Serialize(@namespace.Item2));
+                                    break;
+                                case WatchEventType.Deleted:
+                                    if (!NamespaceList.Remove(@namespace.Item2.Metadata.Name, out var _))
+                                    {
+                                        var message = $"Failed to remove namespace {@namespace.Item2.Metadata.Name}";
+                                        Logger.LogError(message);
+                                        Error = message;
+                                    }
+                                    break;
+                                case WatchEventType.Error:
+                                    Logger.LogError(WatchEventType.Error.ToString());
+                                    Logger.LogError(JsonSerializer.Serialize(@namespace.Item2));
+                                    break;
+                                case WatchEventType.Modified:
+                                    var key = @namespace.Item2.Metadata.Name;
+                                    if ((NamespaceList.TryGetValue(key, out var oldValue) && NamespaceList.TryUpdate(key, @namespace.Item2, oldValue)) == false)
+                                    {
+                                        var message = $"Failed to update namespace {@namespace.Item2.Metadata.Name}";
+                                        Logger.LogError(message);
+                                        Error = message;
+                                    }
+                                    break;
+                                default:
+                                    throw new InvalidOperationException($"Unknow {nameof(WatchEventType)} with value {@namespace.Item1}");
+                            }
+
+                            await InvokeAsync(() =>
+                            {
+                                StateHasChanged();
+                            });
+                        }
+                    }
+                }),
+                Task.Run(async () =>
+                {
+                    var deploymentChannel = await k8sHubConnection.StreamAsChannelAsync<Pair<WatchEventType?, V1Deployment>>("Deployments", _dashboardToken.Token);
+
+                    while (await deploymentChannel.WaitToReadAsync(_dashboardToken.Token))
+                    {
+                        while (deploymentChannel.TryRead(out var deployment))
+                        {
+                            if (deployment.Item2 is null)
+                            {
+                                continue;
+                            }
+
+                            var key = $"{deployment.Item2.Metadata.NamespaceProperty}-{deployment.Item2.Metadata.Name}";
+
+                            switch (deployment.Item1)
+                            {
+                                case null:
+                                case WatchEventType.Added:
+                                    if (!Deployments.TryAdd(key, deployment.Item2))
+                                    {
+                                        var message = $"Failed to add deployment {deployment.Item2.Metadata.Name}";
+                                        Logger.LogError(message);
+                                        Error = message;
+                                    }
+                                    break;
+                                case WatchEventType.Bookmark:
+                                    Logger.LogInformation(WatchEventType.Bookmark.ToString());
+                                    Logger.LogInformation(JsonSerializer.Serialize(deployment.Item2));
+                                    break;
+                                case WatchEventType.Deleted:
+                                    if (!Deployments.Remove(key, out var removedDeployment))
+                                    {
+                                        var message = $"Failed to remove deployment {deployment.Item2.Metadata.Name}";
+                                        Logger.LogError(message);
+                                        Error = message;
+                                    }
+                                    break;
+                                case WatchEventType.Error:
+                                    Logger.LogError(WatchEventType.Error.ToString());
+                                    Logger.LogError(JsonSerializer.Serialize(deployment.Item2));
+                                    break;
+                                case WatchEventType.Modified:
+                                    if ((Deployments.TryGetValue(key, out var oldValue) && Deployments.TryUpdate(key, deployment.Item2, oldValue)) == false)
+                                    {
+                                        var message = $"Failed to update deployment {deployment.Item2.Metadata.Name}";
+                                        Logger.LogError(message);
+                                        Error = message;
+                                    }
+                                    break;
+                                default:
+                                    throw new InvalidOperationException($"Unknow {nameof(WatchEventType)} with value {deployment.Item1}");
+                            }
+
+                            await InvokeAsync(() =>
+                            {
+                                StateHasChanged();
+                            });
+                        }
+                    }
+                }),
+                Task.Run(async () =>
+                {
+                    var podChannel = await k8sHubConnection.StreamAsChannelAsync<Pair<WatchEventType?, V1Pod>>("Pods", _dashboardToken.Token);
+
+                    List<Task> taskList = new();
+
+                    while (await podChannel.WaitToReadAsync(_dashboardToken.Token))
+                    {
+                        while (podChannel.TryRead(out var pod))
+                        {
+                            if (pod.Item2 is null)
+                            {
+                                continue;
+                            }
+
+                            var @namespace = pod.Item2.Metadata.NamespaceProperty;
+                            var podName = pod.Item2.Metadata.Name;
+                            var key = $"{@namespace}-{pod.Item2.Metadata.Name}";
+
+                            switch (pod.Item1)
+                            {
+                                case null:
+                                case WatchEventType.Added:
+                                    if (Pods.TryAdd(key, pod.Item2))
+                                    {
+                                        if (pod.Item2.Status.Phase == "Running" && 
+                                            DeployementCheckedForLogs.Any(d => pod.Item2.Metadata.Name.StartsWith(d)))
+                                        {
+                                            taskList.Add(ListenTopPodLogs(PodLogsTaskKey(@namespace, podName), @namespace, podName));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var message = $"Failed to add pod {pod.Item2.Metadata.Name}";
+                                        Logger.LogError(message);
+                                        Error = message;
+                                    }
+                                    break;
+                                case WatchEventType.Bookmark:
+                                    Logger.LogInformation(WatchEventType.Bookmark.ToString());
+                                    Logger.LogInformation(JsonSerializer.Serialize(pod.Item2));
+                                    break;
+                                case WatchEventType.Deleted:
+                                    if (Pods.Remove(key, out var podDeleted))
+                                    {
+                                        var taskKey = PodLogsTaskKey(podDeleted.Metadata.NamespaceProperty, podDeleted.Metadata.Name);
+
+                                        if (TokensBag.TryGetValue(taskKey, out var tokenSourceCancellation))
+                                        {
+                                            tokenSourceCancellation.Cancel();
+
+                                            TokensBag.Remove(taskKey);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var message = $"Failed to remove pod {pod.Item2.Metadata.Name}";
+                                        Logger.LogError(message);
+                                        Error = message;
+                                    }
+                                    break;
+                                case WatchEventType.Error:
+                                    Logger.LogError(WatchEventType.Error.ToString());
+                                    Logger.LogError(JsonSerializer.Serialize(pod.Item2));
+                                    break;
+                                case WatchEventType.Modified:
+                                    if ((Pods.TryGetValue(key, out var oldValue) && Pods.TryUpdate(key, pod.Item2, oldValue)))
+                                    {
+                                        var taskKey = PodLogsTaskKey(pod.Item2.Metadata.NamespaceProperty, pod.Item2.Metadata.Name);
+
+                                        if (TokensBag.TryGetValue(taskKey, out var token))
+                                        {
+                                            if (pod.Item2.Status.Phase == "Pending" ||
+                                                pod.Item2.Status.Phase == "Succeded" ||
+                                                pod.Item2.Status.Phase == "Failed")
+                                            {
+                                                token.Cancel();
+
+                                                TokensBag.Remove(taskKey);
+                                            }
+                                            else if (pod.Item2.Status.Phase == "Running")
+                                            {
+                                                Logger.LogInformation("Get metadata update on a pod that listen to logs");
+                                            }
+                                            else
+                                            {
+                                                Logger.LogWarning("Unknow state recieved from the hub");
+                                                Logger.LogWarning(WatchEventType.Modified.ToString());
+                                                Logger.LogWarning(JsonSerializer.Serialize(pod.Item2));
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            if (pod.Item2.Status.Phase == "Pending" ||
+                                                pod.Item2.Status.Phase == "Succeded" ||
+                                                pod.Item2.Status.Phase == "Failed")
+                                            {
+                                                Logger.LogInformation("Get metadata update on a pod that listen to logs, but the pod is not ready for listening to logs");
+                                            }
+                                            else if (pod.Item2.Status.Phase == "Running" && 
+                                                     DeployementCheckedForLogs.Any(d => pod.Item2.Metadata.Name.StartsWith(d)))
+                                            {
+                                                taskList.Add(ListenTopPodLogs(PodLogsTaskKey(@namespace, podName), @namespace, podName));
+                                            }
+                                            else
+                                            {
+                                                Logger.LogWarning("Unknow state recieved from the hub");
+                                                Logger.LogWarning(WatchEventType.Modified.ToString());
+                                                Logger.LogWarning(JsonSerializer.Serialize(pod.Item2));
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var message = $"Failed to update pod {pod.Item2.Metadata.Name}";
+                                        Logger.LogError(message);
+                                        Error = message;
+                                    }
+                                    break;
+                                default:
+                                    throw new InvalidOperationException($"Unknow {nameof(WatchEventType)} with value {pod.Item1}");
+                            }
+
+                            await InvokeAsync(() =>
+                            {
+                                StateHasChanged();
+                            });
+                        }
+                    }
+
+                    await Task.WhenAll(taskList);
+                })
+            });
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e.Message, e);
+            Error = $"RunK8sDashboarde: {e.Message}{Environment.NewLine}You may want to reload the page to fully restore the live refresh";
+        }
+    }
 
     private async Task OnPodLogClick(ChangeEventArgs args, string podNamespace, string podName)
     {
-        var taskKey = $"{podNamespace}{podName}";
+        var taskKey = PodLogsTaskKey(podNamespace, podName);
 
         if (TokensBag.TryGetValue(taskKey, out var tokenSourceCancellation))
         {
@@ -262,9 +516,17 @@
         }
         else
         {
-            var tokenSource = new System.Threading.CancellationTokenSource();
+            await ListenTopPodLogs(taskKey, podNamespace, podName);
+        }
+    }
 
-            var channel = await hubConnection.StreamAsChannelAsync<string>("GetPodLog", podNamespace, podName, tokenSource.Token);
+    public async Task ListenTopPodLogs(string taskKey, string podNamespace, string podName)
+    {
+        var tokenSource = new System.Threading.CancellationTokenSource();
+
+        try
+        {
+            var channel = await logHubConnection.StreamAsChannelAsync<string>("GetPodLog", podNamespace, podName, tokenSource.Token);
 
             TokensBag.Add(taskKey, tokenSource);
 
@@ -281,15 +543,25 @@
                 }
             }
         }
+        catch (OperationCanceledException e)
+        {
+            Logger.LogInformation($"{e.Message}{Environment.NewLine}{e.StackTrace}");
+        }
     }
+
+    public string PodLogsTaskKey(string podNamespace, string podName) => $"{podNamespace}{podName}";
+
+    public HashSet<string> DeployementCheckedForLogs { get; } = new();
 
     private async Task OnDeploymentLogClick(ChangeEventArgs args, string deploymentNamespace, string deploymentName)
     {
-        if (Pods != null && Pods.Items != null)
+        try
         {
-            var taskList = new List<Task>();
+            DeployementCheckedForLogs.Add(deploymentName);
 
-            foreach (var pod in Pods.Items)
+            List<Task> taskList = new();
+
+            foreach (var pod in Pods.Values)
             {
                 if (pod.Name().StartsWith(deploymentName))
                 {
@@ -301,6 +573,17 @@
             {
                 await task;
             }
+        }
+        catch (Exception e)
+        {
+            try
+            {
+                DeployementCheckedForLogs.Remove($"{deploymentNamespace}-{deploymentName}");
+            }
+            catch { }
+
+            Error = e.Message;
+            Logger.LogError(e, e.Message);
         }
     }
 
@@ -315,34 +598,6 @@
             Error = e.Message;
             Logger.LogError(e, e.Message);
         }
-
-        if (Pods == null)
-        {
-            Pods = new V1PodList();
-        }
-
-        NamespaceList = await Client.ListNamespaceAsync();
-
-        Pods.Items = Pods.Items.Where(p =>
-        {
-            if (p.Namespace() != ns.Metadata.Name)
-            {
-                return true;
-            }
-
-            var taskKey = $"{ns.Metadata.Name}{p.Metadata.Name}";
-
-            if (TokensBag.TryGetValue(taskKey, out var tokenSourceCancellation))
-            {
-                tokenSourceCancellation.Cancel();
-
-                TokensBag.Remove(taskKey);
-            }
-
-            return false;
-        }).ToList();
-
-        StateHasChanged();
     }
 
     private void ClearLogs()
@@ -359,10 +614,33 @@
 
     public async ValueTask DisposeAsync()
     {
-        if (hubConnection is not null)
+        if (logHubConnection is not null)
         {
-            await hubConnection.DisposeAsync();
+            await logHubConnection.DisposeAsync();
         }
+
+        if (k8sHubConnection is not null)
+        {
+            await k8sHubConnection.DisposeAsync();
+        }
+    }
+
+    public void Dispose()
+    {
+        _dashboardToken.Cancel();
+
+        try
+        {
+            _dashboardTask?.Wait();
+        }
+        catch (Exception e)
+        {
+            Console.Error.WriteLine(e.Message);
+            Console.Error.WriteLine(e.StackTrace);
+        }
+
+        _dashboardTask?.Dispose();
+        _dashboardToken.Dispose();
     }
 
     public void Collapsing(string collapseId)
