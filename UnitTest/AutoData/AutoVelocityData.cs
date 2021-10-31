@@ -20,7 +20,8 @@ namespace UnitTest.AutoData
             var fixture = fixtureFactory();
 
             fixture.Customize(new AutoNSubstituteCustomization())
-                   .Customize(new ProxyCustomization());
+                   .Customize(new ProxyCustomization())
+                   .Customize(new ConfigurationCustomization());
 
             fixture.Register<IUserPreferenceRepository>(() => new MockUserPreferenceRepository());
 
