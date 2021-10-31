@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using AzureDevOpsTeamMembersVelocity.Mock;
 using System.Linq;
 
 namespace IntegrationTest.ApplicationFactory
@@ -24,7 +23,7 @@ namespace IntegrationTest.ApplicationFactory
 
                 services.Remove(descriptor);
 
-                services.AddSingleton<IKubernetes, MockKubernetes>();
+                services.AddSingleton<IKubernetes>(sp => NSubstitute.Substitute.For<IKubernetes>());
             });
         }
     }
