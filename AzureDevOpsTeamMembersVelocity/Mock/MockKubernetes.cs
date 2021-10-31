@@ -22,7 +22,7 @@ namespace AzureDevOpsTeamMembersVelocity.Mock
     public class MockKubernetes : IKubernetes
     {
         // Custom mocking
-        private V1NamespaceList _namespaceList = new()
+        private readonly V1NamespaceList _namespaceList = new()
         {
             Items = new List<V1Namespace>
             {
@@ -44,7 +44,7 @@ namespace AzureDevOpsTeamMembersVelocity.Mock
             });
         }
 
-        private V1DeploymentList _deploymentList = new V1DeploymentList
+        private readonly V1DeploymentList _deploymentList = new()
         {
             Items = new List<V1Deployment>
             {
@@ -67,14 +67,14 @@ namespace AzureDevOpsTeamMembersVelocity.Mock
             });
         }
 
-        private V1PodList _podList = new V1PodList
+        private readonly V1PodList _podList = new()
         {
             Items = new List<V1Pod>()
         };
 
-        private CancellationTokenSource _tokenSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource _tokenSource = new ();
 
-        private Task _backgroundProcess;
+        private readonly Task _backgroundProcess;
 
         /// <summary>
         /// Constructeur par défaut
@@ -98,6 +98,10 @@ namespace AzureDevOpsTeamMembersVelocity.Mock
 
         private bool disposedValue;
 
+        /// <summary>
+        /// Dispose the instance
+        /// </summary>
+        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -132,26 +136,34 @@ namespace AzureDevOpsTeamMembersVelocity.Mock
 
         // Implementation of IKubernetes
 
+        /// <inheritdoc />
         public Uri BaseUri { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+        /// <inheritdoc />
         public JsonSerializerSettings SerializationSettings => throw new NotImplementedException();
 
+        /// <inheritdoc />
         public JsonSerializerSettings DeserializationSettings => throw new NotImplementedException();
 
+        /// <inheritdoc />
         public ServiceClientCredentials Credentials => throw new NotImplementedException();
 
+        /// <inheritdoc />
         public HttpClient HttpClient => throw new NotImplementedException();
 
+        /// <inheritdoc />
         public Task<HttpOperationResponse<string>> GetServiceAccountIssuerOpenIDConfigurationWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public Task<HttpOperationResponse<V1APIVersions>> GetAPIVersionsWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public Task<HttpOperationResponse<V1APIGroupList>> GetAPIVersions1WithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
@@ -362,12 +374,20 @@ namespace AzureDevOpsTeamMembersVelocity.Mock
             throw new NotImplementedException();
         }
 
-        public Task<HttpOperationResponse<V1NamespaceList>> ListNamespaceWithHttpMessagesAsync(bool? allowWatchBookmarks = null, string continueParameter = null, string fieldSelector = null, string labelSelector = null, int? limit = null, string resourceVersion = null, string resourceVersionMatch = null, int? timeoutSeconds = null, bool? watch = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public async Task<HttpOperationResponse<V1NamespaceList>> ListNamespaceWithHttpMessagesAsync(bool? allowWatchBookmarks = null, string continueParameter = null, string fieldSelector = null, string labelSelector = null, int? limit = null, string resourceVersion = null, string resourceVersionMatch = null, int? timeoutSeconds = null, bool? watch = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(new HttpOperationResponse<V1NamespaceList>
+            if (watch == true)
+            {
+                await Task.Delay(int.MaxValue, cancellationToken);
+
+                return new HttpOperationResponse<V1NamespaceList>();
+            }
+
+            return new HttpOperationResponse<V1NamespaceList>
             {
                 Body = _namespaceList
-            });
+            };
         }
 
         public Task<HttpOperationResponse<V1Namespace>> CreateNamespaceWithHttpMessagesAsync(V1Namespace body, string dryRun = null, string fieldManager = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
@@ -635,24 +655,35 @@ namespace AzureDevOpsTeamMembersVelocity.Mock
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public Task<HttpOperationResponse<V1PersistentVolumeClaim>> ReplaceNamespacedPersistentVolumeClaimStatusWithHttpMessagesAsync(V1PersistentVolumeClaim body, string name, string namespaceParameter, string dryRun = null, string fieldManager = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public Task<HttpOperationResponse<V1Status>> DeleteCollectionNamespacedPodWithHttpMessagesAsync(string namespaceParameter, V1DeleteOptions body = null, string continueParameter = null, string dryRun = null, string fieldSelector = null, int? gracePeriodSeconds = null, string labelSelector = null, int? limit = null, bool? orphanDependents = null, string propagationPolicy = null, string resourceVersion = null, string resourceVersionMatch = null, int? timeoutSeconds = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public Task<HttpOperationResponse<V1PodList>> ListNamespacedPodWithHttpMessagesAsync(string namespaceParameter, bool? allowWatchBookmarks = null, string continueParameter = null, string fieldSelector = null, string labelSelector = null, int? limit = null, string resourceVersion = null, string resourceVersionMatch = null, int? timeoutSeconds = null, bool? watch = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public async Task<HttpOperationResponse<V1PodList>> ListNamespacedPodWithHttpMessagesAsync(string namespaceParameter, bool? allowWatchBookmarks = null, string continueParameter = null, string fieldSelector = null, string labelSelector = null, int? limit = null, string resourceVersion = null, string resourceVersionMatch = null, int? timeoutSeconds = null, bool? watch = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(new HttpOperationResponse<V1PodList>
+            if (watch == true)
+            {
+                await Task.Delay(int.MaxValue, cancellationToken);
+
+                return new HttpOperationResponse<V1PodList>();
+            }
+
+            return new HttpOperationResponse<V1PodList>
             {
                 Body = _podList
-            });
+            };
         }
 
+        /// <inheritdoc />
         public Task<HttpOperationResponse<V1Pod>> CreateNamespacedPodWithHttpMessagesAsync(V1Pod body, string namespaceParameter, string dryRun = null, string fieldManager = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
@@ -1663,12 +1694,20 @@ namespace AzureDevOpsTeamMembersVelocity.Mock
             throw new NotImplementedException();
         }
 
-        public Task<HttpOperationResponse<V1DeploymentList>> ListDeploymentForAllNamespacesWithHttpMessagesAsync(bool? allowWatchBookmarks = null, string continueParameter = null, string fieldSelector = null, string labelSelector = null, int? limit = null, bool? pretty = null, string resourceVersion = null, string resourceVersionMatch = null, int? timeoutSeconds = null, bool? watch = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public async Task<HttpOperationResponse<V1DeploymentList>> ListDeploymentForAllNamespacesWithHttpMessagesAsync(bool? allowWatchBookmarks = null, string continueParameter = null, string fieldSelector = null, string labelSelector = null, int? limit = null, bool? pretty = null, string resourceVersion = null, string resourceVersionMatch = null, int? timeoutSeconds = null, bool? watch = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(new HttpOperationResponse<V1DeploymentList>
+            if (watch == true)
+            {
+                await Task.Delay(int.MaxValue, cancellationToken);
+
+                return new HttpOperationResponse<V1DeploymentList>();
+            }
+
+            return new HttpOperationResponse<V1DeploymentList>
             {
                 Body = _deploymentList
-            });
+            };
         }
 
         public Task<HttpOperationResponse<V1Status>> DeleteCollectionNamespacedControllerRevisionWithHttpMessagesAsync(string namespaceParameter, V1DeleteOptions body = null, string continueParameter = null, string dryRun = null, string fieldSelector = null, int? gracePeriodSeconds = null, string labelSelector = null, int? limit = null, bool? orphanDependents = null, string propagationPolicy = null, string resourceVersion = null, string resourceVersionMatch = null, int? timeoutSeconds = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
