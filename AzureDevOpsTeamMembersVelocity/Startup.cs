@@ -22,8 +22,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
 using MudBlazor.Services;
-using static System.Environment;
-using AzureDevOpsTeamMembersVelocity.Mock;
 
 namespace AzureDevOpsTeamMembersVelocity
 {
@@ -95,11 +93,6 @@ namespace AzureDevOpsTeamMembersVelocity
 
             services.AddSingleton<IKubernetes>(sp =>
             {
-                if (string.Equals(Configuration["MockKubernetes"], bool.TrueString, StringComparison.OrdinalIgnoreCase))
-                {
-                    return new MockKubernetes();
-                }
-
                 if (KubernetesClientConfiguration.IsInCluster())
                 {
                     return new Kubernetes(KubernetesClientConfiguration.InClusterConfig());
@@ -110,8 +103,7 @@ namespace AzureDevOpsTeamMembersVelocity
 
             services.AddResponseCompression(opts =>
             {
-                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-                    new[] { "application/octet-stream" });
+                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
             });
         }
 
