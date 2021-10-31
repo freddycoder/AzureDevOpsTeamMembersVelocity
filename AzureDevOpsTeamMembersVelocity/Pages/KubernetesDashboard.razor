@@ -487,21 +487,28 @@
     {
         var tokenSource = new System.Threading.CancellationTokenSource();
 
-        var channel = await logHubConnection.StreamAsChannelAsync<string>("GetPodLog", podNamespace, podName, tokenSource.Token);
-
-        TokensBag.Add(taskKey, tokenSource);
-
-        while (await channel.WaitToReadAsync(tokenSource.Token))
+        try
         {
-            while (channel.TryRead(out var log))
+            var channel = await logHubConnection.StreamAsChannelAsync<string>("GetPodLog", podNamespace, podName, tokenSource.Token);
+
+            TokensBag.Add(taskKey, tokenSource);
+
+            while (await channel.WaitToReadAsync(tokenSource.Token))
             {
-                PodLogs.Add(log);
-                StateHasChanged();
-                if (ScrollToBottom)
+                while (channel.TryRead(out var log))
                 {
-                    await JS.InvokeVoidAsync("window.scrollToBottom");
+                    PodLogs.Add(log);
+                    StateHasChanged();
+                    if (ScrollToBottom)
+                    {
+                        await JS.InvokeVoidAsync("window.scrollToBottom");
+                    }
                 }
             }
+        }
+        catch (OperationCanceledException e)
+        {
+            Logger.LogInformation($"{e.Message}{Environment.NewLine}{e.StackTrace}");
         }
     }
 
