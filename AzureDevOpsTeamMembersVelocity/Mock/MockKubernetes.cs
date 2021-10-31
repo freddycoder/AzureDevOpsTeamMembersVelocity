@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.WebSockets;
 using System.Threading;
@@ -77,7 +76,7 @@ namespace AzureDevOpsTeamMembersVelocity.Mock
         private readonly Task _backgroundProcess;
 
         /// <summary>
-        /// Constructeur par défaut
+        /// Default constructor
         /// </summary>
         public MockKubernetes()
         {
@@ -377,13 +376,6 @@ namespace AzureDevOpsTeamMembersVelocity.Mock
         /// <inheritdoc />
         public async Task<HttpOperationResponse<V1NamespaceList>> ListNamespaceWithHttpMessagesAsync(bool? allowWatchBookmarks = null, string continueParameter = null, string fieldSelector = null, string labelSelector = null, int? limit = null, string resourceVersion = null, string resourceVersionMatch = null, int? timeoutSeconds = null, bool? watch = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
-            if (watch == true)
-            {
-                await Task.Delay(int.MaxValue, cancellationToken);
-
-                return new HttpOperationResponse<V1NamespaceList>();
-            }
-
             return new HttpOperationResponse<V1NamespaceList>
             {
                 Body = _namespaceList
@@ -670,13 +662,6 @@ namespace AzureDevOpsTeamMembersVelocity.Mock
         /// <inheritdoc />
         public async Task<HttpOperationResponse<V1PodList>> ListNamespacedPodWithHttpMessagesAsync(string namespaceParameter, bool? allowWatchBookmarks = null, string continueParameter = null, string fieldSelector = null, string labelSelector = null, int? limit = null, string resourceVersion = null, string resourceVersionMatch = null, int? timeoutSeconds = null, bool? watch = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
-            if (watch == true)
-            {
-                await Task.Delay(int.MaxValue, cancellationToken);
-
-                return new HttpOperationResponse<V1PodList>();
-            }
-
             return new HttpOperationResponse<V1PodList>
             {
                 Body = _podList
@@ -1689,6 +1674,7 @@ namespace AzureDevOpsTeamMembersVelocity.Mock
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public Task<HttpOperationResponse<V1DaemonSetList>> ListDaemonSetForAllNamespacesWithHttpMessagesAsync(bool? allowWatchBookmarks = null, string continueParameter = null, string fieldSelector = null, string labelSelector = null, int? limit = null, bool? pretty = null, string resourceVersion = null, string resourceVersionMatch = null, int? timeoutSeconds = null, bool? watch = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
@@ -1697,74 +1683,79 @@ namespace AzureDevOpsTeamMembersVelocity.Mock
         /// <inheritdoc />
         public async Task<HttpOperationResponse<V1DeploymentList>> ListDeploymentForAllNamespacesWithHttpMessagesAsync(bool? allowWatchBookmarks = null, string continueParameter = null, string fieldSelector = null, string labelSelector = null, int? limit = null, bool? pretty = null, string resourceVersion = null, string resourceVersionMatch = null, int? timeoutSeconds = null, bool? watch = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
-            if (watch == true)
-            {
-                await Task.Delay(int.MaxValue, cancellationToken);
-
-                return new HttpOperationResponse<V1DeploymentList>();
-            }
-
             return new HttpOperationResponse<V1DeploymentList>
             {
                 Body = _deploymentList
             };
         }
 
+        /// <inheritdoc />
         public Task<HttpOperationResponse<V1Status>> DeleteCollectionNamespacedControllerRevisionWithHttpMessagesAsync(string namespaceParameter, V1DeleteOptions body = null, string continueParameter = null, string dryRun = null, string fieldSelector = null, int? gracePeriodSeconds = null, string labelSelector = null, int? limit = null, bool? orphanDependents = null, string propagationPolicy = null, string resourceVersion = null, string resourceVersionMatch = null, int? timeoutSeconds = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public Task<HttpOperationResponse<V1ControllerRevisionList>> ListNamespacedControllerRevisionWithHttpMessagesAsync(string namespaceParameter, bool? allowWatchBookmarks = null, string continueParameter = null, string fieldSelector = null, string labelSelector = null, int? limit = null, string resourceVersion = null, string resourceVersionMatch = null, int? timeoutSeconds = null, bool? watch = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public Task<HttpOperationResponse<V1ControllerRevision>> CreateNamespacedControllerRevisionWithHttpMessagesAsync(V1ControllerRevision body, string namespaceParameter, string dryRun = null, string fieldManager = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public Task<HttpOperationResponse<V1Status>> DeleteNamespacedControllerRevisionWithHttpMessagesAsync(string name, string namespaceParameter, V1DeleteOptions body = null, string dryRun = null, int? gracePeriodSeconds = null, bool? orphanDependents = null, string propagationPolicy = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public Task<HttpOperationResponse<V1ControllerRevision>> ReadNamespacedControllerRevisionWithHttpMessagesAsync(string name, string namespaceParameter, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public Task<HttpOperationResponse<V1ControllerRevision>> PatchNamespacedControllerRevisionWithHttpMessagesAsync(V1Patch body, string name, string namespaceParameter, string dryRun = null, string fieldManager = null, bool? force = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public Task<HttpOperationResponse<V1ControllerRevision>> ReplaceNamespacedControllerRevisionWithHttpMessagesAsync(V1ControllerRevision body, string name, string namespaceParameter, string dryRun = null, string fieldManager = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public Task<HttpOperationResponse<V1Status>> DeleteCollectionNamespacedDaemonSetWithHttpMessagesAsync(string namespaceParameter, V1DeleteOptions body = null, string continueParameter = null, string dryRun = null, string fieldSelector = null, int? gracePeriodSeconds = null, string labelSelector = null, int? limit = null, bool? orphanDependents = null, string propagationPolicy = null, string resourceVersion = null, string resourceVersionMatch = null, int? timeoutSeconds = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public Task<HttpOperationResponse<V1DaemonSetList>> ListNamespacedDaemonSetWithHttpMessagesAsync(string namespaceParameter, bool? allowWatchBookmarks = null, string continueParameter = null, string fieldSelector = null, string labelSelector = null, int? limit = null, string resourceVersion = null, string resourceVersionMatch = null, int? timeoutSeconds = null, bool? watch = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public Task<HttpOperationResponse<V1DaemonSet>> CreateNamespacedDaemonSetWithHttpMessagesAsync(V1DaemonSet body, string namespaceParameter, string dryRun = null, string fieldManager = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public Task<HttpOperationResponse<V1Status>> DeleteNamespacedDaemonSetWithHttpMessagesAsync(string name, string namespaceParameter, V1DeleteOptions body = null, string dryRun = null, int? gracePeriodSeconds = null, bool? orphanDependents = null, string propagationPolicy = null, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public Task<HttpOperationResponse<V1DaemonSet>> ReadNamespacedDaemonSetWithHttpMessagesAsync(string name, string namespaceParameter, bool? pretty = null, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
