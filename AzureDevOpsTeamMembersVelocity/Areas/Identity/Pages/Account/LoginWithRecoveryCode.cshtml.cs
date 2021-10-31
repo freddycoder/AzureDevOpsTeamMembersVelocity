@@ -33,6 +33,9 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
         [BindProperty]
         public InputModel Input { get; set; } = new InputModel();
 
+        /// <summary>
+        /// The return url
+        /// </summary>
         public string? ReturnUrl { get; set; }
 
         /// <summary>
@@ -40,6 +43,9 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
+            /// <summary>
+            /// The recovery code
+            /// </summary>
             [BindProperty]
             [Required]
             [DataType(DataType.Text)]
@@ -47,6 +53,11 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
             public string? RecoveryCode { get; set; }
         }
 
+        /// <summary>
+        /// Append on Http Get
+        /// </summary>
+        /// <param name="returnUrl"></param>
+        /// <returns></returns>
         public async Task<IActionResult> OnGetAsync(string? returnUrl = null)
         {
             // Ensure the user has gone through the username & password screen first
@@ -61,6 +72,11 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity.Pages.Account
             return Page();
         }
 
+        /// <summary>
+        /// Append on Http Post
+        /// </summary>
+        /// <param name="returnUrl"></param>
+        /// <returns></returns>
         public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
         {
             if (!ModelState.IsValid || (Input == null || Input.RecoveryCode == null))

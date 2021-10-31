@@ -9,10 +9,19 @@ namespace AzureDevOpsTeamMembersVelocity.Model
     /// </summary>
     public class Nuget
     {
+        /// <summary>
+        /// The id of the nuget
+        /// </summary>
         public Guid Id { get; set; }
 
+        /// <summary>
+        /// The normalized name
+        /// </summary>
         public string? NormalizedName { get; set; }
 
+        /// <summary>
+        /// The name
+        /// </summary>
         public string? Name { get; set; }
 
         /// <summary>
@@ -20,10 +29,19 @@ namespace AzureDevOpsTeamMembersVelocity.Model
         /// </summary>
         public string? ProtocolType { get; set; }
 
+        /// <summary>
+        /// The url
+        /// </summary>
         public string? Url { get; set; }
 
+        /// <summary>
+        /// List of version of the nuget
+        /// </summary>
         public List<NugetVersion>? Versions { get; set; }
 
+        /// <summary>
+        /// Links related to the package
+        /// </summary>
         [JsonPropertyName("_links")]
         public NugetLinks? Links { get; set; }
     }
