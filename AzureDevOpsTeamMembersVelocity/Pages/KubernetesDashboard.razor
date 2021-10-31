@@ -243,7 +243,7 @@
             {
                 Task.Run(async () =>
                 {
-                    var namespaceChannel = await k8sHubConnection.StreamAsChannelAsync<Pair<WatcherChangeTypes?, V1Namespace>>("Namespaces", _dashboardToken.Token);
+                    var namespaceChannel = await k8sHubConnection.StreamAsChannelAsync<Pair<WatchEventType?, V1Namespace>>("Namespaces", _dashboardToken.Token);
 
                     while (await namespaceChannel.WaitToReadAsync(_dashboardToken.Token))
                     {
@@ -257,20 +257,19 @@
                             switch (@namespace.Item1)
                             {
                                 case null:
-                                case WatcherChangeTypes.Created:
+                                case WatchEventType.Added:
                                     NamespaceList.Add(@namespace.Item2);
                                     break;
-                                case WatcherChangeTypes.Changed:
-                                    throw new NotImplementedException();
-                                    break;
-                                case WatcherChangeTypes.Deleted:
-                                    throw new NotImplementedException();
-                                    break;
-                                case WatcherChangeTypes.Renamed:
-                                    throw new NotImplementedException();
-                                    break;
+                                case WatchEventType.Bookmark:
+                                    throw new NotImplementedException(WatchEventType.Bookmark.ToString());
+                                case WatchEventType.Deleted:
+                                    throw new NotImplementedException(WatchEventType.Deleted.ToString());
+                                case WatchEventType.Error:
+                                    throw new NotImplementedException(WatchEventType.Error.ToString());
+                                case WatchEventType.Modified:
+                                    throw new NotImplementedException(WatchEventType.Modified.ToString());
                                 default:
-                                    throw new InvalidOperationException($"Unknow {nameof(WatcherChangeTypes)}");
+                                    throw new InvalidOperationException($"Unknow {nameof(WatchEventType)} with value {@namespace.Item1}");
                             }
 
                             await InvokeAsync(() =>
@@ -282,7 +281,7 @@
                 }),
                 Task.Run(async () =>
                 {
-                    var deploymentChannel = await k8sHubConnection.StreamAsChannelAsync<Pair<WatcherChangeTypes?, V1Deployment>>("Deployments", _dashboardToken.Token);
+                    var deploymentChannel = await k8sHubConnection.StreamAsChannelAsync<Pair<WatchEventType?, V1Deployment>>("Deployments", _dashboardToken.Token);
 
                     while (await deploymentChannel.WaitToReadAsync(_dashboardToken.Token))
                     {
@@ -296,20 +295,19 @@
                             switch (deployment.Item1)
                             {
                                 case null:
-                                case WatcherChangeTypes.Created:
+                                case WatchEventType.Added:
                                     Deployments.Add(deployment.Item2);
                                     break;
-                                case WatcherChangeTypes.Changed:
-                                    throw new NotImplementedException();
-                                    break;
-                                case WatcherChangeTypes.Deleted:
-                                    throw new NotImplementedException();
-                                    break;
-                                case WatcherChangeTypes.Renamed:
-                                    throw new NotImplementedException();
-                                    break;
+                                case WatchEventType.Bookmark:
+                                    throw new NotImplementedException(WatchEventType.Bookmark.ToString());
+                                case WatchEventType.Deleted:
+                                    throw new NotImplementedException(WatchEventType.Deleted.ToString());
+                                case WatchEventType.Error:
+                                    throw new NotImplementedException(WatchEventType.Error.ToString());
+                                case WatchEventType.Modified:
+                                    throw new NotImplementedException(WatchEventType.Modified.ToString());
                                 default:
-                                    throw new InvalidOperationException($"Unknow {nameof(WatcherChangeTypes)}");
+                                    throw new InvalidOperationException($"Unknow {nameof(WatchEventType)} with value {deployment.Item1}");
                             }
 
                             await InvokeAsync(() =>
@@ -321,7 +319,7 @@
                 }),
                 Task.Run(async () =>
                 {
-                    var podChannel = await k8sHubConnection.StreamAsChannelAsync<Pair<WatcherChangeTypes?, V1Pod>>("Pods", _dashboardToken.Token);
+                    var podChannel = await k8sHubConnection.StreamAsChannelAsync<Pair<WatchEventType?, V1Pod>>("Pods", _dashboardToken.Token);
 
                     while (await podChannel.WaitToReadAsync(_dashboardToken.Token))
                     {
@@ -335,20 +333,19 @@
                             switch (pod.Item1)
                             {
                                 case null:
-                                case WatcherChangeTypes.Created:
+                                case WatchEventType.Added:
                                     Pods.Add(pod.Item2);
                                     break;
-                                case WatcherChangeTypes.Changed:
-                                    throw new NotImplementedException();
-                                    break;
-                                case WatcherChangeTypes.Deleted:
-                                    throw new NotImplementedException();
-                                    break;
-                                case WatcherChangeTypes.Renamed:
-                                    throw new NotImplementedException();
-                                    break;
+                                case WatchEventType.Bookmark:
+                                    throw new NotImplementedException(WatchEventType.Bookmark.ToString());
+                                case WatchEventType.Deleted:
+                                    throw new NotImplementedException(WatchEventType.Deleted.ToString());
+                                case WatchEventType.Error:
+                                    throw new NotImplementedException(WatchEventType.Error.ToString());
+                                case WatchEventType.Modified:
+                                    throw new NotImplementedException(WatchEventType.Modified.ToString());
                                 default:
-                                    throw new InvalidOperationException($"Unknow {nameof(WatcherChangeTypes)}");
+                                    throw new InvalidOperationException($"Unknow {nameof(WatchEventType)} with value {pod.Item1}");
                             }
 
                             await InvokeAsync(() =>
