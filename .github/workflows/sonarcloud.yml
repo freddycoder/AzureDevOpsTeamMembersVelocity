@@ -43,5 +43,5 @@ jobs:
         shell: powershell
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"freddycoder_AzureDevOpsTeamMembersVelocity" /o:"freddycoder" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
-          dotnet build TeamMembersVelocity.sln
+          dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
