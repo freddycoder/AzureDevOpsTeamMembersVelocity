@@ -2,9 +2,17 @@ name: AzureDevOpsTeamMembersVelocity-Image
 
 on:
   push:
+    paths:
+      - 'AzureDevOpsTeamMembersVelocity'
+      - 'IntegrationTest'
+      - 'UnitTest'
     branches:
       - main
   pull_request:
+    paths:
+      - 'AzureDevOpsTeamMembersVelocity'
+      - 'IntegrationTest'
+      - 'UnitTest'
     types: [opened, synchronize, reopened]
 
 env:

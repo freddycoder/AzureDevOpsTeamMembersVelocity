@@ -360,3 +360,5 @@ Documentation.xml
 AzureDevOpsTeamMembersVelocity.db
 certs/
 .env
+
+coverage.cobertura.xml
