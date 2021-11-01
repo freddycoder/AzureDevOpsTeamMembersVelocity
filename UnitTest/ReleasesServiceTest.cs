@@ -15,7 +15,16 @@ namespace UnitTest
 
             Assert.Null(errorMessage);
             Assert.NotNull(releasesList);
+            if (releasesList is null)
+            {
+                return;
+            }
             Assert.Equal(17, releasesList.Count);
+            Assert.NotNull(releasesList.Value);
+            if (releasesList.Value is null)
+            {
+                return;
+            }
             Assert.Equal(17, releasesList.Value.Count);
         }
     }

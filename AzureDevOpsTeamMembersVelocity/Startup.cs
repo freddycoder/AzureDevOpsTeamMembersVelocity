@@ -170,7 +170,7 @@ namespace AzureDevOpsTeamMembersVelocity
                 endpoints.MapControllers();
                 endpoints.MapBlazorHub();
                 endpoints.MapHub<LogStreamHub>("/GetPodLog");
-                endpoints.MapHub<K8sHub>("/K8sHub");
+                endpoints.MapHub<K8SHub>("/K8sHub");
                 endpoints.MapFallbackToPage("/_Host");
             });
         }

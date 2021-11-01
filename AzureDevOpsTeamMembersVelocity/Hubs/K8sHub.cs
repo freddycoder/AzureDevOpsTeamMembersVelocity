@@ -14,17 +14,17 @@ namespace AzureDevOpsTeamMembersVelocity.Hubs
     /// K8sHub to get informations and get notify for changes
     /// </summary>
     [Authorize]
-    public class K8sHub : Hub
+    public class K8SHub : Hub
     {
         private readonly IKubernetes _kubernetesClient;
-        private readonly ILogger<K8sHub> _logger;
+        private readonly ILogger<K8SHub> _logger;
 
         /// <summary>
         /// Constructor with dependencies
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
-        public K8sHub(IKubernetes client, ILogger<K8sHub> logger)
+        public K8SHub(IKubernetes client, ILogger<K8SHub> logger)
         {
             _kubernetesClient = client;
             _logger = logger;
