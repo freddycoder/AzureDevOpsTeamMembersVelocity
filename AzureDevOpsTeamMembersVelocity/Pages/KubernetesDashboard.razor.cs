@@ -427,6 +427,9 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
 
         public string PodLogsTaskKey(string podNamespace, string podName) => $"{podNamespace}{podName}";
 
+        /// <summary>
+        /// Set of deployment that user select to listen to logs
+        /// </summary>
         public HashSet<string> DeployementCheckedForLogs { get; } = new();
 
         private async Task OnDeploymentLogClick(ChangeEventArgs args, string deploymentNamespace, string deploymentName)
@@ -437,23 +440,23 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
 
                 List<Task> taskList = new();
 
-                foreach (var pod in Pods.Values)
+                foreach (var pod in Pods.Values.Where(p => p.Name().StartsWith(deploymentName)))
                 {
-                    if (pod.Name().StartsWith(deploymentName))
+                    var keyHashSet = $"{deploymentNamespace}-{deploymentName}";
+
+                    taskList.Add(OnPodLogClick(args, deploymentNamespace, pod.Name()).ContinueWith(task =>
                     {
-                        var keyHashSet = $"{deploymentNamespace}-{deploymentName}";
-
-                        taskList.Add(OnPodLogClick(args, deploymentNamespace, pod.Name()).ContinueWith(task =>
+                        try
                         {
-                            try
-                            {
-                                DeployementCheckedForLogs.Remove(keyHashSet);
-                            }
-                            catch { }
+                            DeployementCheckedForLogs.Remove(keyHashSet);
+                        }
+                        catch
+                        {
+                            // The catch block is empty because the code try to remove the string from the set
+                        }
 
-                            return Task.CompletedTask;
-                        }));
-                    }
+                        return Task.CompletedTask;
+                    }));
                 }
 
                 foreach (var task in taskList)
@@ -467,7 +470,10 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
                 {
                     DeployementCheckedForLogs.Remove($"{deploymentNamespace}-{deploymentName}");
                 }
-                catch { }
+                catch 
+                { 
+                    // The catch block is empty because the code try to remove the string from the set
+                }
 
                 Error = e.Message;
                 Logger.LogError(e, e.Message);
@@ -489,11 +495,14 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
 
         private void ClearLogs()
         {
-            while (PodLogs.TryTake(out _)) { }
+            while (PodLogs.TryTake(out _)) ;
         }
 
         private bool ScrollToBottom { get; set; }
 
+        /// <summary>
+        /// inverse the value of the <see cref="ScrollToBottom" /> property
+        /// </summary>
         public void ChangeScrollToBottom()
         {
             ScrollToBottom = !ScrollToBottom;
@@ -530,6 +539,10 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
             _dashboardToken.Dispose();
         }
 
+        /// <summary>
+        /// Set the 'collapse' class to the appropriate property
+        /// </summary>
+        /// <param name="collapseId"></param>
         public void Collapsing(string collapseId)
         {
             if (collapseId == "collapseNamespace")
