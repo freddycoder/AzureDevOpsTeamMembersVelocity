@@ -108,11 +108,11 @@
         }
     }
 
-    public async Task UpdateRepositoryAndGetPullRequests(HashSet<string> repositoriesNames)
+    public async Task UpdateRepositoryAndGetPullRequests(IEnumerable<string> repositoriesNames)
     {
-        SelectedRepositories = repositoriesNames;
+        SelectedRepositories = repositoriesNames?.ToHashSet();
 
-        GitSettings.SelectedRepositories = repositoriesNames;
+        GitSettings.SelectedRepositories = repositoriesNames?.ToHashSet();
 
         PullRequests?.Clear();
 
@@ -121,7 +121,7 @@
             PullRequests = new List<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest>();
         }
 
-        foreach (var repo in GitSettings.SelectedRepositories)
+        foreach (var repo in GitSettings.SelectedRepositories ?? Array.Empty<string>())
         {
             await GetPullRequests(repo);
         }

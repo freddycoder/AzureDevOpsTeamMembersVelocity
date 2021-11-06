@@ -77,6 +77,6 @@
     private System.Reflection.PropertyInfo? PropertyTitleInfo { get; set; }
 
     [Parameter]
-    public Action<HashSet<string?>> OnSelectedValueChanged { get; set; } = (set) => { };
+    public Action<IEnumerable<string?>> OnSelectedValueChanged { get; set; } = (set) => { };
 }
 
