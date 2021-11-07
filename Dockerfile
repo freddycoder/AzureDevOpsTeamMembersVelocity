@@ -5,9 +5,11 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
+COPY ["MockK8s/MockK8s.csproj", "MockK8s/"]
 COPY ["AzureDevOpsTeamMembersVelocity/AzureDevOpsTeamMembersVelocity.csproj", "AzureDevOpsTeamMembersVelocity/"]
 COPY ["UnitTest/UnitTest.csproj", "UnitTest/"]
 COPY ["IntegrationTest/IntegrationTest.csproj", "IntegrationTest/"]
+RUN dotnet restore "MockK8s/MockK8s.csproj"
 RUN dotnet restore "AzureDevOpsTeamMembersVelocity/AzureDevOpsTeamMembersVelocity.csproj"
 RUN dotnet restore "UnitTest/UnitTest.csproj"
 RUN dotnet restore "IntegrationTest/IntegrationTest.csproj"
