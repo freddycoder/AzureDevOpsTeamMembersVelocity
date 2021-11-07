@@ -6,6 +6,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
 
+        "FileLoggingEnable": "true",
+
         "COOKIEAUTH_USER": "admin@teamvelocity.com",
         //"COOKIEAUTH_PASSWORD": "admin",
 
@@ -24,7 +26,7 @@
         // Cache response of the Azure DevOps REST API for reuse
         // If the value is not set, a default cache a 1 seconds is apply
         // Cache is apply for a Scope instance of the DevOpsProxy class
-        "DevOpsProxyCacheSeconds": "3",
+        "DevOpsProxyCacheSeconds": "3"
 
         // If Redis_hostname is initialized, a Redis cache will be use
         // docker pull redis

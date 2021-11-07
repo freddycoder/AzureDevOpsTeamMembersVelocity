@@ -124,7 +124,7 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
         }
 
         private HubConnection? k8sHubConnection;
-        private CancellationTokenSource _dashboardToken = new();
+        private readonly CancellationTokenSource _dashboardToken = new();
         private Task? _dashboardTask;
 
         private HubConnection? logHubConnection;
@@ -191,7 +191,7 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
                             break;
                         case WatchEventType.Modified:
                             var key = @namespace.Item2.Metadata.Name;
-                            if ((NamespaceList.TryGetValue(key, out var oldValue) && NamespaceList.TryUpdate(key, @namespace.Item2, oldValue)) == false)
+                            if (!(NamespaceList.TryGetValue(key, out var oldValue) && NamespaceList.TryUpdate(key, @namespace.Item2, oldValue)))
                             {
                                 var message = $"Failed to update namespace {@namespace.Item2.Metadata.Name}";
                                 Logger.LogError(message);
@@ -253,7 +253,7 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
                             Logger.LogError(JsonSerializer.Serialize(deployment.Item2));
                             break;
                         case WatchEventType.Modified:
-                            if ((Deployments.TryGetValue(key, out var oldValue) && Deployments.TryUpdate(key, deployment.Item2, oldValue)) == false)
+                            if (!(Deployments.TryGetValue(key, out var oldValue) && Deployments.TryUpdate(key, deployment.Item2, oldValue)))
                             {
                                 var message = $"Failed to update deployment {deployment.Item2.Metadata.Name}";
                                 Logger.LogError(message);

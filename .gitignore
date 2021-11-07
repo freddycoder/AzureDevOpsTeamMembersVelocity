@@ -362,3 +362,5 @@ certs/
 .env
 
 coverage.cobertura.xml
+
+AzureDevOpsTeamMembersVelocity_*.log

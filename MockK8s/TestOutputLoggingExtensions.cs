@@ -2,7 +2,7 @@
 using System;
 using Xunit.Abstractions;
 
-namespace IntegrationTest.MockK8s
+namespace MockK8s
 {
     /// <summary>
     ///     Extension methods for logging to Xunit text output.

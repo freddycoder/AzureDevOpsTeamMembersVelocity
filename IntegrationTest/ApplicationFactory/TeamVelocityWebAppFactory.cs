@@ -1,21 +1,16 @@
-﻿using k8s;
+﻿using AzureDevOpsTeamMembersVelocity.Extensions;
+using AzureDevOpsTeamMembersVelocity.Hubs;
+using k8s;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using MockK8s;
 using System;
 using System.Net.Http;
 using Xunit.Sdk;
-
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using AzureDevOpsTeamMembersVelocity.Hubs;
-using AzureDevOpsTeamMembersVelocity.Extensions;
-//using Microsoft.Extensions.Logging;
 
 namespace IntegrationTest.ApplicationFactory
 {
@@ -35,7 +30,7 @@ namespace IntegrationTest.ApplicationFactory
                 // Mock kubernetes
                 services.RemoveAll(typeof(IKubernetes));
 
-                services.AddSingleton(sp => MockK8s.K8sClientFactory.CreateClientForIntegrationTest(new TestOutputHelper()));
+                services.AddSingleton(sp => K8sClientFactory.CreateClientForIntegrationTest(new TestOutputHelper()));
 
                 // Provide Func for SignlaR connections
                 var webHostBuilder = new WebHostBuilder()
@@ -44,6 +39,8 @@ namespace IntegrationTest.ApplicationFactory
                         services.AddAuthentication();
 
                         services.AddTeamMemberVelocityAutorisation(context.Configuration);
+
+                        services.AddSingleton<IKubernetes>(K8sClientFactory.CreateClientForIntegrationTest(new TestOutputHelper()));
 
                         services.AddSignalR();
                     })

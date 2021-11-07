@@ -105,6 +105,22 @@ namespace AzureDevOpsTeamMembersVelocity
             {
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
             });
+
+            if (string.Equals(Configuration["FileLoggingEnable"], bool.TrueString, StringComparison.OrdinalIgnoreCase))
+            {
+                services.AddLogging(loggingBuilder =>
+                {
+                    var loggingSection = Configuration.GetSection("Logging");
+
+                    loggingBuilder.AddFile(loggingSection, fileLoggerOpts =>
+                    {
+                        fileLoggerOpts.FormatLogFileName = fName =>
+                        {
+                            return string.Format(fName, DateTime.Now);
+                        };
+                    });
+                });
+            }
         }
 
         /// <summary>

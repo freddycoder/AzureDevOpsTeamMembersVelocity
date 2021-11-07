@@ -2,7 +2,7 @@
 using System;
 using Xunit.Abstractions;
 
-namespace IntegrationTest.MockK8s
+namespace MockK8s
 {
     /// <summary>
     ///     Logger provider for logging to Xunit test output.
@@ -22,12 +22,7 @@ namespace IntegrationTest.MockK8s
         /// </param>
         public TestOutputLoggerProvider(ITestOutputHelper testOutput, LogLevel minLogLevel)
         {
-            if (testOutput == null)
-            {
-                throw new ArgumentNullException(nameof(testOutput));
-            }
-
-            TestOutput = testOutput;
+            TestOutput = testOutput ?? throw new ArgumentNullException(nameof(testOutput));
             MinLogLevel = minLogLevel;
         }
 

@@ -5,16 +5,16 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IntegrationTest.MockK8s
+namespace MockK8s
 {
     public class MockWebSocket : WebSocket
     {
         private WebSocketCloseStatus? closeStatus;
         private string closeStatusDescription;
         private WebSocketState state;
-        private string subProtocol;
-        private ConcurrentQueue<MessageData> receiveBuffers = new ConcurrentQueue<MessageData>();
-        private AsyncAutoResetEvent receiveEvent = new AsyncAutoResetEvent(false);
+        private readonly string subProtocol;
+        private readonly ConcurrentQueue<MessageData> receiveBuffers = new();
+        private readonly AsyncAutoResetEvent receiveEvent = new(false);
         private bool disposedValue;
 
         public MockWebSocket(string subProtocol = null)
@@ -61,7 +61,7 @@ namespace IntegrationTest.MockK8s
             closeStatusDescription = statusDescription;
             receiveBuffers.Enqueue(new MessageData()
             {
-                Buffer = new ArraySegment<byte>(new byte[] { }),
+                Buffer = new ArraySegment<byte>(Array.Empty<byte>()),
                 EndOfMessage = true,
                 MessageType = WebSocketMessageType.Close,
             });
@@ -88,8 +88,7 @@ namespace IntegrationTest.MockK8s
             var endOfMessage = true;
             var messageType = WebSocketMessageType.Close;
 
-            MessageData received = null;
-            if (receiveBuffers.TryPeek(out received))
+            if (receiveBuffers.TryPeek(out MessageData received))
             {
                 messageType = received.MessageType;
                 if (received.Buffer.Count <= buffer.Count)
