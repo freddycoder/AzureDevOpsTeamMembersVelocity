@@ -25,6 +25,7 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
     [Authorize]
     public partial class KubernetesDashboard : IDisposable, IAsyncDisposable
     {
+#pragma warning disable CS8618 // Un champ non-nullable doit contenir une valeur non-null lors de la fermeture du constructeur. Envisagez de déclarer le champ comme nullable.
         [Inject]
         IKubernetes Client { get; set; }
 
@@ -42,15 +43,31 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
 
         [Inject]
         IUserPreferenceRepository UserPreference { get; set; }
+#pragma warning restore CS8618 // Un champ non-nullable doit contenir une valeur non-null lors de la fermeture du constructeur. Envisagez de déclarer le champ comme nullable.
 
+        /// <summary>
+        /// Namespaces
+        /// </summary>
         public ConcurrentDictionary<string, V1Namespace> NamespaceList { get; set; } = new();
 
+        /// <summary>
+        /// Deployments
+        /// </summary>
         public ConcurrentDictionary<string, V1Deployment> Deployments { get; set; } = new();
 
+        /// <summary>
+        /// Pods
+        /// </summary>
         public ConcurrentDictionary<string, V1Pod> Pods { get; set; } = new();
 
+        /// <summary>
+        /// The error message to display to the user, if any
+        /// </summary>
         public string? Error { get; set; }
 
+        /// <summary>
+        /// Preferences of the user
+        /// </summary>
         public KubernetesPageSettings Settings { get; set; } = new KubernetesPageSettings();
 
         /// <inheritdoc />
@@ -396,7 +413,7 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
             }
         }
 
-        public async Task ListenTopPodLogs(string taskKey, string podNamespace, string podName)
+        private async Task ListenTopPodLogs(string taskKey, string podNamespace, string podName)
         {
             CancellationTokenSource tokenSource = new();
 
@@ -425,7 +442,7 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
             }
         }
 
-        public string PodLogsTaskKey(string podNamespace, string podName) => $"{podNamespace}{podName}";
+        private static string PodLogsTaskKey(string podNamespace, string podName) => $"{podNamespace}{podName}";
 
         /// <summary>
         /// Set of deployment that user select to listen to logs
@@ -508,6 +525,7 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
             ScrollToBottom = !ScrollToBottom;
         }
 
+        /// <inheritdoc />
         public async ValueTask DisposeAsync()
         {
             if (logHubConnection is not null)
@@ -521,22 +539,36 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
             }
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
-            _dashboardToken.Cancel();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-            try
+        /// <summary>
+        /// Dispose method that cleanup backgroud task
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                _dashboardTask?.Wait();
-            }
-            catch (Exception e)
-            {
-                Console.Error.WriteLine(e.Message);
-                Console.Error.WriteLine(e.StackTrace);
-            }
+                _dashboardToken.Cancel();
 
-            _dashboardTask?.Dispose();
-            _dashboardToken.Dispose();
+                try
+                {
+                    _dashboardTask?.Wait();
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine(e.Message);
+                    Console.Error.WriteLine(e.StackTrace);
+                }
+
+                _dashboardTask?.Dispose();
+                _dashboardToken.Dispose();
+            }
         }
 
         /// <summary>

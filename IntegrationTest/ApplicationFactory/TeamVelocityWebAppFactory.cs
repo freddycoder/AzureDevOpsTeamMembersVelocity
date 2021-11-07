@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
+using Xunit.Sdk;
 
 namespace IntegrationTest.ApplicationFactory
 {
@@ -23,7 +24,7 @@ namespace IntegrationTest.ApplicationFactory
 
                 services.Remove(descriptor);
 
-                services.AddSingleton<IKubernetes>(sp => NSubstitute.Substitute.For<IKubernetes>());
+                services.AddSingleton<IKubernetes>(sp => MockK8s.K8sClientFactory.CreateClientForIntegrationTest(new TestOutputHelper()));
             });
         }
     }
