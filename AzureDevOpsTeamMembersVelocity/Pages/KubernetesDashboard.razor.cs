@@ -4,6 +4,7 @@ using k8s.Models;
 using k8s;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using System;
@@ -16,6 +17,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using AzureDevOpsTeamMembersVelocity.Repository;
 using System.Text.Json;
+using System.Net.Http;
 
 namespace AzureDevOpsTeamMembersVelocity.Pages
 {
@@ -43,6 +45,9 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
 
         [Inject]
         IUserPreferenceRepository UserPreference { get; set; }
+
+        [Inject]
+        IServiceProvider ServiceProvider { get; set; }
 #pragma warning restore CS8618 // Un champ non-nullable doit contenir une valeur non-null lors de la fermeture du constructeur. Envisagez de déclarer le champ comme nullable.
 
         /// <summary>
@@ -93,6 +98,7 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
                     .WithUrl(NavigationManager.ToAbsoluteUri("/K8sHub"), options =>
                     {
                         options.Cookies = cookiesCollection;
+                        options.HttpMessageHandlerFactory = ServiceProvider.GetService<Func<HttpMessageHandler, HttpMessageHandler>>();
                     })
                     .Build();
 
@@ -104,6 +110,7 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
                     .WithUrl(NavigationManager.ToAbsoluteUri("/GetPodLog"), options =>
                     {
                         options.Cookies = cookiesCollection;
+                        options.HttpMessageHandlerFactory = ServiceProvider.GetService<Func<HttpMessageHandler, HttpMessageHandler>>();
                     })
                     .Build();
 
