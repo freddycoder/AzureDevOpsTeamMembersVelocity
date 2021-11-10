@@ -6,6 +6,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
 
+        // Write log to a file
         "FileLoggingEnable": "true",
 
         "COOKIEAUTH_USER": "admin@teamvelocity.com",
@@ -26,15 +27,17 @@
         // Cache response of the Azure DevOps REST API for reuse
         // If the value is not set, a default cache a 1 seconds is apply
         // Cache is apply for a Scope instance of the DevOpsProxy class
-        "DevOpsProxyCacheSeconds": "3"
+        "DevOpsProxyCacheSeconds": "3",
 
         // If Redis_hostname is initialized, a Redis cache will be use
         // docker pull redis
         // docker run -d -p 6379:6379 redis
-        //"REDIS_HOSTNAME": "localhost"
+        //"REDIS_HOSTNAME": "localhost",
 
         // Delay of the next check of log in the LogStreamHub
-        //"DelayLogStreamEmpty": "1998"
+        //"DelayLogStreamEmpty": "1998",
+
+        //"MockK8s": "true"
       },
       "dotnetRunMessages": "true",
       "applicationUrl": "https://localhost:5001;http://localhost:5000"

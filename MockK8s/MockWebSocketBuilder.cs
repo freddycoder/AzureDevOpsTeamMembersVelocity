@@ -15,7 +15,7 @@ namespace MockK8s
 
         public Collection<X509Certificate2> Certificates { get; } = new Collection<X509Certificate2>();
 
-        public Uri Uri { get; private set; }
+        public Uri? Uri { get; private set; }
 
         public WebSocket PublicWebSocket => this.WebSocket;
 
@@ -27,8 +27,7 @@ namespace MockK8s
 
         public override Task<WebSocket> BuildAndConnectAsync(Uri uri, CancellationToken cancellationToken)
         {
-            this.Uri
- = uri;
+            this.Uri = uri;
 
             return Task.FromResult(this.PublicWebSocket);
         }

@@ -16,7 +16,7 @@ namespace MockK8s
         private static readonly string AddedDeploymentStreamLine = BuildWatchEventStreamLine(WatchEventType.Added, MockKubeApiServer.MockDeploymentReponse);
         private static readonly string AddedPodStreamLine = BuildWatchEventStreamLine(WatchEventType.Added, MockKubeApiServer.MockPodResponse);
 
-        public static IKubernetes CreateClientForIntegrationTest(ITestOutputHelper testOutput)
+        public static IKubernetes CreateClientForIntegrationTest(ITestOutputHelper? testOutput = null)
         {
             var created = new AsyncManualResetEvent(false);
             var eventsReceived = new AsyncManualResetEvent(false);

@@ -146,6 +146,7 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
             {
                 Logger.LogError(e.Message, e);
                 Error = $"RunK8sDashboarde: {e.Message}{Environment.NewLine}You may want to reload the page to fully restore the live refresh";
+                StateHasChanged();
             }
         }
 
@@ -370,10 +371,17 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
                                     {
                                         Logger.LogInformation("Get metadata update on a pod that listen to logs, but the pod is not ready for listening to logs");
                                     }
-                                    else if ((pod.Item2.Status.Phase == "Running" || pod.Item2.Status.Phase == "Pending") &&
-                                             DeployementCheckedForLogs.Any(d => pod.Item2.Metadata.Name.StartsWith(d)))
+                                    else if (pod.Item2.Status.Phase == "Running" || pod.Item2.Status.Phase == "Pending")
                                     {
-                                        taskList.Add(ListenTopPodLogs(PodLogsTaskKey(@namespace, podName), @namespace, podName));
+                                        if (DeployementCheckedForLogs.Any(d => pod.Item2.Metadata.Name.StartsWith(d)))
+                                        {
+                                            Logger.LogInformation("Start listen to pod log after reveived a ready state");
+                                            taskList.Add(ListenTopPodLogs(PodLogsTaskKey(@namespace, podName), @namespace, podName));
+                                        }
+                                        else
+                                        {
+                                            Logger.LogInformation($"Recived {WatchEventType.Modified} from the hub for pod {podName} in namespace {@namespace}");
+                                        }
                                     }
                                     else
                                     {

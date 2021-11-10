@@ -29,8 +29,8 @@ namespace MockK8s
 
         private readonly IWebHost _webHost;
 
-        public MockKubeApiServer(ITestOutputHelper testOutput, Func<HttpContext, Task<bool>> shouldNext = null,
-            Action<ListenOptions> listenConfigure = null,
+        public MockKubeApiServer(ITestOutputHelper? testOutput, Func<HttpContext, Task<bool>>? shouldNext = null,
+            Action<ListenOptions>? listenConfigure = null,
             string resp = MockPodResponse)
         {
             shouldNext ??= (_ => Task.FromResult(true));

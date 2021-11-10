@@ -12,12 +12,12 @@ namespace MockK8s
         private WebSocketCloseStatus? closeStatus;
         private string closeStatusDescription;
         private WebSocketState state;
-        private readonly string subProtocol;
+        private readonly string? subProtocol;
         private readonly ConcurrentQueue<MessageData> receiveBuffers = new();
         private readonly AsyncAutoResetEvent receiveEvent = new(false);
         private bool disposedValue;
 
-        public MockWebSocket(string subProtocol = null)
+        public MockWebSocket(string? subProtocol = null)
         {
             this.subProtocol = subProtocol;
         }
@@ -47,7 +47,7 @@ namespace MockK8s
 
         public override WebSocketState State => state;
 
-        public override string SubProtocol => subProtocol;
+        public override string? SubProtocol => subProtocol;
 
         public override void Abort()
         {
@@ -136,7 +136,7 @@ namespace MockK8s
 
         public class MessageDataEventArgs : EventArgs
         {
-            public MessageData Data { get; set; }
+            public MessageData? Data { get; set; }
         }
 
         protected virtual void Dispose(bool disposing)

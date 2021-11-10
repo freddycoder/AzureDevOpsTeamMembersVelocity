@@ -27,7 +27,7 @@ namespace IntegrationTest.Hubs
                     services.AddAuthentication();
 
                     services.AddTeamMemberVelocityAutorisation(context.Configuration);
-                    
+
                     services.AddSingleton<IKubernetes>(K8sClientFactory.CreateClientForIntegrationTest(new TestOutputHelper()));
 
                     services.AddSignalR();
@@ -57,8 +57,10 @@ namespace IntegrationTest.Hubs
 
             await connection.StartAsync();
 
+            // Action
             var channel = await connection.StreamAsChannelAsync<Pair<WatchEventType?, V1Namespace>>("Namespaces");
 
+            // Pre Assert
             Assert.True(channel.CanCount);
         }
     }
