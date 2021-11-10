@@ -55,7 +55,7 @@ namespace MockK8s
         /// <summary>
         ///     Emit a log entry.
         /// </summary>
-        /// <param name="level">
+        /// <param name="logLevel">
         ///     The log entry's level.
         /// </param>
         /// <param name="eventId">
@@ -70,7 +70,7 @@ namespace MockK8s
         /// <param name="formatter">
         ///     A function that creates a <c>string</c> log message from the <paramref name="state"/> and <paramref name="exception"/>.
         /// </param>
-        public void Log<TState>(LogLevel level, EventId eventId, TState state, Exception exception,
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception,
             Func<TState, Exception, string> formatter)
         {
             if (formatter == null)
@@ -80,7 +80,7 @@ namespace MockK8s
 
             TestOutput.WriteLine(string.Format(
                 "[{0}] {1}: {2}",
-                level,
+                logLevel,
                 LoggerCategory,
                 formatter(state, exception)));
 

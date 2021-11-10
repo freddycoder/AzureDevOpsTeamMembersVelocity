@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Http;
 using AzureDevOpsTeamMembersVelocity.Repository;
 using System.Text.Json;
 using System.Net.Http;
+using AzureDevOpsTeamMembersVelocity.Extensions;
 
 namespace AzureDevOpsTeamMembersVelocity.Pages
 {
@@ -40,7 +41,7 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
         [Inject]
         IJSRuntime JS { get; set; }
 
-        [Inject] 
+        [Inject]
         IHttpContextAccessor HttpContextAccessor { get; set; }
 
         [Inject]
@@ -154,123 +155,119 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
         {
             var namespaceChannel = await k8sHubConnection.StreamAsChannelAsync<Pair<WatchEventType?, V1Namespace>>("Namespaces", _dashboardToken.Token);
 
-            while (await namespaceChannel.WaitToReadAsync(_dashboardToken.Token))
+            await namespaceChannel.OnMessageRecieved(async @namespace =>
             {
-                while (namespaceChannel.TryRead(out var @namespace))
+                if (@namespace.Item2 is null)
                 {
-                    if (@namespace.Item2 is null)
-                    {
-                        continue;
-                    }
-
-                    switch (@namespace.Item1)
-                    {
-                        case null:
-                        case WatchEventType.Added:
-                            if (!NamespaceList.TryAdd(@namespace.Item2.Metadata.Name, @namespace.Item2))
-                            {
-                                var message = $"Failed to add namespace {@namespace.Item2.Metadata.Name}";
-                                Logger.LogError(message);
-                                Error = message;
-                            }
-                            break;
-                        case WatchEventType.Bookmark:
-                            Logger.LogInformation(WatchEventType.Bookmark.ToString());
-                            Logger.LogInformation(JsonSerializer.Serialize(@namespace.Item2));
-                            break;
-                        case WatchEventType.Deleted:
-                            if (!NamespaceList.Remove(@namespace.Item2.Metadata.Name, out var _))
-                            {
-                                var message = $"Failed to remove namespace {@namespace.Item2.Metadata.Name}";
-                                Logger.LogError(message);
-                                Error = message;
-                            }
-                            break;
-                        case WatchEventType.Error:
-                            Logger.LogError(WatchEventType.Error.ToString());
-                            Logger.LogError(JsonSerializer.Serialize(@namespace.Item2));
-                            break;
-                        case WatchEventType.Modified:
-                            var key = @namespace.Item2.Metadata.Name;
-                            if (!(NamespaceList.TryGetValue(key, out var oldValue) && NamespaceList.TryUpdate(key, @namespace.Item2, oldValue)))
-                            {
-                                var message = $"Failed to update namespace {@namespace.Item2.Metadata.Name}";
-                                Logger.LogError(message);
-                                Error = message;
-                            }
-                            break;
-                        default:
-                            throw new InvalidOperationException($"Unknow {nameof(WatchEventType)} with value {@namespace.Item1}");
-                    }
-
-                    await InvokeAsync(() =>
-                    {
-                        StateHasChanged();
-                    });
+                    return;
                 }
-            }
+
+                switch (@namespace.Item1)
+                {
+                    case null:
+                    case WatchEventType.Added:
+                        if (!NamespaceList.TryAdd(@namespace.Item2.Metadata.Name, @namespace.Item2))
+                        {
+                            var message = $"Failed to add namespace {@namespace.Item2.Metadata.Name}";
+                            Logger.LogError(message);
+                            Error = message;
+                        }
+                        break;
+                    case WatchEventType.Bookmark:
+                        Logger.LogInformation(WatchEventType.Bookmark.ToString());
+                        Logger.LogInformation(JsonSerializer.Serialize(@namespace.Item2));
+                        break;
+                    case WatchEventType.Deleted:
+                        if (!NamespaceList.Remove(@namespace.Item2.Metadata.Name, out var _))
+                        {
+                            var message = $"Failed to remove namespace {@namespace.Item2.Metadata.Name}";
+                            Logger.LogError(message);
+                            Error = message;
+                        }
+                        break;
+                    case WatchEventType.Error:
+                        Logger.LogError(WatchEventType.Error.ToString());
+                        Logger.LogError(JsonSerializer.Serialize(@namespace.Item2));
+                        break;
+                    case WatchEventType.Modified:
+                        var key = @namespace.Item2.Metadata.Name;
+                        if (!(NamespaceList.TryGetValue(key, out var oldValue) && NamespaceList.TryUpdate(key, @namespace.Item2, oldValue)))
+                        {
+                            var message = $"Failed to update namespace {@namespace.Item2.Metadata.Name}";
+                            Logger.LogError(message);
+                            Error = message;
+                        }
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Unknow {nameof(WatchEventType)} with value {@namespace.Item1}");
+                }
+
+                await InvokeAsync(() =>
+                {
+                    StateHasChanged();
+                });
+
+            }, _dashboardToken.Token);
         }
 
         private async Task WatchDeploymentsTask()
         {
             var deploymentChannel = await k8sHubConnection.StreamAsChannelAsync<Pair<WatchEventType?, V1Deployment>>("Deployments", _dashboardToken.Token);
 
-            while (await deploymentChannel.WaitToReadAsync(_dashboardToken.Token))
+            await deploymentChannel.OnMessageRecieved(async deployment =>
             {
-                while (deploymentChannel.TryRead(out var deployment))
+                if (deployment.Item2 is null)
                 {
-                    if (deployment.Item2 is null)
-                    {
-                        continue;
-                    }
-
-                    var key = $"{deployment.Item2.Metadata.NamespaceProperty}-{deployment.Item2.Metadata.Name}";
-
-                    switch (deployment.Item1)
-                    {
-                        case null:
-                        case WatchEventType.Added:
-                            if (!Deployments.TryAdd(key, deployment.Item2))
-                            {
-                                var message = $"Failed to add deployment {deployment.Item2.Metadata.Name}";
-                                Logger.LogError(message);
-                                Error = message;
-                            }
-                            break;
-                        case WatchEventType.Bookmark:
-                            Logger.LogInformation(WatchEventType.Bookmark.ToString());
-                            Logger.LogInformation(JsonSerializer.Serialize(deployment.Item2));
-                            break;
-                        case WatchEventType.Deleted:
-                            if (!Deployments.Remove(key, out var removedDeployment))
-                            {
-                                var message = $"Failed to remove deployment {deployment.Item2.Metadata.Name}";
-                                Logger.LogError(message);
-                                Error = message;
-                            }
-                            break;
-                        case WatchEventType.Error:
-                            Logger.LogError(WatchEventType.Error.ToString());
-                            Logger.LogError(JsonSerializer.Serialize(deployment.Item2));
-                            break;
-                        case WatchEventType.Modified:
-                            if (!(Deployments.TryGetValue(key, out var oldValue) && Deployments.TryUpdate(key, deployment.Item2, oldValue)))
-                            {
-                                var message = $"Failed to update deployment {deployment.Item2.Metadata.Name}";
-                                Logger.LogError(message);
-                                Error = message;
-                            }
-                            break;
-                        default:
-                            throw new InvalidOperationException($"Unknow {nameof(WatchEventType)} with value {deployment.Item1}");
-                    }
-
-                    await InvokeAsync(() =>
-                    {
-                        StateHasChanged();
-                    });
+                    return;
                 }
-            }
+
+                var key = $"{deployment.Item2.Metadata.NamespaceProperty}-{deployment.Item2.Metadata.Name}";
+
+                switch (deployment.Item1)
+                {
+                    case null:
+                    case WatchEventType.Added:
+                        if (!Deployments.TryAdd(key, deployment.Item2))
+                        {
+                            var message = $"Failed to add deployment {deployment.Item2.Metadata.Name}";
+                            Logger.LogError(message);
+                            Error = message;
+                        }
+                        break;
+                    case WatchEventType.Bookmark:
+                        Logger.LogInformation(WatchEventType.Bookmark.ToString());
+                        Logger.LogInformation(JsonSerializer.Serialize(deployment.Item2));
+                        break;
+                    case WatchEventType.Deleted:
+                        if (!Deployments.Remove(key, out var removedDeployment))
+                        {
+                            var message = $"Failed to remove deployment {deployment.Item2.Metadata.Name}";
+                            Logger.LogError(message);
+                            Error = message;
+                        }
+                        break;
+                    case WatchEventType.Error:
+                        Logger.LogError(WatchEventType.Error.ToString());
+                        Logger.LogError(JsonSerializer.Serialize(deployment.Item2));
+                        break;
+                    case WatchEventType.Modified:
+                        if (!(Deployments.TryGetValue(key, out var oldValue) && Deployments.TryUpdate(key, deployment.Item2, oldValue)))
+                        {
+                            var message = $"Failed to update deployment {deployment.Item2.Metadata.Name}";
+                            Logger.LogError(message);
+                            Error = message;
+                        }
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Unknow {nameof(WatchEventType)} with value {deployment.Item1}");
+                }
+
+                await InvokeAsync(() =>
+                {
+                    StateHasChanged();
+                });
+
+            }, _dashboardToken.Token);
         }
 
         private async Task WatchPodsTask()
@@ -279,135 +276,133 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
 
             List<Task> taskList = new();
 
-            while (await podChannel.WaitToReadAsync(_dashboardToken.Token))
+            await podChannel.OnMessageRecieved(async pod =>
             {
-                while (podChannel.TryRead(out var pod))
+                if (pod.Item2 is null)
                 {
-                    if (pod.Item2 is null)
-                    {
-                        continue;
-                    }
+                    return;
+                }
 
-                    var @namespace = pod.Item2.Metadata.NamespaceProperty;
-                    var podName = pod.Item2.Metadata.Name;
-                    var key = $"{@namespace}-{pod.Item2.Metadata.Name}";
+                var @namespace = pod.Item2.Metadata.NamespaceProperty;
+                var podName = pod.Item2.Metadata.Name;
+                var key = $"{@namespace}-{pod.Item2.Metadata.Name}";
 
-                    switch (pod.Item1)
-                    {
-                        case null:
-                        case WatchEventType.Added:
-                            if (Pods.TryAdd(key, pod.Item2))
+                switch (pod.Item1)
+                {
+                    case null:
+                    case WatchEventType.Added:
+                        if (Pods.TryAdd(key, pod.Item2))
+                        {
+                            if ((pod.Item2.Status.Phase == "Running" || pod.Item2.Status.Phase == "Pending") &&
+                                DeployementCheckedForLogs.Any(d => pod.Item2.Metadata.Name.StartsWith(d)))
                             {
-                                if ((pod.Item2.Status.Phase == "Running" || pod.Item2.Status.Phase == "Pending") &&
-                                    DeployementCheckedForLogs.Any(d => pod.Item2.Metadata.Name.StartsWith(d)))
-                                {
-                                    taskList.Add(ListenTopPodLogs(PodLogsTaskKey(@namespace, podName), @namespace, podName));
-                                }
+                                taskList.Add(ListenTopPodLogs(PodLogsTaskKey(@namespace, podName), @namespace, podName));
                             }
-                            else
-                            {
-                                var message = $"Failed to add pod {pod.Item2.Metadata.Name}";
-                                Logger.LogError(message);
-                                Error = message;
-                            }
-                            break;
-                        case WatchEventType.Bookmark:
-                            Logger.LogInformation(WatchEventType.Bookmark.ToString());
-                            Logger.LogInformation(JsonSerializer.Serialize(pod.Item2));
-                            break;
-                        case WatchEventType.Deleted:
-                            if (Pods.Remove(key, out var podDeleted))
-                            {
-                                var taskKey = PodLogsTaskKey(podDeleted.Metadata.NamespaceProperty, podDeleted.Metadata.Name);
+                        }
+                        else
+                        {
+                            var message = $"Failed to add pod {pod.Item2.Metadata.Name}";
+                            Logger.LogError(message);
+                            Error = message;
+                        }
+                        break;
+                    case WatchEventType.Bookmark:
+                        Logger.LogInformation(WatchEventType.Bookmark.ToString());
+                        Logger.LogInformation(JsonSerializer.Serialize(pod.Item2));
+                        break;
+                    case WatchEventType.Deleted:
+                        if (Pods.Remove(key, out var podDeleted))
+                        {
+                            var taskKey = PodLogsTaskKey(podDeleted.Metadata.NamespaceProperty, podDeleted.Metadata.Name);
 
-                                if (TokensBag.TryGetValue(taskKey, out var tokenSourceCancellation))
+                            if (TokensBag.TryGetValue(taskKey, out var tokenSourceCancellation))
+                            {
+                                tokenSourceCancellation.Cancel();
+
+                                TokensBag.Remove(taskKey);
+                            }
+                        }
+                        else
+                        {
+                            var message = $"Failed to remove pod {pod.Item2.Metadata.Name}";
+                            Logger.LogError(message);
+                            Error = message;
+                        }
+                        break;
+                    case WatchEventType.Error:
+                        Logger.LogError(WatchEventType.Error.ToString());
+                        Logger.LogError(JsonSerializer.Serialize(pod.Item2));
+                        break;
+                    case WatchEventType.Modified:
+                        if (Pods.TryGetValue(key, out var oldValue) && Pods.TryUpdate(key, pod.Item2, oldValue))
+                        {
+                            var taskKey = PodLogsTaskKey(pod.Item2.Metadata.NamespaceProperty, pod.Item2.Metadata.Name);
+
+                            if (TokensBag.TryGetValue(taskKey, out var token))
+                            {
+                                if (pod.Item2.Status.Phase == "Succeded" ||
+                                    pod.Item2.Status.Phase == "Failed")
                                 {
-                                    tokenSourceCancellation.Cancel();
+                                    token.Cancel();
 
                                     TokensBag.Remove(taskKey);
                                 }
+                                else if (pod.Item2.Status.Phase == "Running" ||
+                                            pod.Item2.Status.Phase == "Pending")
+                                {
+                                    Logger.LogInformation("Get metadata update on a pod that listen to logs");
+                                }
+                                else
+                                {
+                                    Logger.LogWarning("Unknow state recieved from the hub");
+                                    Logger.LogWarning(WatchEventType.Modified.ToString());
+                                    Logger.LogWarning(JsonSerializer.Serialize(pod.Item2));
+                                }
                             }
                             else
                             {
-                                var message = $"Failed to remove pod {pod.Item2.Metadata.Name}";
-                                Logger.LogError(message);
-                                Error = message;
-                            }
-                            break;
-                        case WatchEventType.Error:
-                            Logger.LogError(WatchEventType.Error.ToString());
-                            Logger.LogError(JsonSerializer.Serialize(pod.Item2));
-                            break;
-                        case WatchEventType.Modified:
-                            if (Pods.TryGetValue(key, out var oldValue) && Pods.TryUpdate(key, pod.Item2, oldValue))
-                            {
-                                var taskKey = PodLogsTaskKey(pod.Item2.Metadata.NamespaceProperty, pod.Item2.Metadata.Name);
-
-                                if (TokensBag.TryGetValue(taskKey, out var token))
+                                if (pod.Item2.Status.Phase == "Succeded" ||
+                                    pod.Item2.Status.Phase == "Failed")
                                 {
-                                    if (pod.Item2.Status.Phase == "Succeded" ||
-                                        pod.Item2.Status.Phase == "Failed")
+                                    Logger.LogInformation("Get metadata update on a pod that listen to logs, but the pod is not ready for listening to logs");
+                                }
+                                else if (pod.Item2.Status.Phase == "Running" || pod.Item2.Status.Phase == "Pending")
+                                {
+                                    if (DeployementCheckedForLogs.Any(d => pod.Item2.Metadata.Name.StartsWith(d)))
                                     {
-                                        token.Cancel();
-
-                                        TokensBag.Remove(taskKey);
-                                    }
-                                    else if (pod.Item2.Status.Phase == "Running" ||
-                                             pod.Item2.Status.Phase == "Pending")
-                                    {
-                                        Logger.LogInformation("Get metadata update on a pod that listen to logs");
+                                        Logger.LogInformation("Start listen to pod log after reveived a ready state");
+                                        taskList.Add(ListenTopPodLogs(PodLogsTaskKey(@namespace, podName), @namespace, podName));
                                     }
                                     else
                                     {
-                                        Logger.LogWarning("Unknow state recieved from the hub");
-                                        Logger.LogWarning(WatchEventType.Modified.ToString());
-                                        Logger.LogWarning(JsonSerializer.Serialize(pod.Item2));
+                                        Logger.LogInformation($"Recived {WatchEventType.Modified} from the hub for pod {podName} in namespace {@namespace}");
                                     }
                                 }
                                 else
                                 {
-                                    if (pod.Item2.Status.Phase == "Succeded" ||
-                                        pod.Item2.Status.Phase == "Failed")
-                                    {
-                                        Logger.LogInformation("Get metadata update on a pod that listen to logs, but the pod is not ready for listening to logs");
-                                    }
-                                    else if (pod.Item2.Status.Phase == "Running" || pod.Item2.Status.Phase == "Pending")
-                                    {
-                                        if (DeployementCheckedForLogs.Any(d => pod.Item2.Metadata.Name.StartsWith(d)))
-                                        {
-                                            Logger.LogInformation("Start listen to pod log after reveived a ready state");
-                                            taskList.Add(ListenTopPodLogs(PodLogsTaskKey(@namespace, podName), @namespace, podName));
-                                        }
-                                        else
-                                        {
-                                            Logger.LogInformation($"Recived {WatchEventType.Modified} from the hub for pod {podName} in namespace {@namespace}");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        Logger.LogWarning("Unknow state recieved from the hub");
-                                        Logger.LogWarning(WatchEventType.Modified.ToString());
-                                        Logger.LogWarning(JsonSerializer.Serialize(pod.Item2));
-                                    }
+                                    Logger.LogWarning("Unknow state recieved from the hub");
+                                    Logger.LogWarning(WatchEventType.Modified.ToString());
+                                    Logger.LogWarning(JsonSerializer.Serialize(pod.Item2));
                                 }
                             }
-                            else
-                            {
-                                var message = $"Failed to update pod {pod.Item2.Metadata.Name}";
-                                Logger.LogError(message);
-                                Error = message;
-                            }
-                            break;
-                        default:
-                            throw new InvalidOperationException($"Unknow {nameof(WatchEventType)} with value {pod.Item1}");
-                    }
-
-                    await InvokeAsync(() =>
-                    {
-                        StateHasChanged();
-                    });
+                        }
+                        else
+                        {
+                            var message = $"Failed to update pod {pod.Item2.Metadata.Name}";
+                            Logger.LogError(message);
+                            Error = message;
+                        }
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Unknow {nameof(WatchEventType)} with value {pod.Item1}");
                 }
-            }
+
+                await InvokeAsync(() =>
+                {
+                    StateHasChanged();
+                });
+
+            }, _dashboardToken.Token);
 
             await Task.WhenAll(taskList);
         }
@@ -438,18 +433,15 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
 
                 TokensBag.Add(taskKey, tokenSource);
 
-                while (await channel.WaitToReadAsync(tokenSource.Token))
+                await channel.OnMessageRecieved(async log =>
                 {
-                    while (channel.TryRead(out var log))
+                    PodLogs.Add(log);
+                    StateHasChanged();
+                    if (ScrollToBottom)
                     {
-                        PodLogs.Add(log);
-                        StateHasChanged();
-                        if (ScrollToBottom)
-                        {
-                            await JS.InvokeVoidAsync("window.scrollToBottom");
-                        }
+                        await JS.InvokeVoidAsync("window.scrollToBottom");
                     }
-                }
+                }, tokenSource.Token);
             }
             catch (OperationCanceledException e)
             {
@@ -502,8 +494,8 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
                 {
                     DeployementCheckedForLogs.Remove($"{deploymentNamespace}-{deploymentName}");
                 }
-                catch 
-                { 
+                catch
+                {
                     // The catch block is empty because the code try to remove the string from the set
                 }
 

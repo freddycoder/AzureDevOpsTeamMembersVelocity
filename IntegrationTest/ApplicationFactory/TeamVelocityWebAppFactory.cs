@@ -30,7 +30,9 @@ namespace IntegrationTest.ApplicationFactory
                 // Mock kubernetes
                 services.RemoveAll(typeof(IKubernetes));
 
-                services.AddSingleton(sp => K8sClientFactory.CreateClientForIntegrationTest(new TestOutputHelper()));
+                var k8sClient = K8sClientFactory.CreateClientForIntegrationTest(new TestOutputHelper());
+
+                services.AddSingleton(sp => k8sClient);
 
                 // Provide Func for SignlaR connections
                 var webHostBuilder = new WebHostBuilder()
@@ -40,7 +42,7 @@ namespace IntegrationTest.ApplicationFactory
 
                         services.AddTeamMemberVelocityAutorisation(context.Configuration);
 
-                        services.AddSingleton<IKubernetes>(K8sClientFactory.CreateClientForIntegrationTest(new TestOutputHelper()));
+                        services.AddSingleton<IKubernetes>(k8sClient);
 
                         services.AddSignalR();
                     })

@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace MockK8s
 {
-    public class MockWebSocket : WebSocket
+    public class MockWebSocket : WebSocket, IDisposable
     {
         private WebSocketCloseStatus? closeStatus;
-        private string closeStatusDescription;
+        private string? closeStatusDescription;
         private WebSocketState state;
         private readonly string? subProtocol;
         private readonly ConcurrentQueue<MessageData> receiveBuffers = new();
@@ -43,7 +43,7 @@ namespace MockK8s
 
         public override WebSocketCloseStatus? CloseStatus => closeStatus;
 
-        public override string CloseStatusDescription => closeStatusDescription;
+        public override string? CloseStatusDescription => closeStatusDescription;
 
         public override WebSocketState State => state;
 
@@ -152,13 +152,6 @@ namespace MockK8s
                 disposedValue = true;
             }
         }
-
-        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~MockWebSocket()
-        // {
-        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        //     Dispose(disposing: false);
-        // }
 
         public override void Dispose()
         {
