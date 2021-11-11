@@ -27,7 +27,7 @@ namespace MockK8s
             this.state = state;
         }
 
-        public EventHandler<MessageDataEventArgs> MessageSent { get; set; }
+        public EventHandler<MessageDataEventArgs>? MessageSent { get; set; }
 
         public Task InvokeReceiveAsync(ArraySegment<byte> buffer, WebSocketMessageType messageType, bool endOfMessage)
         {
@@ -54,8 +54,7 @@ namespace MockK8s
             throw new NotImplementedException();
         }
 
-        public override Task CloseAsync(WebSocketCloseStatus closeStatus, string statusDescription,
-            CancellationToken cancellationToken)
+        public override Task CloseAsync(WebSocketCloseStatus closeStatus, string? statusDescription, CancellationToken cancellationToken)
         {
             this.closeStatus = closeStatus;
             closeStatusDescription = statusDescription;
@@ -69,15 +68,12 @@ namespace MockK8s
             return Task.CompletedTask;
         }
 
-        public override Task CloseOutputAsync(WebSocketCloseStatus closeStatus, string statusDescription,
-            CancellationToken cancellationToken)
+        public override Task CloseOutputAsync(WebSocketCloseStatus closeStatus, string? statusDescription, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public override async Task<WebSocketReceiveResult> ReceiveAsync(
-            ArraySegment<byte> buffer,
-            CancellationToken cancellationToken)
+        public override async Task<WebSocketReceiveResult> ReceiveAsync(ArraySegment<byte> buffer, CancellationToken cancellationToken)
         {
             if (receiveBuffers.IsEmpty)
             {
@@ -88,15 +84,17 @@ namespace MockK8s
             var endOfMessage = true;
             var messageType = WebSocketMessageType.Close;
 
-            if (receiveBuffers.TryPeek(out MessageData received))
+            if (receiveBuffers.TryPeek(out MessageData? received))
             {
                 messageType = received.MessageType;
                 if (received.Buffer.Count <= buffer.Count)
                 {
-                    receiveBuffers.TryDequeue(out received);
-                    received.Buffer.CopyTo(buffer);
-                    bytesReceived = received.Buffer.Count;
-                    endOfMessage = received.EndOfMessage;
+                    if (receiveBuffers.TryDequeue(out received))
+                    {
+                        received.Buffer.CopyTo(buffer);
+                        bytesReceived = received.Buffer.Count;
+                        endOfMessage = received.EndOfMessage;
+                    }
                 }
                 else
                 {

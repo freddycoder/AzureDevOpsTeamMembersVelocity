@@ -334,64 +334,7 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
                         Logger.LogError(JsonSerializer.Serialize(pod.Item2));
                         break;
                     case WatchEventType.Modified:
-                        if (Pods.TryGetValue(key, out var oldValue) && Pods.TryUpdate(key, pod.Item2, oldValue))
-                        {
-                            var taskKey = PodLogsTaskKey(pod.Item2.Metadata.NamespaceProperty, pod.Item2.Metadata.Name);
-
-                            if (TokensBag.TryGetValue(taskKey, out var token))
-                            {
-                                if (pod.Item2.Status.Phase == "Succeeded" ||
-                                    pod.Item2.Status.Phase == "Failed")
-                                {
-                                    token.Cancel();
-
-                                    TokensBag.Remove(taskKey);
-                                }
-                                else if (pod.Item2.Status.Phase == "Running" ||
-                                         pod.Item2.Status.Phase == "Pending")
-                                {
-                                    Logger.LogInformation("Get metadata update on a pod that listen to logs");
-                                }
-                                else
-                                {
-                                    Logger.LogWarning("Unknow state recieved from the hub");
-                                    Logger.LogWarning(WatchEventType.Modified.ToString());
-                                    Logger.LogWarning(JsonSerializer.Serialize(pod.Item2));
-                                }
-                            }
-                            else
-                            {
-                                if (pod.Item2.Status.Phase == "Succeeded" ||
-                                    pod.Item2.Status.Phase == "Failed")
-                                {
-                                    Logger.LogInformation("Get metadata update on a pod that listen to logs, but the pod is not ready for listening to logs");
-                                }
-                                else if (pod.Item2.Status.Phase == "Running" || pod.Item2.Status.Phase == "Pending")
-                                {
-                                    if (DeployementCheckedForLogs.Any(d => pod.Item2.Metadata.Name.StartsWith(d)))
-                                    {
-                                        Logger.LogInformation("Start listen to pod log after reveived a ready state");
-                                        taskList.Add(ListenTopPodLogs(PodLogsTaskKey(@namespace, podName), @namespace, podName));
-                                    }
-                                    else
-                                    {
-                                        Logger.LogInformation($"Recived {WatchEventType.Modified} from the hub for pod {podName} in namespace {@namespace}");
-                                    }
-                                }
-                                else
-                                {
-                                    Logger.LogWarning("Unknow state recieved from the hub");
-                                    Logger.LogWarning(WatchEventType.Modified.ToString());
-                                    Logger.LogWarning(JsonSerializer.Serialize(pod.Item2));
-                                }
-                            }
-                        }
-                        else
-                        {
-                            var message = $"Failed to update pod {pod.Item2.Metadata.Name}";
-                            Logger.LogError(message);
-                            Error = message;
-                        }
+                        OnUpdatePodInfo(key, pod.Item2, taskList);
                         break;
                     default:
                         throw new InvalidOperationException($"Unknow {nameof(WatchEventType)} with value {pod.Item1}");
@@ -405,6 +348,68 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
             }, _dashboardToken.Token);
 
             await Task.WhenAll(taskList);
+        }
+
+        private void OnUpdatePodInfo(string key, V1Pod pod, List<Task> taskList)
+        {
+            if (Pods.TryGetValue(key, out var oldValue) && Pods.TryUpdate(key, pod, oldValue))
+            {
+                var taskKey = PodLogsTaskKey(pod.Metadata.NamespaceProperty, pod.Metadata.Name);
+
+                if (TokensBag.TryGetValue(taskKey, out var token))
+                {
+                    if (pod.Status.Phase == "Succeeded" ||
+                        pod.Status.Phase == "Failed")
+                    {
+                        token.Cancel();
+
+                        TokensBag.Remove(taskKey);
+                    }
+                    else if (pod.Status.Phase == "Running" ||
+                             pod.Status.Phase == "Pending")
+                    {
+                        Logger.LogInformation("Get metadata update on a pod that listen to logs");
+                    }
+                    else
+                    {
+                        Logger.LogWarning("Unknow state recieved from the hub");
+                        Logger.LogWarning(WatchEventType.Modified.ToString());
+                        Logger.LogWarning(JsonSerializer.Serialize(pod));
+                    }
+                }
+                else
+                {
+                    if (pod.Status.Phase == "Succeeded" ||
+                        pod.Status.Phase == "Failed")
+                    {
+                        Logger.LogInformation("Get metadata update on a pod that listen to logs, but the pod is not ready for listening to logs");
+                    }
+                    else if (pod.Status.Phase == "Running" || pod.Status.Phase == "Pending")
+                    {
+                        if (DeployementCheckedForLogs.Any(d => pod.Metadata.Name.StartsWith(d)))
+                        {
+                            Logger.LogInformation("Start listen to pod log after reveived a ready state");
+                            taskList.Add(ListenTopPodLogs(PodLogsTaskKey(pod.Namespace(), pod.Name()), pod.Namespace(), pod.Name()));
+                        }
+                        else
+                        {
+                            Logger.LogInformation($"Recived {WatchEventType.Modified} from the hub for pod {pod.Name()} in namespace {pod.Namespace()}");
+                        }
+                    }
+                    else
+                    {
+                        Logger.LogWarning("Unknow state recieved from the hub");
+                        Logger.LogWarning(WatchEventType.Modified.ToString());
+                        Logger.LogWarning(JsonSerializer.Serialize(pod));
+                    }
+                }
+            }
+            else
+            {
+                var message = $"Failed to update pod {pod.Metadata.Name}";
+                Logger.LogError(message);
+                Error = message;
+            }
         }
 
         private async Task OnPodLogClick(ChangeEventArgs args, string podNamespace, string podName)
@@ -522,7 +527,21 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
 
         private void ClearLogs()
         {
-            while (PodLogs.TryTake(out _)) ;
+            try
+            {
+                bool trySucceeded = false;
+
+                do
+                {
+                    trySucceeded = PodLogs.TryTake(out _);
+
+                } while (trySucceeded);
+            }
+            catch (Exception e)
+            {
+                Error = $"An error append when clearing logs: {e.Message}";
+                Logger.LogWarning(e, e.Message);
+            }
         }
 
         private bool ScrollToBottom { get; set; }

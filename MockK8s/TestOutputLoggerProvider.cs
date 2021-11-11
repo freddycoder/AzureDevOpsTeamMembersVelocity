@@ -31,6 +31,7 @@ namespace MockK8s
         /// </summary>
         public void Dispose()
         {
+            // Nothing to dispose
         }
 
         /// <summary>

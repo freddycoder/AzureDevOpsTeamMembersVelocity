@@ -30,7 +30,7 @@ namespace IntegrationTest.ApplicationFactory
                 // Mock kubernetes
                 services.RemoveAll(typeof(IKubernetes));
 
-                var k8sClient = K8sClientFactory.CreateClientForIntegrationTest(new TestOutputHelper());
+                var k8sClient = K8SClientFactory.CreateClientForIntegrationTest(new TestOutputHelper());
 
                 services.AddSingleton(sp => k8sClient);
 

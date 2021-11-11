@@ -96,7 +96,7 @@ namespace AzureDevOpsTeamMembersVelocity
             {
                 if (string.Equals(Configuration["MockK8s"], bool.TrueString, StringComparison.OrdinalIgnoreCase))
                 {
-                    return K8sClientFactory.CreateClientForIntegrationTest();
+                    return K8SClientFactory.CreateClientForIntegrationTest();
                 }
 
                 if (KubernetesClientConfiguration.IsInCluster())

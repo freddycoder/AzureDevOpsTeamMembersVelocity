@@ -10,7 +10,7 @@ using Xunit.Abstractions;
 
 namespace MockK8s
 {
-    public static class K8sClientFactory
+    public static class K8SClientFactory
     {
         private static readonly string AddedNamespaceStreamLine = BuildWatchEventStreamLine(WatchEventType.Added, MockKubeApiServer.MockNamespaceResponse);
         private static readonly string AddedDeploymentStreamLine = BuildWatchEventStreamLine(WatchEventType.Added, MockKubeApiServer.MockDeploymentReponse);
@@ -19,7 +19,6 @@ namespace MockK8s
         public static IKubernetes CreateClientForIntegrationTest(ITestOutputHelper? testOutput = null)
         {
             var created = new AsyncManualResetEvent(false);
-            var eventsReceived = new AsyncManualResetEvent(false);
 
             var server = new MockKubeApiServer(testOutput,
             async httpContext =>

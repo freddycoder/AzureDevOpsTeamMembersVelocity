@@ -28,7 +28,7 @@ namespace IntegrationTest.Hubs
 
                     services.AddTeamMemberVelocityAutorisation(context.Configuration);
 
-                    services.AddSingleton<IKubernetes>(K8sClientFactory.CreateClientForIntegrationTest(new TestOutputHelper()));
+                    services.AddSingleton<IKubernetes>(K8SClientFactory.CreateClientForIntegrationTest(new TestOutputHelper()));
 
                     services.AddSignalR();
                 })
