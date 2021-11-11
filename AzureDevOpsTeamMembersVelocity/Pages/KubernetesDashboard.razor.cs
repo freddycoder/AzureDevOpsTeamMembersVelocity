@@ -221,7 +221,7 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
                     return;
                 }
 
-                var key = $"{deployment.Item2.Metadata.NamespaceProperty}-{deployment.Item2.Metadata.Name}";
+                var key = $"{deployment.Item2.Namespace()}-{deployment.Item2.Name()}";
 
                 switch (deployment.Item1)
                 {
@@ -283,8 +283,8 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
                     return;
                 }
 
-                var @namespace = pod.Item2.Metadata.NamespaceProperty;
-                var podName = pod.Item2.Metadata.Name;
+                var @namespace = pod.Item2.Namespace();
+                var podName = pod.Item2.Name();
                 var key = $"{@namespace}-{pod.Item2.Metadata.Name}";
 
                 switch (pod.Item1)
@@ -340,7 +340,7 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
 
                             if (TokensBag.TryGetValue(taskKey, out var token))
                             {
-                                if (pod.Item2.Status.Phase == "Succeded" ||
+                                if (pod.Item2.Status.Phase == "Succeeded" ||
                                     pod.Item2.Status.Phase == "Failed")
                                 {
                                     token.Cancel();
@@ -348,7 +348,7 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
                                     TokensBag.Remove(taskKey);
                                 }
                                 else if (pod.Item2.Status.Phase == "Running" ||
-                                            pod.Item2.Status.Phase == "Pending")
+                                         pod.Item2.Status.Phase == "Pending")
                                 {
                                     Logger.LogInformation("Get metadata update on a pod that listen to logs");
                                 }
@@ -361,7 +361,7 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
                             }
                             else
                             {
-                                if (pod.Item2.Status.Phase == "Succeded" ||
+                                if (pod.Item2.Status.Phase == "Succeeded" ||
                                     pod.Item2.Status.Phase == "Failed")
                                 {
                                     Logger.LogInformation("Get metadata update on a pod that listen to logs, but the pod is not ready for listening to logs");
@@ -411,15 +411,18 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
         {
             var taskKey = PodLogsTaskKey(podNamespace, podName);
 
-            if (TokensBag.TryGetValue(taskKey, out var tokenSourceCancellation))
+            if (((bool?)args.Value) == true)
             {
-                tokenSourceCancellation.Cancel();
-
-                TokensBag.Remove(taskKey);
+                await ListenTopPodLogs(taskKey, podNamespace, podName);
             }
             else
             {
-                await ListenTopPodLogs(taskKey, podNamespace, podName);
+                if (TokensBag.TryGetValue(taskKey, out var tokenSourceCancellation))
+                {
+                    tokenSourceCancellation.Cancel();
+
+                    TokensBag.Remove(taskKey);
+                }
             }
         }
 
