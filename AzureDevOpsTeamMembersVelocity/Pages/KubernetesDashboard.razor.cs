@@ -641,6 +641,7 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
         public Task OnSearchPods(ChangeEventArgs args)
         {
             SearchPods = args.Value?.ToString() ?? string.Empty;
+            StateHasChanged();
             return Task.CompletedTask;
         }
     }
