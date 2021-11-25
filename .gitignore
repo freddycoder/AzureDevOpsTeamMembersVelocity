@@ -364,3 +364,5 @@ certs/
 coverage.cobertura.xml
 
 AzureDevOpsTeamMembersVelocity_*.log
+
+.vscode/

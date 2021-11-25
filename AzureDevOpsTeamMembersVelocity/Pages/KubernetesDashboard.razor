@@ -106,11 +106,29 @@
 <hr />
 
 <div class="row">
-    <button class="btn btn-primary"
-            type="button"
-            @onclick='() => Collapsing("collapsePods")'>
-        Pods
-    </button>
+    <div class="col-1">
+        <button class="btn btn-primary"
+                type="button"
+                @onclick='() => Collapsing("collapsePods")'>
+            Pods
+        </button>
+    </div>
+    <div class="col-11 @Settings.PodsCollapseClass">
+        <div class="input-group mb-3">
+            <input id="search-pods"
+                type="text"
+                class="form-control"
+                placeholder="Search pods"
+                @bind="SearchPods" />
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary"
+                        type="button"
+                        @onclick="() => ClearSearchPods()">
+                    Clear
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="@Settings.PodsCollapseClass" id="collapsePods">
@@ -127,7 +145,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var pod in Pods.Values)
+            @foreach (var pod in Pods.Values.Where(p => SearchPods == "" || p.Name()?.Contains(SearchPods, StringComparison.InvariantCulture) == true))
             {
                 var podNamespace = pod.Namespace();
                 var podName = pod.Name();

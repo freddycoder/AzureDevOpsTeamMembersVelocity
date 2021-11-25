@@ -621,5 +621,27 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
 
             UserPreference.SetAsync(Settings);
         }
+
+        /// <summary>
+        /// Property use to filter the pods table
+        /// </summary>
+        public string SearchPods {get;set;} = string.Empty;
+
+        /// <summary>
+        /// Set the search pods property to empty string
+        /// </summary>
+        public void ClearSearchPods()
+        {
+            SearchPods = string.Empty;
+        }
+
+        /// <summary>
+        /// Append when user type in the search pods input
+        /// </summary>
+        public Task OnSearchPods(ChangeEventArgs args)
+        {
+            SearchPods = args.Value?.ToString() ?? string.Empty;
+            return Task.CompletedTask;
+        }
     }
 }
