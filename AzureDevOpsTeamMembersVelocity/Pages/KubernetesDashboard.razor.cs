@@ -525,6 +525,19 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
             }
         }
 
+        private async Task DeletePod(V1Pod pod)
+        {
+            try
+            {
+                await Client.DeleteNamespacedPodAsync(pod.Name(), pod.Namespace(), new V1DeleteOptions());
+            }
+            catch (Exception e)
+            {
+                Error = e.Message;
+                Logger.LogError(e, e.Message);
+            }
+        }
+
         private void ClearLogs()
         {
             try
