@@ -9,8 +9,14 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace AzureDevOpsTeamMembersVelocity.Pages
 {
+    /// <summary>
+    /// Logout page
+    /// </summary>
     public class LogoutModel : PageModel
     {
+        /// <summary>
+        /// Logout
+        /// </summary>
         public async Task<IActionResult> OnPostAsync()
         {
             await HttpContext

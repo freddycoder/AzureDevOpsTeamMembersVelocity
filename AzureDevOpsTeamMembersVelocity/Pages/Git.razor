@@ -89,10 +89,10 @@
         // to allow better transition to te new mechanisme. User will keep there
         // previous setting and after the first use there settings file are going
         // to use the collection of repostiory intead of the single repository.
-        if (GitSettings.Repository != null && GitSettings.SelectedRepositories == null)
+        @* if (GitSettings.Repository != null && GitSettings.SelectedRepositories == null)
         {
             SelectedRepositories.Add(GitSettings.Repository);
-        }
+        } *@
 
         EditContext = new EditContext(GitSettings);
 

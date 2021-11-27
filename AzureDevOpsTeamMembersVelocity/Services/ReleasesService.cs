@@ -35,6 +35,9 @@ namespace AzureDevOpsTeamMembersVelocity.Services
 $"https://vsrm.dev.azure.com/{organization}/{teamProject}/_apis/release/releases?api-version=6.0");
         }
 
+        /// <summary>
+        /// Get a list of releases definition for a team project.
+        /// </summary>
         public Task<(ListResponse<Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.ReleaseDefinition>?, string?)> ListDefinition(string organization, string teamProject)
         {
             return _proxy.GetAsync<ListResponse<Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.ReleaseDefinition>>(
