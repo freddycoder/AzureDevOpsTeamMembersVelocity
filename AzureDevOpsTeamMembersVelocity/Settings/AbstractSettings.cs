@@ -14,7 +14,7 @@
         /// <summary>
         /// Tell if the settings instance as changed
         /// </summary>
-        public bool AsChanged()
+        public virtual bool AsChanged()
         {
             return _asChanged;
         }
@@ -22,7 +22,7 @@
         /// <summary>
         /// Tell if the settings instance as not changed
         /// </summary>
-        public bool AsNotChanged()
+        public virtual bool AsNotChanged()
         {
             return !_asChanged;
         }
@@ -31,7 +31,7 @@
         /// Class that store settings should call this function ater saving the settings
         /// to help reduce number of I/O operation
         /// </summary>
-        public void Saved()
+        public virtual void Saved()
         {
             _asChanged = false;
         }

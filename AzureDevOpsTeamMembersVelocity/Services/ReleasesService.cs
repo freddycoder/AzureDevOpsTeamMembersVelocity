@@ -1,5 +1,5 @@
-﻿using AzureDevOpsTeamMembersVelocity.Proxy;
-using Microsoft.CodeAnalysis;
+﻿using AzureDevOpsTeamMembersVelocity.Settings;
+using AzureDevOpsTeamMembersVelocity.Proxy;
 using System.Threading.Tasks;
 
 namespace AzureDevOpsTeamMembersVelocity.Services
@@ -38,10 +38,19 @@ $"https://vsrm.dev.azure.com/{organization}/{teamProject}/_apis/release/releases
         /// <summary>
         /// Get a list of releases definition for a team project.
         /// </summary>
-        public Task<(ListResponse<Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.ReleaseDefinition>?, string?)> ListDefinition(string organization, string teamProject)
+        /// <remarks>
+        /// Microsoft documentation: https://docs.microsoft.com/en-us/rest/api/azure/devops/release/definitions/list?view=azure-devops-rest-6.0
+        /// </remarks>
+        public Task<(ListResponse<Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.ReleaseDefinition>?, string?)> ListDefinition(string organization, string teamProject, ListDefinitionFilter? listDefinitionFilter = default)
         {
-            return _proxy.GetAsync<ListResponse<Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.ReleaseDefinition>>(
-$"https://vsrm.dev.azure.com/{organization}/{teamProject}/_apis/release/definitions?api-version=6.0");
+            string releaseDefinitionUrl = $"https://vsrm.dev.azure.com/{organization}/{teamProject}/_apis/release/definitions?api-version=6.0";
+
+            if (listDefinitionFilter != null)
+            {
+                releaseDefinitionUrl = listDefinitionFilter.AppendParameterToQueryString(releaseDefinitionUrl);
+            }
+
+            return _proxy.GetAsync<ListResponse<Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.ReleaseDefinition>>(releaseDefinitionUrl);
         }
     }
 }

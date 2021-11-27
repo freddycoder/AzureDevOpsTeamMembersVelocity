@@ -1,12 +1,18 @@
-﻿@page "/Releases" 
+﻿@page "/Releases"
 @inject ReleasesService ReleasesService
 @inject IUserPreferenceRepository UserPreference
+@inject IDialogService DialogService
 
-<h3>Releases</h3>
+<div class="row">
+    <h3>Releases</h3>
+</div>
 
 <div class="row">
     <div class="col-3">
         <h4>Releases definition</h4>
+        <div @onclick="OpenFilterModal">
+            Advenced search 
+        </div>
         <ul class="list-group">
             @if (DefinitionList != null)
             {
@@ -48,15 +54,34 @@
 
     List<Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.ReleaseDefinition>? DefinitionList { get; set; }
 
+    ListDefinitionFilter ListDefinitionFilter { get; set; } = new ListDefinitionFilter();
+
     protected override async Task OnInitializedAsync()
     {
         var settings = await UserPreference.GetAsync<TeamMembersVelocitySettings>();
 
         if (settings.Organisation != null && settings.TeamProject != null)
         {
-            DefinitionList = (await ReleasesService.ListDefinition(settings.Organisation, settings.TeamProject)).Item1?.Value;
+            ListDefinitionFilter = await UserPreference.GetAsync<ListDefinitionFilter>();
+
+            DefinitionList = (await ReleasesService.ListDefinition(settings.Organisation, settings.TeamProject, ListDefinitionFilter)).Item1?.Value;
 
             ReleasesList = (await ReleasesService.ListReleases(settings.Organisation, settings.TeamProject)).Item1?.Value;
         }
+    }
+
+    public async Task OpenFilterModal()
+    {
+        var parameters = new DialogParameters();
+
+        parameters.Add("T", ListDefinitionFilter.GetType());
+        parameters.Add("Value", ListDefinitionFilter);
+
+        DialogService.Show<AdvancedSearchDialog>("Advanved search", parameters, new DialogOptions
+        {
+            MaxWidth = MaxWidth.ExtraLarge
+        });
+
+        await Task.CompletedTask;
     }
 }

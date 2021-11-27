@@ -1,0 +1,21 @@
+﻿
+@foreach (var param in T.GetProperties())
+{
+    <div class="form-group">
+        <span>@param.Name</span>
+        <input type="text" />
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Type? T { get; set; }
+
+    [Parameter]
+    public object? Value { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        await Task.CompletedTask;
+    }
+}
