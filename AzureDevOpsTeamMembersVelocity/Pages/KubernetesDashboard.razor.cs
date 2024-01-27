@@ -516,7 +516,7 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
         {
             try
             {
-                await Client.DeleteNamespaceAsync(ns.Metadata.Name, new V1DeleteOptions());
+                await Client.CoreV1.DeleteNamespaceAsync(ns.Metadata.Name, new V1DeleteOptions());
             }
             catch (Exception e)
             {
@@ -529,7 +529,7 @@ namespace AzureDevOpsTeamMembersVelocity.Pages
         {
             try
             {
-                await Client.DeleteNamespacedPodAsync(pod.Name(), pod.Namespace(), new V1DeleteOptions());
+                await Client.CoreV1.DeleteNamespacedPodAsync(pod.Name(), pod.Namespace(), new V1DeleteOptions());
             }
             catch (Exception e)
             {

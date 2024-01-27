@@ -97,7 +97,7 @@ Welcome to the team members velocity app.
                 @foreach (var iteration in Sprints)
                 {
                     <li class="list-group-item list-group-item-action">
-                        <a href="/SprintAnalysis?sprints=@iteration.Url">@iteration.Name</a>
+                        <a href="/SprintAnalysis?sprints=@iteration.Url">@iteration.Name - @iteration?.Attributes?.StartDate</a>
                     </li>
                 }
             </ul>

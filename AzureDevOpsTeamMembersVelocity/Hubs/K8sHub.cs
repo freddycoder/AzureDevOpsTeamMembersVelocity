@@ -37,7 +37,7 @@ namespace AzureDevOpsTeamMembersVelocity.Hubs
         /// <returns></returns>
         public async IAsyncEnumerable<Pair<WatchEventType?, V1Namespace>> Namespaces([EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            var watcher = _kubernetesClient.ListNamespaceWithHttpMessagesAsync(allowWatchBookmarks: false, watch: true, cancellationToken: cancellationToken);
+            var watcher = _kubernetesClient.CoreV1.ListNamespaceWithHttpMessagesAsync(allowWatchBookmarks: false, watch: true, cancellationToken: cancellationToken);
 
             await foreach (var (type, item) in watcher.WatchAsync<V1Namespace, V1NamespaceList>())
             {
@@ -54,7 +54,7 @@ namespace AzureDevOpsTeamMembersVelocity.Hubs
         /// <returns></returns>
         public async IAsyncEnumerable<Pair<WatchEventType?, V1Deployment>> Deployments([EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            var watcher = _kubernetesClient.ListDeploymentForAllNamespacesWithHttpMessagesAsync(allowWatchBookmarks: false, watch: true, cancellationToken: cancellationToken);
+            var watcher = _kubernetesClient.AppsV1.ListDeploymentForAllNamespacesWithHttpMessagesAsync(allowWatchBookmarks: false, watch: true, cancellationToken: cancellationToken);
 
             await foreach (var (type, item) in watcher.WatchAsync<V1Deployment, V1DeploymentList>())
             {
@@ -71,7 +71,7 @@ namespace AzureDevOpsTeamMembersVelocity.Hubs
         /// <returns></returns>
         public async IAsyncEnumerable<Pair<WatchEventType?, V1Pod>> Pods([EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            var watcher = _kubernetesClient.ListPodForAllNamespacesWithHttpMessagesAsync(allowWatchBookmarks: false, watch: true, cancellationToken: cancellationToken);
+            var watcher = _kubernetesClient.CoreV1.ListPodForAllNamespacesWithHttpMessagesAsync(allowWatchBookmarks: false, watch: true, cancellationToken: cancellationToken);
 
             await foreach (var (type, item) in watcher.WatchAsync<V1Pod, V1PodList>())
             {

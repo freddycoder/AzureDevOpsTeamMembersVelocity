@@ -61,7 +61,7 @@ namespace AzureDevOpsTeamMembersVelocity.Hubs
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var stream = await _kubernetesClient.ReadNamespacedPodLogAsync(pod, ns, follow: true, sinceSeconds: 2000, cancellationToken: cancellationToken);
+            var stream = await _kubernetesClient.CoreV1.ReadNamespacedPodLogAsync(pod, ns, follow: true, sinceSeconds: 2000, cancellationToken: cancellationToken);
 
             var buffer = new byte[8192];
 

@@ -1,10 +1,9 @@
 ﻿using k8s;
 using k8s.Models;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using Nito.AsyncEx;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Xunit.Abstractions;
 
@@ -41,10 +40,9 @@ namespace MockK8s
 
         private static string BuildWatchEventStreamLine(WatchEventType eventType, string response)
         {
-            var corev1PodList = JsonConvert.DeserializeObject<V1PodList>(response);
-            return JsonConvert.SerializeObject(
-                new Watcher<V1Pod>.WatchEvent { Type = eventType, Object = corev1PodList.Items.First() },
-                new StringEnumConverter());
+            var corev1PodList = JsonSerializer.Deserialize<V1PodList>(response);
+            return JsonSerializer.Serialize(
+                new Watcher<V1Pod>.WatchEvent { Type = eventType, Object = corev1PodList.Items.First() });
         }
 
         private static async Task WriteStreamLine(HttpContext httpContext, string reponseLine)

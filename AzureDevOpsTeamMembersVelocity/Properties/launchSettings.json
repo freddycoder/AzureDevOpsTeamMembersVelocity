@@ -10,7 +10,7 @@
         "FileLoggingEnable": "true",
 
         "COOKIEAUTH_USER": "admin@teamvelocity.com",
-        //"COOKIEAUTH_PASSWORD": "admin",
+        "COOKIEAUTH_PASSWORD": "admin",
 
         //"USE_IDENTITY": "true",
 
