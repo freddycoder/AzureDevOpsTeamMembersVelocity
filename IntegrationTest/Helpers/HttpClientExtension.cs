@@ -36,6 +36,11 @@ namespace IntegrationTest.Helpers
             IHtmlElement submitButton,
             IEnumerable<KeyValuePair<string, string>> formValues)
         {
+            if (form == null)
+            {
+                throw new ArgumentNullException("form cannot be null to when calling method SendAsync");
+            }
+
             foreach (var kvp in formValues)
             {
                 var element = Assert.IsAssignableFrom<IHtmlInputElement>(form[kvp.Key]);

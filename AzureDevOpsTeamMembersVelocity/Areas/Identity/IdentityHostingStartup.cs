@@ -26,6 +26,8 @@ namespace AzureDevOpsTeamMembersVelocity.Areas.Identity
 
                 services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                     .AddEntityFrameworkStores<IdentityContext>();
+
+                services.AddSingleton<IEmailSender, EmailSender>();
             });
         }
     }

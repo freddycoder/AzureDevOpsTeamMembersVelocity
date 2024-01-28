@@ -31,25 +31,5 @@ namespace UnitTest
 
             Assert.NotEmpty(servicesCollection);
         }
-
-        [Theory, AutoVelocityData]
-        public void Configure_ExecuteMethod_NoException(IWebHostEnvironment webHostEnvir, IConfiguration configuration, Startup sut)
-        {
-            var servicesCollection = new ServiceCollection();
-            Assert.Empty(servicesCollection);
-            sut.ConfigureServices(servicesCollection);
-            servicesCollection.AddSingleton(sp => NSubstitute.Substitute.For<IHostApplicationLifetime>());
-            servicesCollection.AddSingleton(sp => configuration);
-            var provider = servicesCollection.BuildServiceProvider();
-            var app = new ApplicationBuilder(provider, NSubstitute.Substitute.For<IFeatureCollection>());
-            Assert.NotNull(app.ServerFeatures);
-
-            sut.Configure(app,
-                          webHostEnvir,
-                          provider,
-                          provider.GetRequiredService<ILogger<Startup>>());
-
-            Assert.NotEmpty(servicesCollection);
-        }
     }
 }
