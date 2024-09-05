@@ -2,17 +2,27 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject AuthUrlPagesProvider AuthUrlProvider
 
+@* Required *@
+<MudThemeProvider />
+<MudPopoverProvider />
+
+@* Needed for dialogs *@
+<MudDialogProvider />
+
+@* Needed for snackbars *@
+<MudSnackbarProvider />
+
 <MudLayout>
     <MudAppBar Dense="true">
         <AuthorizeView>
             <Authorized>
                 @if (AuthUrlProvider.IsIdentity)
                 {
-                    <a href="/identity/account/manage">Welcome @context?.User?.Identity?.Name</a>
+                    <a href="/identity/account/manage">Welcome @UserName</a>
                 }
                 else
                 {
-                    <span>Welcome @context?.User?.Identity?.Name</span>
+                    <span>Welcome @UserEmail</span>
                 }
             </Authorized>
         </AuthorizeView>
@@ -32,11 +42,19 @@
 @code {
     public ClaimsPrincipal? ClaimsPrincipal { get; set; }
 
+    public string? UserName { get; set; }
+
+    public string? UserEmail { get; set; }
+
     protected override async Task OnParametersSetAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
 
         ClaimsPrincipal = authState.User;
+
+        UserName = ClaimsPrincipal?.Claims?.FirstOrDefault(c => c.Type.EndsWith("name", StringComparison.OrdinalIgnoreCase))?.Value;
+
+        UserEmail = ClaimsPrincipal?.Claims?.FirstOrDefault(c => c.Type.EndsWith("email", StringComparison.OrdinalIgnoreCase))?.Value;
     }
 
     bool _drawerOpen = true;
