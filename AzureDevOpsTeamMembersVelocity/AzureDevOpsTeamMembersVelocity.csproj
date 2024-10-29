@@ -23,7 +23,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.8" />
-    <PackageReference Include="Microsoft.Identity.Web" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="3.3.0" />
     <PackageReference Include="Microsoft.Identity.Web.UI" Version="3.1.0" />
     <PackageReference Include="Microsoft.TeamFoundation.DistributedTask.Common.Contracts" Version="19.243.0-preview" />
     <PackageReference Include="Microsoft.TeamFoundation.DistributedTask.WebApi" Version="19.243.0-preview" />
