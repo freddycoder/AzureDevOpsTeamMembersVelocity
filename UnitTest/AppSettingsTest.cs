@@ -1,8 +1,6 @@
-﻿using AutoFixture;
-using AzureDevOpsTeamMembersVelocity;
+﻿using AzureDevOpsTeamMembersVelocity;
 using AzureDevOpsTeamMembersVelocity.Repository;
 using AzureDevOpsTeamMembersVelocity.Settings;
-using NSubstitute;
 using System.IO.Abstractions;
 using System.Text.Json;
 using System.Threading.Tasks;

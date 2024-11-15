@@ -46,18 +46,18 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// </summary>
         /// <param name="pullRequestUrl">The pull request url from a GitRepositoryUrl</param>
         /// <returns>A task that list pull requests</returns>
-        public Task<(ListResponse<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest>?,string?)> GetPullRequests(string pullRequestUrl)
+        public Task<(ListResponse<GitPullRequest>?,string?)> GetPullRequests(string pullRequestUrl)
         {
-            return _proxy.GetAsync<ListResponse<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest>>($"{pullRequestUrl}?api-version=6.0");
+            return _proxy.GetAsync<ListResponse<GitPullRequest>>($"{pullRequestUrl}?api-version=6.0");
         }
 
         /// <summary>
         /// List all pull request of a repository
         /// </summary>
         /// <returns>A task that list pull requests</returns>
-        public Task<(ListResponse<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest>?, string?)> GetPullRequests(string organization, Guid teamProjectId, Guid repositoryId)
+        public Task<(ListResponse<GitPullRequest>?, string?)> GetPullRequests(string organization, Guid teamProjectId, Guid repositoryId)
         {
-            return _proxy.GetAsync<ListResponse<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest>>(
+            return _proxy.GetAsync<ListResponse<GitPullRequest>>(
     $"https://dev.azure.com/{organization}/{teamProjectId}/_apis/git/repositories/{repositoryId}/pullRequests?api-version=6.0");
         }
 
@@ -66,9 +66,9 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// </summary>
         /// <param name="pullRequestUrl">The pull request url</param>
         /// <returns>A PR and an error if any</returns>
-        public Task<(Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest?, string?)> GetPullRequest(string pullRequestUrl)
+        public Task<(GitPullRequest?, string?)> GetPullRequest(string pullRequestUrl)
         {
-            return _proxy.GetAsync<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest?>($"{pullRequestUrl}?api-version=6.0");
+            return _proxy.GetAsync<GitPullRequest?>($"{pullRequestUrl}?api-version=6.0");
         }
 
         /// <summary>
@@ -78,9 +78,9 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// <param name="repositoryId"></param>
         /// <param name="pullRequestId"></param>
         /// <returns></returns>
-        public Task<(ListResponse<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequestCommentThread>?, string?)> GetComments(string organization, Guid repositoryId, int? pullRequestId)
+        public Task<(ListResponse<GitPullRequestCommentThread>?, string?)> GetComments(string organization, Guid repositoryId, int? pullRequestId)
         {
-            return _proxy.GetAsync<ListResponse<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequestCommentThread>>(
+            return _proxy.GetAsync<ListResponse<GitPullRequestCommentThread>>(
 $"https://dev.azure.com/{organization}/_apis/git/repositories/{repositoryId}/pullRequests/{pullRequestId}/threads?api-version=6.0");
         }
     }

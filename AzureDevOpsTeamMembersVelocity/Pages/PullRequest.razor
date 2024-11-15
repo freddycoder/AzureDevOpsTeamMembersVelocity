@@ -40,9 +40,9 @@
 @code {
     public string? Error { get; set; }
 
-    public Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest? PullRequestModel { get; set; }
+    public GitPullRequest? PullRequestModel { get; set; }
 
-    public List<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequestCommentThread>? Comments { get; set; }
+    public List<GitPullRequestCommentThread>? Comments { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -62,7 +62,7 @@
         }
     }
 
-    private async Task GetComments(Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest pr)
+    private async Task GetComments(GitPullRequest pr)
     {
         var settings = await UserSettings.GetAsync<TeamMembersVelocitySettings>();
 

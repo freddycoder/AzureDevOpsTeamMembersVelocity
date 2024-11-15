@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Text.Json;
 
 namespace AzureDevOpsTeamMembersVelocity.Extensions
 {
@@ -10,10 +10,9 @@ namespace AzureDevOpsTeamMembersVelocity.Extensions
         /// <summary>
         /// Transform a string a formatted JSON string
         /// </summary>
-        /// <exception cref="Newtonsoft.Json.JsonReaderException"></exception>
         public static string FormatJson(this string json)
         {
-            return JObject.Parse(json).ToString(Newtonsoft.Json.Formatting.Indented);
+            return JsonSerializer.Serialize(JsonSerializer.Deserialize<object>(json), new JsonSerializerOptions { WriteIndented = true });
         }
     }
 }

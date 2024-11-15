@@ -39,7 +39,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// <param name="teamSettings">Team settings is use to enhance result and do the right calculation</param>
         /// <param name="useCache">Indicate if the value can be get from memory or the results is calculated</param>
         /// <returns></returns>
-        public async IAsyncEnumerable<MemberVelocity> MemberVelocities(string sprintUrl, List<Microsoft.TeamFoundation.Work.WebApi.TeamMemberCapacityIdentityRef>? capacities = null, Sprint? sprint = null, Microsoft.TeamFoundation.Work.WebApi.TeamSettingsDaysOff? teamDaysOff = null, Microsoft.TeamFoundation.Work.WebApi.TeamSetting? teamSettings = null, bool useCache = true)
+        public async IAsyncEnumerable<MemberVelocity> MemberVelocities(string sprintUrl, List<TeamMemberCapacityIdentityRef>? capacities = null, Sprint? sprint = null, TeamSettingsDaysOff? teamDaysOff = null, TeamSetting? teamSettings = null, bool useCache = true)
         {
             if (useCache && _repo.TryGet(sprintUrl, out IEnumerable<MemberVelocity>? memberVelocities) && memberVelocities != null)
             {
@@ -69,7 +69,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             }
         }
 
-        private static MemberVelocity EnhanceMemberVolocityInfo(MemberVelocity velocity, List<Microsoft.TeamFoundation.Work.WebApi.TeamMemberCapacityIdentityRef>? capacities = null, Sprint? sprint = null, Microsoft.TeamFoundation.Work.WebApi.TeamSettingsDaysOff? teamDaysOff = null, Microsoft.TeamFoundation.Work.WebApi.TeamSetting? teamSettings = null)
+        private static MemberVelocity EnhanceMemberVolocityInfo(MemberVelocity velocity, List<TeamMemberCapacityIdentityRef>? capacities = null, Sprint? sprint = null, TeamSettingsDaysOff? teamDaysOff = null, TeamSetting? teamSettings = null)
         {
             if (capacities != default)
             {
@@ -119,7 +119,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             return 0.0;
         }
 
-        private async IAsyncEnumerable<(WorkItem, List<WorkItemUpdate>?)> GetWorksAndHistory(List<Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItemLink> items)
+        private async IAsyncEnumerable<(WorkItem, List<WorkItemUpdate>?)> GetWorksAndHistory(List<WorkItemLink> items)
         {
             foreach (var item in items)
             {
@@ -139,7 +139,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
             }
         }
 
-        private async Task<WorkItem?> GetWorkItem(Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItemLink workItem)
+        private async Task<WorkItem?> GetWorkItem(WorkItemLink workItem)
         {
             if (workItem.Source != null && workItem.Target != null)
             {
@@ -176,7 +176,7 @@ namespace AzureDevOpsTeamMembersVelocity.Services
                     groupByPerson.Add(person, velocity);
                 }
 
-                var remaningWork = update?.Fields?.MaybeGet<string, Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItemFieldUpdate>
+                var remaningWork = update?.Fields?.MaybeGet<string, WorkItemFieldUpdate>
                     ("Microsoft.VSTS.Scheduling.RemainingWork");
 
                 if (remaningWork?.OldValue != null)

@@ -42,7 +42,7 @@
 
     public string? Print(object? obj)
     {
-        if (obj is Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItemFieldUpdate fieldUpdate)
+        if (obj is WorkItemFieldUpdate fieldUpdate)
         {
             return $"old: {fieldUpdate.OldValue}, new: {fieldUpdate.NewValue}";
         }

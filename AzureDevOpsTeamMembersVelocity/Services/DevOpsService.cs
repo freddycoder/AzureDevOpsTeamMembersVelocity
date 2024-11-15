@@ -1,6 +1,5 @@
 ﻿using AzureDevOpsTeamMembersVelocity.Model;
 using AzureDevOpsTeamMembersVelocity.Proxy;
-using Microsoft.TeamFoundation.Core.WebApi;
 using System;
 using System.Threading.Tasks;
 
@@ -55,9 +54,9 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// The api-version used is 6.0, and the caller is not expected to specify the version in the URL.
         /// </remarks>
         /// <param name="teamIterationDaysOffUrl">URL of team days off to fetch</param>
-        public Task<(Microsoft.TeamFoundation.Work.WebApi.TeamSettingsDaysOff?, string?)> TeamDaysOff(string teamIterationDaysOffUrl)
+        public Task<(TeamSettingsDaysOff?, string?)> TeamDaysOff(string teamIterationDaysOffUrl)
         {
-            return _proxy.GetAsync<Microsoft.TeamFoundation.Work.WebApi.TeamSettingsDaysOff>(
+            return _proxy.GetAsync<TeamSettingsDaysOff>(
                 $"{teamIterationDaysOffUrl}?api-version=6.0");
         }
 
@@ -69,9 +68,9 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// </remarks>
         /// <param name="teamSettingsUrl">The teamSettings full URL without the api-version</param>
         /// <returns>The teamSetting instance</returns>
-        public Task<(Microsoft.TeamFoundation.Work.WebApi.TeamSetting?, string?)> TeamSettings(string teamSettingsUrl)
+        public Task<(TeamSetting?, string?)> TeamSettings(string teamSettingsUrl)
         {
-            return _proxy.GetAsync<Microsoft.TeamFoundation.Work.WebApi.TeamSetting>(
+            return _proxy.GetAsync<TeamSetting>(
                 $"{teamSettingsUrl}?api-version=6.0");
         }
 
@@ -109,9 +108,9 @@ namespace AzureDevOpsTeamMembersVelocity.Services
         /// </remarks>
         /// <param name="capacityUrl">The full URL of the capacity information.</param>
         /// <returns>The list of capacities</returns>
-        public Task<(ListResponse<Microsoft.TeamFoundation.Work.WebApi.TeamMemberCapacityIdentityRef>?, string?)> Capacities(string capacityUrl)
+        public Task<(ListResponse<TeamMemberCapacityIdentityRef>?, string?)> Capacities(string capacityUrl)
         {
-            return _proxy.GetAsync<ListResponse<Microsoft.TeamFoundation.Work.WebApi.TeamMemberCapacityIdentityRef>>(
+            return _proxy.GetAsync<ListResponse<TeamMemberCapacityIdentityRef>>(
                 $"{capacityUrl}?api-version=6.0");
         }
 

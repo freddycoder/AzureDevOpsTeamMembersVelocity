@@ -72,9 +72,9 @@
 
     public GitRepository? Repository { get; set; }
 
-    public List<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest>? PullRequests { get; set; }
+    public List<GitPullRequest>? PullRequests { get; set; }
 
-    public Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest? PullRequest { get; set; }
+    public GitPullRequest? PullRequest { get; set; }
 
     private bool _loading;
 
@@ -118,7 +118,7 @@
 
         if (PullRequests == null)
         {
-            PullRequests = new List<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest>();
+            PullRequests = new List<GitPullRequest>();
         }
 
         foreach (var repo in GitSettings.SelectedRepositories ?? Array.Empty<string>())
@@ -141,7 +141,7 @@
             {
                 if (PullRequests == null)
                 {
-                    PullRequests = new List<Microsoft.TeamFoundation.SourceControl.WebApi.GitPullRequest>();
+                    PullRequests = new List<GitPullRequest>();
                 }
 
                 PullRequests.AddRange(pullRequests.Value);

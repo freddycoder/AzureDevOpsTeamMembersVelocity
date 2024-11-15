@@ -63,7 +63,7 @@ namespace AzureDevOpsTeamMembersVelocity.Model
         /// <param name="workingDays">List of working days</param>
         /// <param name="teamDaysOff">TeamDaysOff information</param>
         /// <returns>GetTotalDays() - days off</returns>
-        public double GetTotalWorkingDays(DayOfWeek[]? workingDays, Microsoft.TeamFoundation.Work.WebApi.TeamSettingsDaysOff? teamDaysOff)
+        public double GetTotalWorkingDays(DayOfWeek[]? workingDays, TeamSettingsDaysOff? teamDaysOff)
         {
             var initial = GetTotalDays();
             

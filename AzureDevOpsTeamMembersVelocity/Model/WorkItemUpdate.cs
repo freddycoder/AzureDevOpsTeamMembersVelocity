@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace AzureDevOpsTeamMembersVelocity.Model
 {
-    /// <inheritdoc cref="Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItemUpdate"/>
-    public class WorkItemUpdate : Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItemUpdate, IComparable<WorkItemUpdate>
+    /// <summary>
+    /// WorkItemUpdate
+    /// </summary>
+    public class WorkItemUpdate : IComparable<WorkItemUpdate>
     {
         /// <summary>
         /// The title of the associate WorkItem. 
@@ -13,6 +16,31 @@ namespace AzureDevOpsTeamMembersVelocity.Model
         /// This data is not in the response of Azure DevOps REST API.
         /// </remarks>
         public string? RelatedTaskTitle { get; set; }
+
+        /// <summary>
+        /// The date of the last update of the WorkItem
+        /// </summary>
+        public DateTimeOffset RevisedDate { get; set; }
+
+        /// <summary>
+        /// RevisedBy
+        /// </summary>
+        public UserObj? RevisedBy { get; set; }
+
+        /// <summary>
+        /// Url
+        /// </summary>
+        public string Url { get; set; } = string.Empty;
+
+        /// <summary>
+        /// CreationDate
+        /// </summary>
+        public DateTimeOffset CreationDate { get; set; }
+
+        /// <summary>
+        /// Fields
+        /// </summary>
+        public Dictionary<string, WorkItemFieldUpdate>? Fields { get; set; }
 
         /// <summary>
         /// Compare a WorkItemUpdate base on the RelatedTaskTitle and if the save
@@ -31,5 +59,16 @@ namespace AzureDevOpsTeamMembersVelocity.Model
 
             return initial;
         }
+    }
+
+    /// <summary>
+    /// UserObj
+    /// </summary>
+    public class UserObj
+    {
+        /// <summary>
+        /// DisplayName
+        /// </summary>
+        public string? DisplayName { get; set; }
     }
 }

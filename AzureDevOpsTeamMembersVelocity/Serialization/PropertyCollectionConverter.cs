@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.Services.WebApi;
+﻿using AzureDevOpsTeamMembersVelocity.Model;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -7,9 +7,9 @@ using System.Text.Json.Serialization;
 namespace AzureDevOpsTeamMembersVelocity.Serialization
 {
     /// <summary>
-    /// Converter for the <see cref="Microsoft.VisualStudio.Services.WebApi.PropertiesCollection"/> object
+    /// Converter for the PropertyCollection object
     /// </summary>
-    public class PropertyCollectionConverter : JsonConverter<Microsoft.VisualStudio.Services.WebApi.PropertiesCollection>
+    public class PropertyCollectionConverter : JsonConverter<PropertiesCollection>
     {
         /// <inheritdoc />
         public override PropertiesCollection? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -31,8 +31,7 @@ namespace AzureDevOpsTeamMembersVelocity.Serialization
 
                 var values = PropertyValue(ref reader);
 
-                // TODO : For now, add in this PropertiesCollection throw an exception.
-                //collection.Add(propertyName, values);
+                collection.Add(propertyName, values);
             }
 
             return collection;

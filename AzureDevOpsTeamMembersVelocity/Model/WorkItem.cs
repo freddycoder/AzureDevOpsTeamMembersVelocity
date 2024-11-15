@@ -1,12 +1,19 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace AzureDevOpsTeamMembersVelocity.Model
 {
-    /// <inheritdoc cref="Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItem" />
-    public class WorkItem : Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItem
+    /// <summary>
+    /// WorkItem
+    /// </summary>
+    public class WorkItem
     {
-        /// <inheritdoc cref="Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItemTrackingResource.Links" />
+        public Dictionary<string, object?> Fields { get; set; } = new Dictionary<string, object?>();
+
+        /// <summary>
+        /// Links
+        /// </summary>
         [JsonPropertyName("_links")]
-        public new WorkItemLinks? Links { get; set; }
+        public WorkItemLinks? Links { get; set; }
     }
 }
