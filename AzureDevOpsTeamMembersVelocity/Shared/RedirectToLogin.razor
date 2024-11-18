@@ -1,11 +1,24 @@
 ﻿@inject NavigationManager Navigation
 @inject AuthUrlPagesProvider AuthUrlProvider
+@inject ILogger<RedirectToLogin> Logger
 
 @code {
     [CascadingParameter]
     private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
 
     protected override async Task OnInitializedAsync()
+    {
+        try 
+        {
+            await RedirectToLoginAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error in {ComponentName}", nameof(RedirectToLogin));
+        }
+    }
+
+    private async Task RedirectToLoginAsync()
     {
         if (AuthenticationStateTask == default)
         {
